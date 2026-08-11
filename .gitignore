@@ -1,0 +1,35 @@
+.DS_Store
+*.log
+*.tmp
+*.swp
+
+# Credentials and local environment
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+credentials*.json
+service-account*.json
+secrets/
+
+# Private site configuration and operational data
+site-profiles/private/
+runtime/
+state/
+drafts/
+history/
+reports/
+generated/
+
+# Local tool state
+.openclaw/
+.hermes/
+.idea/
+.vscode/
+
+# OpenClaw guard plugin build state
+plugins/openclaw-serpsmith-guard/node_modules/
+plugins/openclaw-serpsmith-guard/dist/
+plugins/openclaw-serpsmith-guard/*.tgz

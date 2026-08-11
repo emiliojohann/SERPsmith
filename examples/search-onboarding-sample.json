@@ -1,0 +1,29 @@
+{
+  "site_key": "example-site",
+  "public_base_url": "https://example.com",
+  "sitemap_url": "https://example.com/sitemap.xml",
+  "google": {
+    "enabled": true,
+    "required": true,
+    "property": "sc-domain:example.com",
+    "api_enabled": true,
+    "ownership_verified": true,
+    "credential_access_verified": true,
+    "sitemap_verified": true
+  },
+  "bing": {
+    "enabled": true,
+    "required": true,
+    "site_url": "https://example.com/",
+    "ownership_verified": true,
+    "credential_access_verified": true,
+    "sitemap_verified": true
+  },
+  "indexnow": {
+    "enabled": true,
+    "required": true,
+    "host": "example.com",
+    "key_file_live": true,
+    "credential_access_verified": true
+  }
+}

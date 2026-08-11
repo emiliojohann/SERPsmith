@@ -1,0 +1,196 @@
+---
+name: "serpsmith"
+description: "Multi-platform AI agent support for SEO publishing and analytics."
+---
+
+# SERPsmith
+
+Multi-platform AI agent support for evidence-led SEO publishing on Git-based websites. Research, draft, create paired images, validate, publish, verify, and notify search engines without mixing sites or duplicating work.
+
+## Start here
+
+New operators read `references/quickstart.md`. Use `references/agent-runtime-onboarding.md` for runtime capability mapping, `references/repository-onboarding.md` for Git repository connection, `references/site-profile-schema.md` for configuration, `references/search-engine-onboarding.md` for Google Cloud, Google Search Console, Bing Webmaster Tools, and IndexNow setup, `references/image-system.md` for images, `references/runtime-setup.md` for runtime mapping, and `references/troubleshooting.md` for safe stops. Use `references/humanizer-integration.md` for the required portable prose-editing pass. The production read-only Google Analytics 4 extension is documented in `references/google-analytics-integration.md`; use `references/google-analytics-onboarding.md` for setup and verification and `references/content-intelligence.md` for the recommendation observation and authorization lifecycle.
+
+## v0.1 boundary
+
+Support Git-backed websites through a configured content adapter. The bundled reference adapter supports Markdown posts plus a simple XML sitemap. Do not claim arbitrary CMS/API support.
+
+Real profiles, credentials, destinations, drafts, reports, checkpoints, locks, and history stay outside the package. Load exactly one external JSON profile. Run structural validation with `scripts/validate-profile.mjs` before repository preflight.
+
+## Shared core policy
+
+Current core policy version: `serpsmith-core-v8`.
+
+All active profiles MUST declare the exact `core_policy_version` required by the live validator. Universal behavior belongs to SERPsmith's skill and references, never to an individual site profile.
+
+Profiles may configure site facts, adapters, paths, destinations, schedules, editorial/product guardrails, brand palette, mood, visual preferences, and other explicitly documented site-specific fields. Profiles MUST NOT redefine research standards, image selection or crop-validation rules, attempt/retry behavior, isolation, repository safety, publication gates, notifications, or report structure. `image_direction` is aesthetic guidance only; it cannot impose operational safe zones, pixel coordinates, validation gates, or retry budgets.
+
+Fail closed when a profile contains an unknown `image_policy` or `image_direction` field, operational policy language inside aesthetic configuration, or a mismatched core version. Change universal behavior only through a reviewed SERPsmith skill update that bumps the core version, migrates every active profile, and validates all profiles before any unattended run. The portable Humanizer pass is universal core behavior and MUST NOT be redefined or disabled by a site profile.
+
+## Required capabilities
+
+Manual mode needs filesystem/Git, web research, image generation, local conversion, bounded HTTP, secret access, durable state/locks, and the portable `blader/humanizer` Agent Skill at reviewed version 2.9.1 or newer. Configured GA4 also requires read-only Analytics Admin and Data API access. Unattended mode also needs an external scheduler and final reporting.
+
+Use native runtime tools or separately reviewed adapters following `references/adapter-contract.md`. Never guess credentials, paths, commands, chat targets, or browser locations.
+
+## Isolation and idempotency
+
+Select one site profile and stable slot. Read repository instructions. Namespace state by `site_key`. A run key combines site, slot, and slug. Publish at most one article per run key and resume incomplete checkpoints instead of duplicating articles, commits, links, sitemap entries, notifications, or reports.
+
+## Preflight
+
+Before research or mutation:
+
+1. Run structural JSON profile validation.
+2. Follow `references/repository-onboarding.md`; using the runtime's approved Git capability, verify repository, configured branch/upstream, clean tree, explicit repository instructions, and fast-forward-only state.
+3. Verify configured content/image paths and external state roots.
+4. Acquire external per-site/per-slot lock and checkpoint.
+5. Stop on dirty/diverged/conflicted state, missing ownership, unresolved placeholders, or unknown destructive state.
+6. Verify secret access without printing values.
+7. When search integrations are configured, validate exact allowlisted evidence against the selected profile; verify same-site Google property access, Bing verified ownership, the live IndexNow key file, and the sitemap through the standard search-onboarding evidence contract. Return exact user actions for incomplete checks; never guess identifiers or credentials.
+8. When `analytics` is configured, run the bundled GA4 check, verify exact property/hostname binding, and load a fresh immutable aggregate snapshot or one no older than one day. Never substitute another property's data.
+9. Verify that the portable Humanizer Agent Skill is discoverable at reviewed version 2.9.1 or newer. Do not substitute the retired OpenClaw-specific scoring CLI or silently skip the pass.
+10. Use bounded known-path checks; never scan broad directories for tools or credentials.
+
+The structural validator does not execute Git, shell, network, image, or credential operations.
+
+## Research and brief
+
+Inventory posts, slugs, intents, dates, links, and recent images. Use verified aggregate GA4 snapshots when configured, Search Console when configured, free SERP signals, and authoritative sources. Record query, intent, evidence, competition signal, site fit, cannibalization risk, sources, and link opportunities. Label demand `directional` unless measured volume exists. Never invent metrics, citations, consensus, or capabilities.
+
+Define title, slug, audience, intent, angle, sources, outline, links, CTA, metadata, excerpt, tags/category, image direction, alt text, and reading time. Follow the site schema and guardrails. One template-owned H1; body starts at H2 unless configured otherwise. Format every article body H2 and H3 in standard English Title Case, matching established site style; capitalize major words and keep short articles, coordinating conjunctions, and prepositions lowercase unless they begin or end the heading. Use direct authoritative citations, straight ASCII double quotes, and configured link limits. Never diagnose, promise cures, fabricate consensus, or claim unshipped behavior.
+
+## Portable Humanizer pass
+
+After the sourced article draft is complete and before final content validation, invoke the installed `blader/humanizer` Agent Skill in embedded mode and use only its final rewrite. Follow `references/humanizer-integration.md`.
+
+Apply the pass to article prose, not frontmatter, code, structured data, quoted source titles, citations, URLs, link targets, product names, or other exact factual tokens. Preserve every supported claim and never invent facts, names, numbers, dates, quotations, or citations. Preserve SERPsmith's standard English Title Case for article-body H2/H3 headings even though the generic Humanizer treats Title Case as a possible AI pattern. Preserve required SEO terms when removing them would change search intent or accuracy.
+
+The portable skill performs an editorial rewrite, not deterministic authorship detection. Do not manufacture or report a numerical Humanizer score. After the pass, rerun factual, citation, link, metadata, heading, product-claim, and site validation. A missing or incompatible Humanizer skill is a safe stop before publication, not permission to fall back to the retired local CLI or publish without the pass.
+
+## Read-only Google Analytics 4
+
+When `analytics` is configured, use the bundled adapter and exact selected profile. Bind every request and snapshot to the private numeric property ID and exact hostname. Collect aggregate Organic Search landing-page metrics for 7, 28, and 90 days plus preceding windows. Allowed fields are sessions, engaged sessions, engagement rate, active users, page views, aggregate engagement duration, and counts for explicitly configured events.
+
+Never request or persist user identifiers, advertising identifiers, demographics, or individual journeys. Analytics is advisory. Separate observed Search Console evidence, observed GA4 evidence, inference, and recommendation. It does not authorize rewrites, deletions, redirects, CTA/template changes, or schedule changes.
+
+## Content Intelligence observation and authorization
+
+Follow `references/content-intelligence.md`. Store recommendations in private, site-namespaced operational state; never publish or commit the ledger. A newly detected recommendation starts as `observing`, not approved. Observe it for at least 7 days and normally 14 days. Use the longer window for new or low-traffic sites, volatile data, partial tracking, recent deployments, or conflicting Search Console and GA4 signals.
+
+Make a recommendation `eligible_for_owner_authorization` only when the signal appears in at least two comparable evidence snapshots, the proposed action is specific and reversible, and no tracking, indexing, deployment, seasonality, or one-day-spike explanation is more plausible. Time alone never promotes a weak recommendation. If the signal fades or conflicts, keep observing, downgrade it, or close it without action.
+
+Eligibility is not authorization. SERPsmith MUST request explicit owner approval before adding internal links, refreshing copy, changing metadata or CTA copy, or making any other existing-page mutation. Approval must identify the exact URLs and proposed diff. Analytics never authorizes deletions, redirects, major rewrites, product/template changes, tracking changes, schedule changes, or bulk edits.
+
+After one approved change, record its commit and start a 7–14 day `measuring` cooldown before recommending another optimization to the same page. Compare like-for-like windows, label attribution as directional, and report whether the signal improved, worsened, or remained inconclusive. Change one meaningful variable at a time.
+
+## Links
+
+Link the new article to useful existing pages. Add small reciprocal links when natural. Do not re-date or broadly rewrite older content. Record every old-page insertion or report none.
+
+## Images
+
+Follow `references/image-system.md`. Build the brief from article title/focus, query/intent, audience/promise, site `image_direction`, recent image history, and restrictions. Generate two meaningfully different concepts, inspect both, and rank every reviewed candidate. Prefer literal or functional visual connections over poetic abstraction. Apply the three-second clarity test with the exact article title as context.
+
+Review at most six generated candidates per run. Before the limit, reject candidates that fail clarity or required responsive composition and continue with a more direct concept. If none passes every quality gate after six candidates, select the highest-ranked fallback-eligible candidate and continue publication under the existing authorization.
+
+A fallback may have documented clarity, composition, anatomy, or responsive-crop weaknesses, but it MUST remain relevant, coherent, and pass hard publication gates: no unsafe or misleading claim, unrelated destructive signal, generated/pseudo-text, logo/brand, severe meaning-breaking generation defect, missing required asset, or invalid file/MIME/dimensions. Subject clipping, weakened gestures, reduced title clarity, and other aesthetic misses become disclosed quality exceptions after the sixth candidate; they do not stop publication when the image remains recognizable and technically usable. If no candidate is fallback-eligible, stop safely. Record all candidate rankings, the exact exception, and an owner-review recommendation in the checkpoint and final notification.
+
+Default production is exact 1280 x 720 WebP plus a locally derived matching JPEG. Focal-crop; never stretch. Inspect original candidates and every required desktop hero, mobile hero, blog-card, and social render. Responsive-crop weaknesses may use the six-candidate fallback whenever the image remains recognizable and technically usable; blank, corrupt, missing, or invalid assets may not. Strip metadata, verify dimensions/MIME, never overwrite, and validate live assets/crawlers.
+
+## Content and repository validation
+
+The bundled Markdown adapter is `scripts/markdown-content-adapter.mjs`. It writes one new Markdown article and updates a simple XML sitemap from explicit JSON input. Custom layouts require a custom adapter.
+
+Before commit validate content syntax/schema, headings, slug, metadata, citations, links, images, discovery files, expected diff, allowed checks, staged secrets/private data, and the completed portable Humanizer pass. Do not run prohibited tests or include unrelated changes.
+
+## Publish and verify
+
+Publishing requires explicit per-run approval or recorded site authorization. Create one focused commit, push normally to configured SSH branch, never force-push, verify deployment/article/canonical/links/metadata/sitemap/assets/crawlers, then run configured search adapters. Accepted notification does not guarantee indexing or ranking.
+
+Pre-push failure leaves the article unpublished. Post-push failure never creates a second publication commit or rollback; resume only incomplete verification, notification, or reporting.
+
+Validate live HTML semantically where possible. Accept equivalent valid serialization such as attribute-order and closing-tag variations. Use exact literal matching only when the selected site profile explicitly guarantees that template output.
+
+## Retries and safe stops
+
+Persist checkpoints and sanitized attempts externally. Retry only transient timeouts, resets, rate limits, temporary provider/server failures, incomplete responses, propagation delays, reporting outages, or local diagnostic/matcher construction errors that have not changed repository or remote state. Use bounded attempts: initial, about 30 seconds, about 2 minutes, then at most one delayed recovery around 15 minutes when supported.
+
+Never retry secrets/privacy findings, unsafe claims, invalid config, auth/permission/ownership failures, dirty/diverged repos, merge conflicts, malformed content requiring judgment, or unknown destructive state. Preserve state and report the exact next action.
+
+## Attempt outcome discipline
+
+Before executing a check, classify a nonzero result as either an exhausted gate failure or an attempt-level diagnostic that may be corrected or retried.
+
+### Guarded runtimes
+
+When an unattended runtime supports per-job tool restrictions, remove raw shell, Bash, exec, and process tools from the job. Every shell command, whether expected to pass or potentially recoverable, MUST run through a dedicated guarded execution capability that:
+
+- converts child-process nonzero exits, timeouts, and signals into structured attempt data rather than runtime tool errors;
+- suppresses failed-command output from the scheduler while retaining sanitized stage, attempt, status, and exit metadata;
+- bounds the working directory, timeout, and captured output;
+- provides an intentional exhausted-gate failure capability; and
+- provides a finalizer that validates the durable checkpoint before success can be reported.
+
+For the bundled OpenClaw reference integration, use `serpsmith_exec` for every shell command. Use `serpsmith_fail` only after a non-retryable or exhausted gate. Before the final success response, call `serpsmith_finalize` with the authoritative checkpoint path. The cron tool allowlist MUST include only the file, research, image, and SERPsmith guard tools required by the run and MUST exclude raw `exec`, `bash`, `shell`, and `process`. A prose instruction is not enforcement; do not call the OpenClaw integration installed until the live job allowlist proves those raw tools are absent.
+
+A stored job allowlist is not proof when the selected agent harness can expose native tools outside OpenClaw's registry. Production unattended jobs MUST run in a runtime where the job allowlist controls the complete callable tool surface. Record the effective agent runtime and inspect a real validation trajectory: it MUST contain `serpsmith_exec` calls and MUST NOT contain raw `exec`, `bash`, `shell`, or `process` calls. If a base tool profile removes the guard plugin before the job allowlist is applied, use a dedicated operator-controlled agent profile that exposes the plugin, then keep each production job restricted by its exact `toolsAllow`. Do not broaden the owner's normal agent runtime or tool profile.
+
+### Portable wrapper fallback
+
+On a runtime that cannot restrict job tools but can execute shell, every command whose nonzero result may be retried, reinterpreted, calibrated, or replaced MUST be invoked as `/bin/zsh /absolute/path/to/scripts/controlled-attempt.sh STAGE ATTEMPT REASON -- COMMAND [ARG ...]`. This includes Git fetch or other preflight probes, matcher construction, expected alternate paths, secret-scan calibration, metadata probes, deployment polling, live verification, and notification retries. Never execute the wrapper path directly or rely on its filesystem executable bit.
+
+The wrapper fallback suppresses failed-command output and returns a structured `SERPSMITH_ATTEMPT` result, but it does not prevent an autonomous agent from bypassing the wrapper. Do not describe wrapper-only unattended containment as enforced. Prefer manual mode when the runtime cannot remove raw execution and reliable scheduler status is required.
+
+Do not use fail-fast shell behavior inside retryable checks. Do not reproduce either guard inline. Record structured results in the sanitized attempt log. A passed attempt confirms only that attempt; the durable checkpoint remains authoritative.
+
+After the permitted attempts, reread the checkpoint. If the gate is still incomplete, emit one explicit exhausted-gate failure with the stage, attempts, safe state, and next action. Immediately non-retryable failures may fail directly. A recovered attempt remains in the log but must never override a completed checkpoint or successful final report.
+
+Before reporting success, confirm every required publication, live-verification, notification, and reporting gate is complete. Never convert a genuinely exhausted failure into success merely to silence scheduler alerts.
+
+Before unattended release, validate the selected integration. For the OpenClaw reference integration, run the guard plugin build, unit tests, plugin validation, plugin doctor, and a real isolated scheduler validation that executes one failing command and one passing command through `serpsmith_exec`, calls `serpsmith_finalize` against a complete checkpoint, finishes with scheduler status `ok`, and confirms the recorded trajectory contains no raw execution tools. Inspect the live production cron payload to prove its tool allowlist excludes raw execution. For the portable fallback, run `/bin/zsh scripts/test-controlled-attempt.sh`; the regression must verify both failing and passing commands through a non-executable copy of the wrapper.
+
+## Manual and unattended modes
+
+Onboard manually: follow `references/repository-onboarding.md`, `references/agent-runtime-onboarding.md`, and `references/search-engine-onboarding.md`, produce a profile-bound sanitized search-onboarding report, run read-only preflight, then continue with research/brief review, article/image review, diff review, explicit publish approval, and live verification. Only the owner can authorize unattended mode externally. Authorization never includes product/template changes, force pushes, conflict resolution, credential changes, unrelated edits, cron changes, or bypassing gates.
+
+## Portability and reporting
+
+SERPsmith provides multi-platform AI agent support through the adapter contract. The agent environment must provide the required tools; chat-only agents or environments missing required capabilities cannot automate the workflow. Keep every platform's test status accurate: OpenClaw is the production-tested reference integration, while Hermes, Claude-based agent environments, ChatGPT agent environments, and others remain certification-pending until their exact setup passes the documented tests. Report title/URL, time/timezone, keyword evidence, metrics when available, portable Humanizer version/result without a fabricated score, old-page changes, images/crawlers, notifications, commit/deployment, and failures/recovery. Never expose secrets, credential paths, private identifiers, or secret-bearing URLs.
+
+Format every final publication report as clearly separated labeled sections, never as one dense paragraph or uninterrupted block. Put each major field on its own line and insert a blank line between fields or logical groups. Use this plain-text pattern, omitting only fields that do not apply:
+
+Title: <article title>
+
+Live URL: <public URL>
+
+Published: <local publication time and timezone, plus any configured secondary timezone>
+
+Keyword evidence: <measured or directional evidence, with no unsupported volume claim>
+
+Analytics evidence: <GA4 snapshot window/status and concise aggregate finding, when configured>
+
+Images:
+- <hero asset and dimensions>
+- <social asset and dimensions>
+- <"Standard selection" or "Best-available fallback after six candidates; owner review recommended: exact quality exception">
+
+Old-post changes:
+- <reciprocal links or "None">
+
+Commit: <short commit hash>
+
+Deployment checks:
+- <concise verified checks>
+
+Search notifications:
+- Google Search Console: <status>
+- Bing Webmaster Tools: <status>
+- IndexNow: <status>
+
+Failures/recovery:
+- <only when applicable>
+
+Keep labels short, leave one blank line before the next labeled section, and use bullets only inside multi-item sections. Plain text remains required for unattended OpenClaw delivery.
+
+For unattended OpenClaw delivery, prefer an explicit final `message` tool call after `serpsmith_finalize`, restricted to the configured owner destination. Send plain text only: no attachments, media, generated-image references, or file paths. After a confirmed explicit send, return `NO_REPLY` so fallback announce delivery does not duplicate the report or inherit transient generated-media attachments. Do not move, trash, or delete generated source candidates before final reporting is acknowledged; allow configured retention cleanup to handle them.

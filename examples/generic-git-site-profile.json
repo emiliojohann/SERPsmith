@@ -1,0 +1,72 @@
+{
+  "site_key": "example-site",
+  "core_policy_version": "serpsmith-core-v8",
+  "repository": "/absolute/path/to/example-site",
+  "branch": "main",
+  "remote": "origin",
+  "public_base_url": "https://example.com",
+  "article_route": "/blog/<slug>",
+  "content_adapter": {
+    "name": "markdown",
+    "posts_directory": "content/blog"
+  },
+  "image_directory": "public/images/blog",
+  "image_policy": {
+    "width": 1280,
+    "height": 720,
+    "hero_format": "webp",
+    "hero_quality": 82,
+    "social_format": "jpeg",
+    "social_quality": 85,
+    "derive_social_from_hero": true,
+    "strip_metadata": true
+  },
+  "image_direction": {
+    "style": "premium photorealistic editorial photography",
+    "mood": "calm, practical, trustworthy",
+    "avoid": [
+      "generated text or pseudo-text",
+      "third-party logos",
+      "generic stock staging"
+    ]
+  },
+  "sitemap_file": "public/sitemap.xml",
+  "sitemap_url": "https://example.com/sitemap.xml",
+  "search_console_property": "sc-domain:example.com",
+  "bing_site_url": "https://example.com/",
+  "indexnow_host": "example.com",
+  "required_notifications": [
+    "google-search-console",
+    "bing-webmaster-tools",
+    "indexnow"
+  ],
+  "deployment_adapter": {
+    "name": "simulated-deploy"
+  },
+  "checkpoint_root": "/absolute/external/state/checkpoints/example-site",
+  "lock_root": "/absolute/external/state/locks/example-site",
+  "timezone": "UTC",
+  "editorial_guardrails": [
+    "Use only verifiable claims.",
+    "Follow repository instructions."
+  ],
+  "repository_instruction_files": [
+    "SERPSMITH.md"
+  ],
+  "validation_policy": {
+    "secret_scan_required": true
+  },
+  "autopilot_enabled": false,
+  "analytics": {
+    "adapter": "google-analytics-data-v1",
+    "property_id": "123456789",
+    "expected_hostname": "example.com",
+    "windows_days": [
+      7,
+      28,
+      90
+    ],
+    "organic_channel": "Organic Search",
+    "key_events": []
+  }
+}

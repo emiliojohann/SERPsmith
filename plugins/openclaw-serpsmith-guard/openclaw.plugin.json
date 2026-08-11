@@ -1,0 +1,36 @@
+{
+  "id": "serpsmith-guard",
+  "name": "SERPsmith Guard",
+  "description": "Contain recoverable command failures in unattended SERPsmith jobs.",
+  "version": "0.1.0",
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "allowedRoots": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        },
+        "minItems": 1,
+        "maxItems": 8
+      },
+      "maxOutputChars": {
+        "type": "integer",
+        "minimum": 1000,
+        "maximum": 50000,
+        "default": 12000
+      }
+    }
+  },
+  "activation": {
+    "onStartup": true
+  },
+  "contracts": {
+    "tools": [
+      "serpsmith_exec",
+      "serpsmith_finalize",
+      "serpsmith_fail"
+    ]
+  }
+}
