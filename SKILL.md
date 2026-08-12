@@ -1,6 +1,6 @@
 ---
 name: "serpsmith"
-description: "Multi-platform AI agent support for SEO publishing and analytics."
+description: "Multi-platform SEO publishing, analytics, recovery, and safe run retention."
 ---
 
 # SERPsmith
@@ -9,7 +9,7 @@ Multi-platform AI agent support for evidence-led SEO publishing on Git-based web
 
 ## Start here
 
-New operators read `references/quickstart.md`. Use `references/agent-runtime-onboarding.md` for runtime capability mapping, `references/repository-onboarding.md` for Git repository connection, `references/site-profile-schema.md` for configuration, `references/search-engine-onboarding.md` for Google Cloud, Google Search Console, Bing Webmaster Tools, and IndexNow setup, `references/image-system.md` for images, `references/runtime-setup.md` for runtime mapping, and `references/troubleshooting.md` for safe stops. Use `references/humanizer-integration.md` for the required portable prose-editing pass. The production read-only Google Analytics 4 extension is documented in `references/google-analytics-integration.md`; use `references/google-analytics-onboarding.md` for setup and verification and `references/content-intelligence.md` for the recommendation observation and authorization lifecycle.
+New operators read `references/quickstart.md`. Use `references/agent-runtime-onboarding.md` for runtime capability mapping, `references/repository-onboarding.md` for Git repository connection, `references/site-profile-schema.md` for configuration, `references/search-engine-onboarding.md` for Google Cloud, Google Search Console, Bing Webmaster Tools, and IndexNow setup, `references/image-system.md` for images, `references/runtime-setup.md` for runtime mapping, and `references/troubleshooting.md` for safe stops. Use `references/humanizer-integration.md` for the required portable prose-editing pass and `references/retention.md` for completed-run cleanup. The production read-only Google Analytics 4 extension is documented in `references/google-analytics-integration.md`; use `references/google-analytics-onboarding.md` for setup and verification and `references/content-intelligence.md` for the recommendation observation and authorization lifecycle.
 
 ## v0.1 boundary
 
@@ -19,7 +19,7 @@ Real profiles, credentials, destinations, drafts, reports, checkpoints, locks, a
 
 ## Shared core policy
 
-Current core policy version: `serpsmith-core-v8`.
+Current core policy version: `serpsmith-core-v9`.
 
 All active profiles MUST declare the exact `core_policy_version` required by the live validator. Universal behavior belongs to SERPsmith's skill and references, never to an individual site profile.
 
@@ -112,11 +112,38 @@ Pre-push failure leaves the article unpublished. Post-push failure never creates
 
 Validate live HTML semantically where possible. Accept equivalent valid serialization such as attribute-order and closing-tag variations. Use exact literal matching only when the selected site profile explicitly guarantees that template output.
 
+## Completed-run retention
+
+SERPsmith keeps the published website and its Git history as the canonical content record. It inventories the current repository and live website on every run for slugs, links, sitemap state, and recent published images; completed working directories are not the source of truth for internal linking.
+
+After the final publication report has been successfully delivered, run the bundled retention tool against the selected profile and keep exactly the latest three completed article runs for that site. Preserve every incomplete or failed resumable run regardless of age, plus the site-namespaced analytics directory and recommendation ledger. Never delete website articles, production images, Git history, analytics evidence, locks, active checkpoints, or files outside the selected checkpoint root.
+
+Use `node scripts/prune-completed-runs.mjs PROFILE --keep 3 --apply` only after confirmed report delivery. The tool defaults to a dry run unless `--apply` is explicit. Record the sanitized cleanup result. A cleanup failure must fail the unattended job without undoing or duplicating the already-published article.
+
 ## Retries and safe stops
 
 Persist checkpoints and sanitized attempts externally. Retry only transient timeouts, resets, rate limits, temporary provider/server failures, incomplete responses, propagation delays, reporting outages, or local diagnostic/matcher construction errors that have not changed repository or remote state. Use bounded attempts: initial, about 30 seconds, about 2 minutes, then at most one delayed recovery around 15 minutes when supported.
 
 Never retry secrets/privacy findings, unsafe claims, invalid config, auth/permission/ownership failures, dirty/diverged repos, merge conflicts, malformed content requiring judgment, or unknown destructive state. Preserve state and report the exact next action.
+
+## Concurrent repository recovery
+
+A concurrent repository change is a recoverable coordination event, not permission to abandon a completed article package silently.
+
+When the repository, branch, upstream, or worktree changes after preflight:
+
+1. Stop before commit or push and preserve the checkpoint, lock, article package, assets, and sanitized attempt history.
+2. Identify the exact concurrent files and commits. Never overwrite, revert, stage, or absorb unrelated work.
+3. Notify the owner immediately with the affected article, safe state, exact conflict/change, and whether automatic recovery is possible.
+4. Wait until the other writer has finished or the repository is stable. Do not poll destructively and do not modify another process's files.
+5. Once stable, fetch normally, verify the configured branch can be fast-forwarded without conflict, and re-run repository preflight against the new upstream state.
+6. Revalidate the preserved publication diff against the new base, including content, images, reciprocal links, discovery files, secret scan, and allowed checks.
+7. Resume the same run key from the earliest invalidated checkpoint. Never create a duplicate article, slot, commit, or run.
+8. If the preserved changes apply cleanly and every gate passes, complete commit, push, deployment verification, search notifications, and final reporting under the existing publication authorization.
+9. If recovery needs conflict resolution, changes product/template behavior, would include unrelated files, or remains unstable after bounded attempts, stop and request explicit owner direction.
+10. Never leave a recoverable pre-push package indefinitely. Before ending, either complete recovery, schedule/trigger a bounded continuation in an authorized runtime, or give the owner an explicit blocker and exact next action. A failed delivery attempt must be retried through the configured owner channel or reported by the supervising session.
+
+Record the concurrent change and all recovery attempts in the existing checkpoint. A successful recovery must replace the failed pre-push outcome with the actual publication result while retaining the earlier attempt history.
 
 ## Attempt outcome discipline
 
@@ -193,4 +220,4 @@ Failures/recovery:
 
 Keep labels short, leave one blank line before the next labeled section, and use bullets only inside multi-item sections. Plain text remains required for unattended OpenClaw delivery.
 
-For unattended OpenClaw delivery, prefer an explicit final `message` tool call after `serpsmith_finalize`, restricted to the configured owner destination. Send plain text only: no attachments, media, generated-image references, or file paths. After a confirmed explicit send, return `NO_REPLY` so fallback announce delivery does not duplicate the report or inherit transient generated-media attachments. Do not move, trash, or delete generated source candidates before final reporting is acknowledged; allow configured retention cleanup to handle them.
+For unattended OpenClaw delivery, prefer an explicit final `message` tool call after `serpsmith_finalize`, restricted to the configured owner destination. Send plain text only: no attachments, media, generated-image references, or file paths. After a confirmed explicit send, return `NO_REPLY` so fallback announce delivery does not duplicate the report or inherit transient generated-media attachments. Do not move, trash, or delete generated source candidates before final reporting is acknowledged. After confirmed delivery, run the configured completed-run retention cleanup and keep exactly the latest three completed article runs for the selected site.

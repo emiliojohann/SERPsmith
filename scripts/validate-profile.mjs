@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
-const CORE_POLICY_VERSION="serpsmith-core-v8";
+const CORE_POLICY_VERSION="serpsmith-core-v9";
 const TOP_LEVEL_KEYS=new Set(["core_policy_version","site_key","repository","branch","remote","public_base_url","article_route","content_adapter","image_directory","image_policy","image_direction","sitemap_file","sitemap_url","llms_file","llms_full_file","search_console_property","bing_site_url","indexnow_host","required_notifications","deployment_adapter","checkpoint_root","lock_root","timezone","editorial_guardrails","autopilot_enabled","repository_instruction_files","validation_commands","crawler_user_agents","internal_link_minimum","external_link_limits","prose_adapter","notification_adapter","schedule","authorization","product_source","validation_policy","robots_policy","analytics"]);
 const IMAGE_POLICY=new Set(["width","height","hero_format","hero_quality","social_format","social_quality","derive_social_from_hero","strip_metadata","social_crawlers"]);
 const IMAGE_DIRECTION=new Set(["style","mood","palette","composition","prefer","avoid","preferred_visual_language","forbidden_imagery"]);

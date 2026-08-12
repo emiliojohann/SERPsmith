@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.1.0-beta.4
+
+- Added safe per-site completed-run cleanup that retains the latest three completed article runs while protecting resumable runs, analytics snapshots, and recommendation state.
+- Cleanup runs only after confirmed final-report delivery and defaults to dry-run unless explicitly applied.
+- Documented that the website repository, sitemap, live site, and production images remain canonical for article inventory and internal linking.
+- Advanced shared policy to `serpsmith-core-v9`.
+
 ## v0.1.0-beta.3
 
 - Added clear multi-platform AI agent support and compatibility status.
@@ -8,7 +15,6 @@
 - Requires 7–14 days and at least two comparable snapshots before a recommendation may become eligible for owner authorization.
 - Added an explicit approval boundary for internal links, small refreshes, metadata, CTA copy, and all other existing-page mutations.
 - Added a 7–14 day post-change measurement cooldown and named CTA instrumentation guidance.
-- Advanced shared policy to `serpsmith-core-v8`.
 
 ## v0.1.0-beta.2
 

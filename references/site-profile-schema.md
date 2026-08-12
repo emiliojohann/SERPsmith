@@ -2,7 +2,7 @@
 
 Real profiles stay outside the repository. The bundled validator accepts JSON only. YAML requires conversion to identical JSON before bundled validation.
 
-Every active profile declares `core_policy_version: serpsmith-core-v8`.
+Every active profile declares `core_policy_version: serpsmith-core-v9`.
 
 ## Required
 
@@ -21,8 +21,8 @@ The optional `analytics` object enables the shared read-only adapter:
 - `adapter`: exactly `google-analytics-data-v1`.
 - `property_id`: private numeric GA4 Property ID, never the public `G-...` measurement ID.
 - `expected_hostname`: exact lowercase profile hostname.
-- `windows_days`: exactly `[7, 28, 90]` in core-v8.
-- `organic_channel`: exactly `Organic Search` in core-v8.
+- `windows_days`: exactly `[7, 28, 90]` in core-v9.
+- `organic_channel`: exactly `Organic Search` in core-v9.
 - `key_events`: unique verified GA4 event names; an empty array is valid during initial observation.
 
 Credential contents and paths are never profile fields. Numeric property IDs, real profiles, snapshots, and reports remain private and external. Follow `google-analytics-onboarding.md`.
@@ -32,6 +32,10 @@ Credential contents and paths are never profile fields. Numeric property IDs, re
 When autopilot is true, require recorded owner approval/scope, schedule weekdays/time/timezone/slot, matching profile timezone, notification adapter, explicit required notifications, and `validation_policy.secret_scan_required: true`.
 
 Runtime preflight still verifies adapters, Git, credentials, ownership, deployment, scheduler payload, and tool restrictions.
+
+## Completed-run retention
+
+Completed run artifacts are operational state, not the canonical article inventory. The current repository, sitemap, and live site remain canonical. Keep exactly the latest three completed article runs per site after confirmed final-report delivery. Preserve all resumable incomplete runs, analytics snapshots and recommendation ledgers, and locks. Use the bundled dry-run-by-default retention command documented in `retention.md`.
 
 ## Workflow
 
@@ -45,7 +49,7 @@ The validator uses a top-level allowlist. A field not listed here is rejected in
 - Identity and Git: `site_key`, `repository`, `branch`, `remote`, `public_base_url`, `repository_instruction_files`.
 - Content and deployment: `article_route`, `content_adapter`, `image_directory`, `image_policy`, optional `image_direction`, `sitemap_file`, `llms_file`, `llms_full_file`, `deployment_adapter`.
 - Search: `sitemap_url`, `search_console_property`, `bing_site_url`, `indexnow_host`, `required_notifications`.
-- Analytics: optional `analytics` with the exact core-v8 contract above.
+- Analytics: optional `analytics` with the exact core-v9 contract above.
 - State and policy: `checkpoint_root`, `lock_root`, `timezone`, `editorial_guardrails`, `validation_policy`, optional `validation_commands`, `crawler_user_agents`, `internal_link_minimum`, `external_link_limits`, `product_source`, `robots_policy`, `prose_adapter`.
 - Unattended only: `autopilot_enabled`, `authorization`, `schedule`, `notification_adapter`.
 

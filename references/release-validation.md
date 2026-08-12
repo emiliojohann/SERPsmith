@@ -32,6 +32,7 @@ Test:
 - `scripts/test-google-analytics.mjs`;
 - final report;
 - checkpoint resume after interruption;
+- completed-run retention dry-run and apply behavior, including protection for the newest three completed runs, incomplete runs, and analytics state;
 - prevention of duplicate article, image, commit, sitemap entry, notification, and report.
 
 Inject dirty tree, branch divergence, merge conflict, missing adapter, missing secret, auth failure, rate limit, timeout, provider failure, deployment delay, crawler failure, reporting failure, and malformed content.

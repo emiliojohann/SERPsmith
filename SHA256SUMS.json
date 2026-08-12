@@ -8,8 +8,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "6154ca1f300362c3411bfb553c526e0cc98bb5ec8e036302e825f0e73d860a01",
-      "bytes": 1763
+      "sha256": "42519a6b878a1f50bfab832e226627a3bec84eea57777049b944821209be5a69",
+      "bytes": 2213
     },
     {
       "path": "COMMERCIAL-LICENSE.md",
@@ -48,17 +48,17 @@
     },
     {
       "path": "examples/generic-git-site-profile.json",
-      "sha256": "9c57bb38bd709a8144528f44b69a594f4949d0d2a964d6ca93b4fdace4875caa",
+      "sha256": "d23bbd04ba69fb28f93d4c343a420db31a378671eb714b455fcfbe09cbedd7b0",
       "bytes": 1930
     },
     {
       "path": "examples/hermes-site-profile.md",
-      "sha256": "57a962bbb586dd976c0b02f65233eeec834c75de85709bf1e5559ae6ce6bbc1a",
+      "sha256": "16e932f94816296f8ffec0ba61e22f2b1bbd55d51ecdce9e634ab5e8299c13a9",
       "bytes": 280
     },
     {
       "path": "examples/openclaw-site-profile.md",
-      "sha256": "b7b504e3680d4827d61bb3c5250621cb66da8bb1ab4474d4bc2d25235d97af23",
+      "sha256": "aa0e62f2689d209b57667a1be722a33924fd27fc2926f9c18f091a15b812a9c8",
       "bytes": 281
     },
     {
@@ -123,7 +123,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "8f70a46b057d730244f762c5f7fd8957e0a238881e0563b9a30ae7d45d8d2246",
+      "sha256": "1470225f3b0f673b8974a8534397d045724612d89cd83165ba24e8971fc73948",
       "bytes": 8698
     },
     {
@@ -173,13 +173,18 @@
     },
     {
       "path": "references/release-validation.md",
-      "sha256": "871cc549cd24ea438d4a43bd7fb790fb45d08db615d050ce7ccd86ed2425edc8",
-      "bytes": 3268
+      "sha256": "c2fb80a262e892c6d77b886e59929b4544f3e353a0b0961030952af0aee6152a",
+      "bytes": 3418
     },
     {
       "path": "references/repository-onboarding.md",
       "sha256": "42b65fbefb4f7bb3d4a72e3ddb8f2111eec090a03511bf09d4e90fb63e071671",
       "bytes": 3747
+    },
+    {
+      "path": "references/retention.md",
+      "sha256": "172d474e5b369beb3ec1b4ec88ad52224d14c66f81aebdf4266f997a2a665d16",
+      "bytes": 1395
     },
     {
       "path": "references/runtime-setup.md",
@@ -193,8 +198,8 @@
     },
     {
       "path": "references/site-profile-schema.md",
-      "sha256": "3335124e9b8bafce91278ee1966d1e408fb2a914ad92d54c0449259ec061a30c",
-      "bytes": 5534
+      "sha256": "421529e0ef87db9b840a16800cefb7bebae900095d2a41f3046f559e588f48ac",
+      "bytes": 5995
     },
     {
       "path": "references/troubleshooting.md",
@@ -262,6 +267,11 @@
       "bytes": 3841
     },
     {
+      "path": "scripts/prune-completed-runs.mjs",
+      "sha256": "89be9b1e2ae724e72fc51ad2aece34efa2a8664b8e5e54cf050345898c595c43",
+      "bytes": 4722
+    },
+    {
       "path": "scripts/search-onboarding-report.mjs",
       "sha256": "773807999e761b4df45b95c31e058c014208c894df786ea7704e332fd0ee8c38",
       "bytes": 5369
@@ -282,18 +292,23 @@
       "bytes": 3088
     },
     {
+      "path": "scripts/test-prune-completed-runs.mjs",
+      "sha256": "a423503e6164884fe3c74a03bd45abb6906977754aea62c33f4981a926a1a3b8",
+      "bytes": 2431
+    },
+    {
       "path": "scripts/test-search-onboarding.sh",
       "sha256": "ba961dc1774cb3b8e5fa731b3cad1c56aa3806286b181728110bf767a156f28f",
       "bytes": 1800
     },
     {
       "path": "scripts/test-user-onboarding-docs.sh",
-      "sha256": "ba6c89b722194e753848d415811bb65576c8c43177bf2d8a0734a407407c29e7",
-      "bytes": 4467
+      "sha256": "a15717c9da06043d6951064e207cdda76cc2fc4e6497f917179b511b69574c41",
+      "bytes": 4552
     },
     {
       "path": "scripts/validate-profile.mjs",
-      "sha256": "655422c07c27c8724476047e0d0b2a8752bb0d3702bb54f35e79d726a680456f",
+      "sha256": "eea753bd0ed67825ed2cc6cb788349b024b8f961e76e619f243d08779ba6010b",
       "bytes": 16472
     },
     {
@@ -303,8 +318,8 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "d2d4884f0c0c32ab4d82ca81a3e80bd647f09cebf79a476050a6a307a458f79f",
-      "bytes": 22588
+      "sha256": "9487bc92cf7e09363bfafcba90a6c3808c2df18b81617d3510765b8757a3c878",
+      "bytes": 26084
     },
     {
       "path": "templates/runtime-capability-map.md",
@@ -318,7 +333,7 @@
     },
     {
       "path": "VERSION",
-      "sha256": "3ec17cf064f732415268959d5be4035ec903675eaf2ceeac18c976f2447cb665",
+      "sha256": "cd3a330dd51b60d621e3f45b75cfe75adde46dc4732c783c8b8867eee09e25d5",
       "bytes": 14
     }
   ]

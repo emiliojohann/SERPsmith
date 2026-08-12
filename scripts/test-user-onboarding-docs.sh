@@ -5,7 +5,7 @@ public_readme="$root/templates/public/README.md"
 public_version="$root/templates/public/VERSION"
 [[ -f "$public_readme" ]] || public_readme="$root/README.md"
 [[ -f "$public_version" ]] || public_version="$root/VERSION"
-for file in references/repository-onboarding.md references/search-engine-onboarding.md references/google-analytics-onboarding.md references/google-analytics-integration.md references/content-intelligence.md references/agent-runtime-onboarding.md templates/site-repository-instructions.md templates/runtime-capability-map.md; do [[ -f "$root/$file" ]] || exit 1; done
+for file in references/repository-onboarding.md references/search-engine-onboarding.md references/google-analytics-onboarding.md references/google-analytics-integration.md references/content-intelligence.md references/retention.md references/agent-runtime-onboarding.md templates/site-repository-instructions.md templates/runtime-capability-map.md; do [[ -f "$root/$file" ]] || exit 1; done
 grep -q 'generic-git-site-profile.json' "$root/references/quickstart.md" || exit 1
 ! grep -q 'site.yaml' "$root/references/quickstart.md" || exit 1
 grep -q 'Google Analytics Data API' "$root/references/google-analytics-onboarding.md" || exit 1
@@ -22,9 +22,9 @@ grep -q 'explicit owner approval' "$root/references/content-intelligence.md" || 
 grep -q 'production-tested reference integration' "$root/references/compatibility.md" || exit 1
 grep -q 'Claude-based agent environments' "$root/references/compatibility.md" || exit 1
 grep -q 'ChatGPT agent environments' "$root/references/compatibility.md" || exit 1
-grep -q 'Version: `v0.1.0-beta.3`' "$public_readme" || exit 1
+grep -q 'Version: `v0.1.0-beta.4`' "$public_readme" || exit 1
 grep -q 'multi-platform AI agent support' "$public_readme" || exit 1
-[[ "$(<"$public_version")" == 'v0.1.0-beta.3' ]] || exit 1
+[[ "$(<"$public_version")" == 'v0.1.0-beta.4' ]] || exit 1
 grep -q 'google-search-console-check.mjs' "$root/references/search-engine-onboarding.md" || exit 1
 grep -q 'Settings.*API Access' "$root/references/search-engine-onboarding.md" || exit 1
 grep -q 'Do not place the real value on the command line' "$root/references/search-engine-onboarding.md" || exit 1
@@ -45,4 +45,5 @@ fi
 /bin/zsh "$root/scripts/test-profile-validation.sh" || exit 1
 /bin/zsh "$root/scripts/test-search-onboarding.sh" || exit 1
 node "$root/scripts/test-google-analytics.mjs" || exit 1
+node "$root/scripts/test-prune-completed-runs.mjs" || exit 1
 print -r -- "user onboarding documentation tests passed"

@@ -1,6 +1,6 @@
 {
   "site_key": "example-site",
-  "core_policy_version": "serpsmith-core-v8",
+  "core_policy_version": "serpsmith-core-v9",
   "repository": "/absolute/path/to/example-site",
   "branch": "main",
   "remote": "origin",
