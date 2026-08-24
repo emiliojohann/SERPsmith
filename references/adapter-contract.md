@@ -30,11 +30,12 @@ Deterministic wrapper adapters should:
 - `research`: query/source request -> sources, visible evidence, timestamp.
 - `image_generate`: prompt/concept -> temporary asset reference and provider result.
 - `image_convert`: source plus policy -> verified WebP/JPEG metadata.
-- `content`: profile/article package -> deterministic repository edits and validation result.
+- `content`: profile/article package -> deterministic repository edits and validation.
 - `deploy`: commit/site -> deployment reference or configured auto-deploy wait result.
 - `http_verify`: URL/headers/expectations -> sanitized status, MIME, canonical/metadata checks.
 - `gsc`: property/sitemap -> accepted or classified failure.
 - `ga4_check`: private profile plus explicit guarded credential reference -> sanitized property/hostname/read-access result.
+- `ai_search_readiness`: profile plus fresh same-site evidence -> verified or action-required crawler, technical, content, llms.txt, and measurement status without a ranking score.
 - `ga4_snapshot`: private profile, new external output path, and guarded credential reference -> immutable aggregate Organic Search snapshot for 7/28/90-day and preceding windows.
 - `bing`: site/sitemap -> accepted or classified failure.
 - `indexnow`: host/URLs -> accepted or classified failure.

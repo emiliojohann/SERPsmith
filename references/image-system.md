@@ -60,6 +60,22 @@ image_direction:
 
 Dimensions, formats, quality, metadata stripping, and social-crawler rules belong in `image_policy`, not `image_direction`.
 
+## Visual rotation and motif budget
+
+Before writing candidate prompts, inventory at least the six most recently published article images when available. For each image, record:
+
+- subject or character;
+- environment;
+- focal object or action;
+- camera perspective or composition;
+- metaphor or material.
+
+Turn that inventory into an explicit recent-image conflict list. Count visually equivalent devices as one motif rather than treating cosmetic changes as variety. In particular, loose sheets, document cards, sticky notes, browser-window tiles, clipped page layouts, and floating rectangular panels all belong to the shared paper/card motif.
+
+If a motif appears in either of the two most recent images or at least twice in the last six, exclude it from both new candidate briefs unless it is genuinely necessary for the article to pass the three-second clarity test. When that exception is necessary, candidate B must avoid the motif completely and the checkpoint must explain why candidate A needed it. A site's recurring palette, lighting mood, and overall photographic style should remain recognizable, but palette continuity never counts as meaningful concept variation.
+
+Relative to each of the two most recent images, each candidate must change at least two of these axes: subject or character, environment, focal object or action, camera perspective or composition, and metaphor or material. Candidate A and B must still differ meaningfully from each other. Do not solve repetition by merely changing a person's age, gender, clothing, or the color and arrangement of the same cards.
+
 ## Automatic article image brief
 
 SERPsmith constructs:
@@ -70,7 +86,8 @@ Article focus: [specific one-sentence idea]
 Query and intent: [query + reader goal]
 Reader promise: [audience + desired feeling/outcome]
 Site direction: [style, mood, palette, composition, preferences]
-Recent-image conflicts: [subjects/compositions/metaphors to avoid]
+Recent-image conflicts: [six-image motif inventory, repeated devices, and subjects/compositions/metaphors to avoid]
+Rotation proof: [at least two axes changed relative to each of the two most recent images]
 Concept: [candidate A or B, visibly different]
 Production: wide 16:9, article-specific, text-free, factually safe
 Clarity test: [literal connection a title-only viewer should recognize within three seconds]

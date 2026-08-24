@@ -2,10 +2,10 @@
 
 ## Product boundary
 
-- Git-backed websites only for v0.1.
+- Git-backed websites using the bundled Markdown/sitemap path.
 - Real site profiles and operational state external.
 - Runtime adapter contract documented.
-- Unsupported CMS/API targets described honestly.
+- Scope and runtime limitations described honestly.
 
 ## Clean environment
 
@@ -28,9 +28,10 @@ Test:
 - deterministic GA4 property/hostname access, 7/28/90-day snapshots, preceding windows, configured event counts, normalization, immutable output, auth failure, timeout, and cross-site rejection;
 - Content Intelligence recommendation states, 7–14 day observation gate, two-snapshot confirmation, explicit owner authorization boundary, and post-change measurement cooldown;
 - `scripts/test-search-onboarding.sh`, including ready, action-required, and secret-rejection fixtures;
+- `scripts/test-ai-search-readiness.mjs`, including ready, crawler-blocked, invalid llms.txt, cross-site, stale-evidence, and secret-rejection fixtures;
 - `scripts/test-user-onboarding-docs.sh`, including repository instructions and complete Google Cloud/Search Console and GA4 setup;
 - `scripts/test-google-analytics.mjs`;
-- final report;
+- final report with an explicit AI-search readiness section and no fabricated ranking score;
 - checkpoint resume after interruption;
 - completed-run retention dry-run and apply behavior, including protection for the newest three completed runs, incomplete runs, and analytics state;
 - prevention of duplicate article, image, commit, sitemap entry, notification, and report.

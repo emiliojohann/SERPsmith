@@ -1,25 +1,25 @@
 ---
 name: "serpsmith"
-description: "Multi-platform SEO publishing, analytics, recovery, and safe run retention."
+description: "Evidence-led SEO and AI-search publishing for Git-backed websites."
 ---
 
 # SERPsmith
 
-Multi-platform AI agent support for evidence-led SEO publishing on Git-based websites. Research, draft, create paired images, validate, publish, verify, and notify search engines without mixing sites or duplicating work.
+Multi-platform AI agent support for evidence-led SEO and AI-search-ready publishing on Git-backed websites. Research, draft, create paired images, validate, publish, verify, and notify search engines without mixing sites or duplicating work.
 
 ## Start here
 
-New operators read `references/quickstart.md`. Use `references/agent-runtime-onboarding.md` for runtime capability mapping, `references/repository-onboarding.md` for Git repository connection, `references/site-profile-schema.md` for configuration, `references/search-engine-onboarding.md` for Google Cloud, Google Search Console, Bing Webmaster Tools, and IndexNow setup, `references/image-system.md` for images, `references/runtime-setup.md` for runtime mapping, and `references/troubleshooting.md` for safe stops. Use `references/humanizer-integration.md` for the required portable prose-editing pass and `references/retention.md` for completed-run cleanup. The production read-only Google Analytics 4 extension is documented in `references/google-analytics-integration.md`; use `references/google-analytics-onboarding.md` for setup and verification and `references/content-intelligence.md` for the recommendation observation and authorization lifecycle.
+New operators read `references/quickstart.md`. Use `references/agent-runtime-onboarding.md` for runtime capability mapping, `references/repository-onboarding.md` for Git repository connection, `references/site-profile-schema.md` for configuration, `references/search-engine-onboarding.md` for Google Cloud, Google Search Console, Bing Webmaster Tools, and IndexNow setup, `references/image-system.md` for images, `references/runtime-setup.md` for runtime mapping, and `references/troubleshooting.md` for safe stops. Use `references/ai-search-discoverability.md` for AI-search readiness, `references/humanizer-integration.md` for the required portable prose-editing pass and `references/retention.md` for completed-run cleanup. The production read-only Google Analytics 4 extension is documented in `references/google-analytics-integration.md`; use `references/google-analytics-onboarding.md` for setup and verification and `references/content-intelligence.md` for the recommendation observation and authorization lifecycle.
 
-## v0.1 boundary
+## v0.4 Boundary
 
-Support Git-backed websites through a configured content adapter. The bundled reference adapter supports Markdown posts plus a simple XML sitemap. Do not claim arbitrary CMS/API support.
+Support Git-backed websites through the bundled Markdown/sitemap adapter and reviewed runtime capabilities. Real site repositories remain canonical after publication. Other publishing products and CMS integrations have independent codebases, profiles, policies, tests, and release cycles.
 
-Real profiles, credentials, destinations, drafts, reports, checkpoints, locks, and history stay outside the package. Load exactly one external JSON profile. Run structural validation with `scripts/validate-profile.mjs` before repository preflight.
+Real profiles, credentials, destinations, drafts, reports, checkpoints, locks, and history stay outside the package. Load exactly one external JSON profile and validate it before target preflight.
 
 ## Shared core policy
 
-Current core policy version: `serpsmith-core-v9`.
+Current core policy version: `serpsmith-core-v14`.
 
 All active profiles MUST declare the exact `core_policy_version` required by the live validator. Universal behavior belongs to SERPsmith's skill and references, never to an individual site profile.
 
@@ -42,15 +42,16 @@ Select one site profile and stable slot. Read repository instructions. Namespace
 Before research or mutation:
 
 1. Run structural JSON profile validation.
-2. Follow `references/repository-onboarding.md`; using the runtime's approved Git capability, verify repository, configured branch/upstream, clean tree, explicit repository instructions, and fast-forward-only state.
-3. Verify configured content/image paths and external state roots.
+2. Follow repository onboarding and verify the repository, branch/upstream, clean tree, instructions, and fast-forward-only state.
+3. Verify the configured content paths, image paths, sitemap/discovery paths, deployment behavior, and external state roots.
 4. Acquire external per-site/per-slot lock and checkpoint.
 5. Stop on dirty/diverged/conflicted state, missing ownership, unresolved placeholders, or unknown destructive state.
 6. Verify secret access without printing values.
 7. When search integrations are configured, validate exact allowlisted evidence against the selected profile; verify same-site Google property access, Bing verified ownership, the live IndexNow key file, and the sitemap through the standard search-onboarding evidence contract. Return exact user actions for incomplete checks; never guess identifiers or credentials.
 8. When `analytics` is configured, run the bundled GA4 check, verify exact property/hostname binding, and load a fresh immutable aggregate snapshot or one no older than one day. Never substitute another property's data.
-9. Verify that the portable Humanizer Agent Skill is discoverable at reviewed version 2.9.1 or newer. Do not substitute the retired OpenClaw-specific scoring CLI or silently skip the pass.
-10. Use bounded known-path checks; never scan broad directories for tools or credentials.
+9. When `ai_search.enabled` is true, verify configured search crawlers and prepare fresh per-article evidence using `references/ai-search-discoverability.md`. A known crawler block is a safe stop before publication; unavailable measurement is disclosed, not invented.
+10. Verify that the portable Humanizer Agent Skill is discoverable at reviewed version 2.9.1 or newer. Do not substitute the retired OpenClaw-specific scoring CLI or silently skip the pass.
+11. Use bounded known-path checks; never scan broad directories for tools or credentials.
 
 The structural validator does not execute Git, shell, network, image, or credential operations.
 
@@ -58,7 +59,21 @@ The structural validator does not execute Git, shell, network, image, or credent
 
 Inventory posts, slugs, intents, dates, links, and recent images. Use verified aggregate GA4 snapshots when configured, Search Console when configured, free SERP signals, and authoritative sources. Record query, intent, evidence, competition signal, site fit, cannibalization risk, sources, and link opportunities. Label demand `directional` unless measured volume exists. Never invent metrics, citations, consensus, or capabilities.
 
-Define title, slug, audience, intent, angle, sources, outline, links, CTA, metadata, excerpt, tags/category, image direction, alt text, and reading time. Follow the site schema and guardrails. One template-owned H1; body starts at H2 unless configured otherwise. Format every article body H2 and H3 in standard English Title Case, matching established site style; capitalize major words and keep short articles, coordinating conjunctions, and prepositions lowercase unless they begin or end the heading. Use direct authoritative citations, straight ASCII double quotes, and configured link limits. Never diagnose, promise cures, fabricate consensus, or claim unshipped behavior.
+Define title, slug, audience, intent, angle, sources, outline, links, CTA, metadata, excerpt, tags/category, image direction, alt text, and reading time. Use no more than two categories and three tags per article; prefer a smaller relevant set and never add filler taxonomy. Follow the site schema and guardrails. One template-owned H1; body starts at H2 unless configured otherwise. Format every article body H2 and H3 in standard English Title Case, matching established site style; capitalize major words and keep short articles, coordinating conjunctions, and prepositions lowercase unless they begin or end the heading. Use direct authoritative citations, straight ASCII double quotes, and configured link limits. Never diagnose, promise cures, fabricate consensus, or claim unshipped behavior.
+
+## AI-search discoverability and citation readiness
+
+Follow `references/ai-search-discoverability.md` when `ai_search.enabled` is true. AI-search readiness extends normal technical SEO; it does not replace it or guarantee selection, citation, ranking, traffic, or revenue.
+
+Create useful, original, non-commodity content with clear authorship, supported claims, direct answers, descriptive headings, visible dates, crawlable internal links, accurate canonicals and structured data, accessible images, sitemap inclusion, and rendered text. Do not rewrite for bots, add artificial "chunking," manufacture third-party mentions, or create special schema solely for LLMs.
+
+Keep search discovery separate from model training. For ChatGPT Search validate `OAI-SearchBot`; do not treat `GPTBot` permission as equivalent. For Perplexity search validate `PerplexityBot`; user-triggered fetchers are separate. Google AI features use Google's normal Search eligibility and ranking systems. An `llms.txt` file is optional for Google; if a site has one, validate that every listed URL is non-empty, canonical, same-site, and live.
+
+After deployment, collect fresh same-site evidence and run:
+
+    node scripts/ai-search-readiness.mjs PROFILE EVIDENCE
+
+A `verified` result means the configured readiness contract passed. An `action-required` result is a disclosed operational gap, not proof that the article cannot appear in an AI answer. Never collapse evidence into a fabricated universal "LLM score." Prompt citation benchmarks are directional observations only.
 
 ## Portable Humanizer pass
 
@@ -90,25 +105,25 @@ Link the new article to useful existing pages. Add small reciprocal links when n
 
 ## Images
 
-Follow `references/image-system.md`. Build the brief from article title/focus, query/intent, audience/promise, site `image_direction`, recent image history, and restrictions. Generate two meaningfully different concepts, inspect both, and rank every reviewed candidate. Prefer literal or functional visual connections over poetic abstraction. Apply the three-second clarity test with the exact article title as context.
+Follow `references/image-system.md`. Build the brief from article title/focus, query/intent, audience/promise, site `image_direction`, recent image history, and restrictions. Before generation, inventory at least the six most recently published article images when available and classify each image's subject or character, environment, focal object or action, camera perspective or composition, and metaphor or material. Build an explicit recent-image conflict list. Treat loose sheets, document cards, sticky notes, browser-window tiles, clipped page layouts, and floating rectangular panels as one shared paper/card motif even when their colors or layouts differ. If a motif appears in either of the two most recent images or at least twice in the last six, exclude it from both new candidate briefs unless the article genuinely requires that object for three-second clarity; when an exception is necessary, candidate B MUST avoid the motif and the checkpoint MUST explain the exception. Brand-palette continuity is required but never counts as meaningful visual variety. Relative to each of the two most recent images, each candidate MUST vary at least two axes among subject or character, environment, focal object or action, camera perspective or composition, and metaphor or material. Generate two meaningfully different concepts, inspect both, and rank every reviewed candidate. Prefer literal or functional visual connections over poetic abstraction. Apply the three-second clarity test with the exact article title as context.
 
 Review at most six generated candidates per run. Before the limit, reject candidates that fail clarity or required responsive composition and continue with a more direct concept. If none passes every quality gate after six candidates, select the highest-ranked fallback-eligible candidate and continue publication under the existing authorization.
 
 A fallback may have documented clarity, composition, anatomy, or responsive-crop weaknesses, but it MUST remain relevant, coherent, and pass hard publication gates: no unsafe or misleading claim, unrelated destructive signal, generated/pseudo-text, logo/brand, severe meaning-breaking generation defect, missing required asset, or invalid file/MIME/dimensions. Subject clipping, weakened gestures, reduced title clarity, and other aesthetic misses become disclosed quality exceptions after the sixth candidate; they do not stop publication when the image remains recognizable and technically usable. If no candidate is fallback-eligible, stop safely. Record all candidate rankings, the exact exception, and an owner-review recommendation in the checkpoint and final notification.
 
-Default production is exact 1280 x 720 WebP plus a locally derived matching JPEG. Focal-crop; never stretch. Inspect original candidates and every required desktop hero, mobile hero, blog-card, and social render. Responsive-crop weaknesses may use the six-candidate fallback whenever the image remains recognizable and technically usable; blank, corrupt, missing, or invalid assets may not. Strip metadata, verify dimensions/MIME, never overwrite, and validate live assets/crawlers.
+Default production is an exact 1280 x 720 WebP hero plus a locally derived matching JPEG social image. Focal-crop; never stretch. Inspect original candidates and every required desktop hero, mobile hero, blog-card, and social render. Responsive-crop weaknesses may use the six-candidate fallback whenever the image remains recognizable and technically usable; blank, corrupt, missing, or invalid assets may not. Strip metadata, verify dimensions/MIME, never overwrite, and validate live assets/crawlers.
 
-## Content and repository validation
+## Content and target validation
 
-The bundled Markdown adapter is `scripts/markdown-content-adapter.mjs`. It writes one new Markdown article and updates a simple XML sitemap from explicit JSON input. Custom layouts require a custom adapter.
+The bundled content adapter is `scripts/markdown-content-adapter.mjs`.
 
-Before commit validate content syntax/schema, headings, slug, metadata, citations, links, images, discovery files, expected diff, allowed checks, staged secrets/private data, and the completed portable Humanizer pass. Do not run prohibited tests or include unrelated changes.
+Before commit validate content syntax/schema, headings, slug, metadata, citations, links, images, discovery files, configured AI-search content and crawler readiness, expected diff, allowed checks, staged secrets/private data, and the completed portable Humanizer pass. Do not run prohibited tests or include unrelated changes.
 
 ## Publish and verify
 
-Publishing requires explicit per-run approval or recorded site authorization. Create one focused commit, push normally to configured SSH branch, never force-push, verify deployment/article/canonical/links/metadata/sitemap/assets/crawlers, then run configured search adapters. Accepted notification does not guarantee indexing or ranking.
+Publishing requires explicit per-run approval or recorded site authorization. Create one focused normal commit and push; never force-push. Verify article, canonical, links, metadata, sitemap, assets, crawlers, AI-search evidence, and search adapters. Accepted notification does not guarantee indexing or ranking.
 
-Pre-push failure leaves the article unpublished. Post-push failure never creates a second publication commit or rollback; resume only incomplete verification, notification, or reporting.
+A pre-push failure leaves the article unpublished. After publication, resume only incomplete verification, notification, or reporting.
 
 Validate live HTML semantically where possible. Accept equivalent valid serialization such as attribute-order and closing-tag variations. Use exact literal matching only when the selected site profile explicitly guarantees that template output.
 
@@ -183,7 +198,7 @@ Onboard manually: follow `references/repository-onboarding.md`, `references/agen
 
 ## Portability and reporting
 
-SERPsmith provides multi-platform AI agent support through the adapter contract. The agent environment must provide the required tools; chat-only agents or environments missing required capabilities cannot automate the workflow. Keep every platform's test status accurate: OpenClaw is the production-tested reference integration, while Hermes, Claude-based agent environments, ChatGPT agent environments, and others remain certification-pending until their exact setup passes the documented tests. Report title/URL, time/timezone, keyword evidence, metrics when available, portable Humanizer version/result without a fabricated score, old-page changes, images/crawlers, notifications, commit/deployment, and failures/recovery. Never expose secrets, credential paths, private identifiers, or secret-bearing URLs.
+SERPsmith provides multi-platform AI agent support through the adapter contract. The agent environment must provide the required tools; chat-only agents or environments missing required capabilities cannot automate the workflow. Keep every platform's test status accurate: OpenClaw is the production-tested reference integration, while Hermes, Claude-based agent environments, ChatGPT agent environments, and others remain certification-pending until their exact setup passes the documented tests. Report title/URL, time/timezone, keyword evidence, metrics when available, configured AI-search readiness without a fabricated score, portable Humanizer version/result without a fabricated score, old-page changes, images/crawlers, notifications, commit/deployment, and failures/recovery. Never expose secrets, credential paths, private identifiers, or secret-bearing URLs.
 
 Format every final publication report as clearly separated labeled sections, never as one dense paragraph or uninterrupted block. Put each major field on its own line and insert a blank line between fields or logical groups. Use this plain-text pattern, omitting only fields that do not apply:
 
@@ -196,6 +211,8 @@ Published: <local publication time and timezone, plus any configured secondary t
 Keyword evidence: <measured or directional evidence, with no unsupported volume claim>
 
 Analytics evidence: <GA4 snapshot window/status and concise aggregate finding, when configured>
+
+AI-search readiness: <platforms, crawler access, technical/content evidence, measurement status, and limitations>
 
 Images:
 - <hero asset and dimensions>

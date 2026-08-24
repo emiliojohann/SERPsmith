@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.4.0-beta.1
+
+- Added a six-image visual-motif inventory and rotation budget for article artwork.
+- Grouped loose sheets, document cards, sticky notes, browser-window tiles, clipped layouts, and floating rectangular panels as one paper/card motif so cosmetic changes cannot pass as variety.
+- Required every new candidate to vary at least two major visual axes from each of the two most recent images while preserving the site's brand palette.
+- Fixed the AI-search readiness entrypoint syntax error so resumable post-publication verification can execute.
+- Enforced a universal maximum of two categories and three tags per article.
+- Released the evidence-based AI-search/AIO readiness, GA4 Content Intelligence, portable Humanizer, guarded execution, search onboarding, and retention capabilities as one Git-backed beta package.
+- Advanced shared policy to `serpsmith-core-v14`.
+
+## v0.2.0-beta.1
+
+- Added evidence-based readiness for Google AI features, ChatGPT Search, and Perplexity search.
+- Added deterministic crawler, technical, content, measurement, and optional llms.txt checks.
+- Distinguished search-discovery crawlers from training and user-triggered bots.
+- Prohibited artificial LLM chunking, unsupported schema, fabricated visibility scores, and ranking guarantees.
+- Kept Git publishing unchanged and advanced to `serpsmith-core-v10`.
+
 ## v0.1.0-beta.4
 
 - Added safe per-site completed-run cleanup that retains the latest three completed article runs while protecting resumable runs, analytics snapshots, and recommendation state.

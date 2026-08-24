@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
-const CORE_POLICY_VERSION="serpsmith-core-v9";
-const TOP_LEVEL_KEYS=new Set(["core_policy_version","site_key","repository","branch","remote","public_base_url","article_route","content_adapter","image_directory","image_policy","image_direction","sitemap_file","sitemap_url","llms_file","llms_full_file","search_console_property","bing_site_url","indexnow_host","required_notifications","deployment_adapter","checkpoint_root","lock_root","timezone","editorial_guardrails","autopilot_enabled","repository_instruction_files","validation_commands","crawler_user_agents","internal_link_minimum","external_link_limits","prose_adapter","notification_adapter","schedule","authorization","product_source","validation_policy","robots_policy","analytics"]);
+const CORE_POLICY_VERSION="serpsmith-core-v14";
+const TOP_LEVEL_KEYS=new Set(["core_policy_version","site_key","repository","branch","remote","public_base_url","article_route","content_adapter","image_directory","image_policy","image_direction","sitemap_file","sitemap_url","llms_file","llms_full_file","search_console_property","bing_site_url","indexnow_host","required_notifications","deployment_adapter","checkpoint_root","lock_root","timezone","editorial_guardrails","autopilot_enabled","repository_instruction_files","validation_commands","crawler_user_agents","internal_link_minimum","external_link_limits","prose_adapter","notification_adapter","schedule","authorization","product_source","validation_policy","robots_policy","analytics","ai_search"]);
 const IMAGE_POLICY=new Set(["width","height","hero_format","hero_quality","social_format","social_quality","derive_social_from_hero","strip_metadata","social_crawlers"]);
 const IMAGE_DIRECTION=new Set(["style","mood","palette","composition","prefer","avoid","preferred_visual_language","forbidden_imagery"]);
 const NOTIFICATIONS=new Set(["google-search-console","bing-webmaster-tools","indexnow"]);
 const ANALYTICS_KEYS=new Set(["adapter","property_id","expected_hostname","windows_days","organic_channel","key_events"]);
+const AI_SEARCH_KEYS=new Set(["enabled","platforms","llms_txt_policy","measurement"]);
+const AI_SEARCH_PLATFORMS=new Set(["google-ai-features","chatgpt-search","perplexity-search"]);
+const AI_SEARCH_LLMS_POLICIES=new Set(["optional","validate-if-present","required"]);
+const AI_SEARCH_MEASUREMENTS=new Set(["search-console-generative-ai","ga4-ai-referrals","prompt-citation-benchmark"]);
 const SECRET_KEY=/(^|_)(api_?key|key_value|token|secret|password|credential|credential_path|credential_file|private_key|oauth_token)$/i;
 const SECRET_VALUE=/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|\bgh[pousr]_[A-Za-z0-9]{20,}\b|\bsk-[A-Za-z0-9_-]{16,}\b|\bAKIA[A-Z0-9]{16}\b|\bAIza[A-Za-z0-9_-]{30,}\b|\bxox[baprs]-[A-Za-z0-9-]{10,}\b|\bglpat-[A-Za-z0-9_-]{16,}\b|\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/;
 const OVERRIDES=[/safe[-_ ]?zone/i,/\bpixel(?:s)?\b/i,/\bcoordinate(?:s)?\b/i,/\bx\s*=\s*\d/i,/\by\s*=\s*\d/i,/\b(?:retry|attempt) budget\b/i,/\bvalidation gate\b/i,/\bevery (?:rendered )?crop\b/i,/\ball (?:rendered )?crops\b/i];
@@ -21,21 +25,20 @@ if(!p||typeof p!=="object"||Array.isArray(p))fail(64,"invalid_profile","profile 
 const inspect=(v,t=[])=>{if(!v||typeof v!=="object")return;for(const [k,c] of Object.entries(v)){if(SECRET_KEY.test(k))fail(64,"secret_field_forbidden",t.concat(k).join("."));inspect(c,t.concat(k));}};inspect(p);
 for(const k of Object.keys(p))if(!TOP_LEVEL_KEYS.has(k))fail(64,"unknown_field",k);
 if(p.core_policy_version!==CORE_POLICY_VERSION)fail(64,"core_policy_mismatch","core_policy_version must equal "+CORE_POLICY_VERSION);
-for(const k of ["site_key","repository","branch","remote","public_base_url","article_route","image_directory","checkpoint_root","lock_root","timezone"])if(typeof p[k]!=="string"||!p[k].trim())fail(64,"missing_field",k);
+for(const k of ["site_key","public_base_url","article_route","checkpoint_root","lock_root","timezone"])if(typeof p[k]!=="string"||!p[k].trim())fail(64,"missing_field",k);
 if(!/^[a-z0-9][a-z0-9-]*$/.test(p.site_key))fail(64,"invalid_site_key","lowercase letters, numbers, hyphens only");
-if(!path.isAbsolute(p.repository))fail(64,"repository_not_absolute","use absolute repository path");
+
 let base;try{base=new URL(p.public_base_url);if(base.protocol!=="https:"||base.username||base.password||base.search||base.hash||(base.pathname!=="/"&&base.pathname!==""))throw new Error();}catch{fail(64,"invalid_public_url","public_base_url must be HTTPS origin");}
 const origin=base.origin,host=base.hostname.toLowerCase();
 if(!/^\/(?!\/)(?!.*(?:\.\.|[?#]))[^\s]*<slug>[^\s]*$/.test(p.article_route)||(p.article_route.match(/<slug>/g)||[]).length!==1)fail(64,"invalid_article_route","use one traversal-free root-relative route containing <slug>");
 const relative=(v,l)=>{if(typeof v!=="string"||!v||path.isAbsolute(v)||v.split(/[\\/]/).includes(".."))fail(64,"invalid_repository_path",l);};
-relative(p.image_directory,"image_directory");
+if(p.image_directory!==undefined)relative(p.image_directory,"image_directory");
 for(const k of ["sitemap_file","llms_file","llms_full_file"])if(p[k]!==undefined)relative(p[k],k);
 if(!p.content_adapter||typeof p.content_adapter!=="object"||typeof p.content_adapter.name!=="string"||!p.content_adapter.name.trim())fail(64,"missing_content_adapter","content_adapter.name");
-for(const [k,v] of Object.entries(p.content_adapter))if(k!=="name"&&typeof v==="string"&&/(?:file|directory|path)$/.test(k))relative(v,"content_adapter."+k);
+if(!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(p.content_adapter.name))fail(64,"invalid_content_adapter","safe adapter identifier required");for(const [k,v] of Object.entries(p.content_adapter))if(k!=="name"&&typeof v==="string"&&/(?:file|directory|path)$/.test(k))relative(v,"content_adapter."+k);
 if(!p.deployment_adapter||typeof p.deployment_adapter!=="object"||typeof p.deployment_adapter.name!=="string"||!p.deployment_adapter.name.trim())fail(64,"missing_deployment_adapter","deployment_adapter.name");
 if(!Array.isArray(p.editorial_guardrails)||!p.editorial_guardrails.length||p.editorial_guardrails.some(x=>typeof x!=="string"||!x.trim()))fail(64,"invalid_editorial_guardrails","non-empty string array required");
-if(!Array.isArray(p.repository_instruction_files)||!p.repository_instruction_files.length)fail(64,"missing_repository_instructions","at least one reviewed path required");
-for(const x of p.repository_instruction_files)relative(x,"repository_instruction_files");
+for(const k of ["repository","branch","remote","image_directory"])if(typeof p[k]!=="string"||!p[k].trim())fail(64,"missing_field",k);if(!path.isAbsolute(p.repository))fail(64,"repository_not_absolute","use absolute repository path");if(!Array.isArray(p.repository_instruction_files)||!p.repository_instruction_files.length)fail(64,"missing_repository_instructions","at least one reviewed path required");for(const x of p.repository_instruction_files)relative(x,"repository_instruction_files");
 if(!p.image_policy||!Number.isInteger(p.image_policy.width)||p.image_policy.width<1||!Number.isInteger(p.image_policy.height)||p.image_policy.height<1)fail(64,"invalid_image_policy","positive integer dimensions required");
 for(const k of Object.keys(p.image_policy))if(!IMAGE_POLICY.has(k))fail(64,"core_policy_override","image_policy."+k);
 const imageFormats=new Set(["webp","jpeg","jpg","png","avif"]);
@@ -54,6 +57,14 @@ if(p.sitemap_url!==undefined)sameOrigin(p.sitemap_url,"sitemap_url");
 if(p.bing_site_url!==undefined)sameOrigin(p.bing_site_url,"bing_site_url");
 if(p.indexnow_host!==undefined&&String(p.indexnow_host).toLowerCase()!==host)fail(64,"cross_site_identifier","indexnow_host");
 if(p.search_console_property!==undefined){const v=String(p.search_console_property);if(v.startsWith("sc-domain:")){const d=v.slice(10).toLowerCase();if(!(host===d||host.endsWith("."+d)))fail(64,"cross_site_identifier","search_console_property");}else{let u;try{u=new URL(v);}catch{fail(64,"invalid_search_console_property","use domain or HTTPS URL-prefix");}if(u.protocol!=="https:"||u.origin!==origin)fail(64,"cross_site_identifier","search_console_property");}}
+if(p.ai_search!==undefined){
+if(!p.ai_search||typeof p.ai_search!=="object"||Array.isArray(p.ai_search))fail(64,"invalid_ai_search","object required");
+for(const k of Object.keys(p.ai_search))if(!AI_SEARCH_KEYS.has(k))fail(64,"unknown_field","ai_search."+k);
+if(typeof p.ai_search.enabled!=="boolean")fail(64,"invalid_ai_search","enabled must be boolean");
+for(const [k,allowed] of [["platforms",AI_SEARCH_PLATFORMS],["measurement",AI_SEARCH_MEASUREMENTS]]){const v=p.ai_search[k];if(!Array.isArray(v)||!v.length||new Set(v).size!==v.length||v.some(x=>!allowed.has(x)))fail(64,"invalid_ai_search",k+" must contain unique supported values");}
+if(!AI_SEARCH_LLMS_POLICIES.has(p.ai_search.llms_txt_policy))fail(64,"invalid_ai_search","llms_txt_policy unsupported");
+if(p.ai_search.llms_txt_policy==="required"&&!p.llms_file)fail(64,"invalid_ai_search","required llms.txt needs llms_file");
+}
 if(p.analytics!==undefined){
 if(!p.analytics||typeof p.analytics!=="object"||Array.isArray(p.analytics))fail(64,"invalid_analytics","object required");
 for(const k of Object.keys(p.analytics))if(!ANALYTICS_KEYS.has(k))fail(64,"unknown_field","analytics."+k);
@@ -67,7 +78,7 @@ if(!Array.isArray(p.analytics.key_events)||p.analytics.key_events.length>20||new
 if(p.required_notifications!==undefined){if(!Array.isArray(p.required_notifications)||p.required_notifications.some(x=>!NOTIFICATIONS.has(x)))fail(64,"invalid_required_notifications","invalid name");if((p.required_notifications.includes("google-search-console")||p.required_notifications.includes("bing-webmaster-tools"))&&!p.sitemap_url)fail(64,"missing_search_identifier","sitemap_url");if(p.required_notifications.includes("google-search-console")&&!p.search_console_property)fail(64,"missing_search_identifier","search_console_property");if(p.required_notifications.includes("bing-webmaster-tools")&&!p.bing_site_url)fail(64,"missing_search_identifier","bing_site_url");if(p.required_notifications.includes("indexnow")&&!p.indexnow_host)fail(64,"missing_search_identifier","indexnow_host");}
 const identifier=(v,l)=>{if(v!==undefined&&(typeof v!=="string"||!/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(v)))fail(64,"invalid_adapter_identifier",l);};
 identifier(p.remote,"remote"); identifier(p.prose_adapter,"prose_adapter"); identifier(p.notification_adapter,"notification_adapter");
-if(typeof p.branch!=="string"||!/^(?![-./])(?!.*(?:\.\.|\/\/|@\{|[~^:?*\[\\\s]))(?!.*(?:\/|\.|\.lock)$)[A-Za-z0-9._\/-]+$/.test(p.branch))fail(64,"invalid_branch","branch must be a safe Git ref name");
+if(!/^(?![-./])(?!.*(?:\.\.|\/\/|@\{|[~^:?*\[\\\s]))(?!.*(?:\/|\.|\.lock)$)[A-Za-z0-9._\/-]+$/.test(p.branch))fail(64,"invalid_branch","branch must be a safe Git ref name");
 if(p.repository_instruction_files.some(x=>typeof x!=="string")||new Set(p.repository_instruction_files).size!==p.repository_instruction_files.length)fail(64,"invalid_repository_instructions","unique string paths required");
 if(p.required_notifications!==undefined&&new Set(p.required_notifications).size!==p.required_notifications.length)fail(64,"invalid_required_notifications","duplicates forbidden");
 if(p.internal_link_minimum!==undefined&&(!Number.isInteger(p.internal_link_minimum)||p.internal_link_minimum<0))fail(64,"invalid_internal_link_minimum","nonnegative integer required");

@@ -1,0 +1,48 @@
+{
+  "site_key": "example-site",
+  "origin": "https://example.com",
+  "article_url": "https://example.com/blog/example",
+  "checked_at": "2099-01-01T00:00:00.000Z",
+  "platforms": {
+    "google-ai-features": {
+      "crawler": "Googlebot",
+      "access": "allowed"
+    },
+    "chatgpt-search": {
+      "crawler": "OAI-SearchBot",
+      "access": "allowed"
+    },
+    "perplexity-search": {
+      "crawler": "PerplexityBot",
+      "access": "allowed"
+    }
+  },
+  "technical": {
+    "indexed_or_eligible": true,
+    "snippet_eligible": true,
+    "canonical_matches": true,
+    "sitemap_contains_url": true,
+    "rendered_text_available": true,
+    "structured_data_matches_visible": true,
+    "internal_links_present": true,
+    "image_context_accessible": true
+  },
+  "content": {
+    "original_value_documented": true,
+    "claims_source_mapped": true,
+    "clear_authorship": true,
+    "published_and_modified_dates": true,
+    "descriptive_headings": true,
+    "direct_answer_present": true
+  },
+  "measurement": {
+    "search-console-generative-ai": "ready",
+    "ga4-ai-referrals": "ready",
+    "prompt-citation-benchmark": "ready"
+  },
+  "llms_txt": {
+    "status": "absent",
+    "empty_links": 0,
+    "canonical_links_only": true
+  }
+}

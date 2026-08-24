@@ -1,6 +1,6 @@
 {
   "site_key": "example-site",
-  "core_policy_version": "serpsmith-core-v9",
+  "core_policy_version": "serpsmith-core-v14",
   "repository": "/absolute/path/to/example-site",
   "branch": "main",
   "remote": "origin",
@@ -68,5 +68,19 @@
     ],
     "organic_channel": "Organic Search",
     "key_events": []
+  },
+  "ai_search": {
+    "enabled": true,
+    "platforms": [
+      "google-ai-features",
+      "chatgpt-search",
+      "perplexity-search"
+    ],
+    "llms_txt_policy": "validate-if-present",
+    "measurement": [
+      "search-console-generative-ai",
+      "ga4-ai-referrals",
+      "prompt-citation-benchmark"
+    ]
   }
 }

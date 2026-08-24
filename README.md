@@ -1,26 +1,27 @@
 # SERPsmith
 
-SERPsmith provides multi-platform AI agent support for evidence-led SEO publishing on Git-based websites. An agent can use it when its environment provides the required repository, research, image, network, secret, state, and approval tools.
+SERPsmith provides multi-platform AI agent support for evidence-led SEO and AI-search publishing on Git-backed websites. An agent can use it when its environment provides the required repository, research, image, network, secret, state, and approval tools.
 
 ## Beta status
 
-Version: `v0.1.0-beta.4`
+Version: `v0.4.0-beta.1`
 
-SERPsmith is beta software. Git-backed Markdown sites are the bundled reference path. Other repository layouts require a custom content adapter. CMS APIs, a hosted service, and a dashboard are not included. Runtime portability is capability-based; each runtime/version must be certified independently.
+SERPsmith is beta software. The bundled publishing path targets Git-backed Markdown sites with deterministic sitemap updates. Runtime portability is capability-based; each runtime/version must be certified independently.
 
 ## What it does
 
 - isolates every site through an external profile;
 - rejects duplicate or cannibalizing topics;
-- creates people-first articles with site-specific guardrails;
+- creates people-first articles with site-specific guardrails and at most two categories and three tags;
 - adds useful internal links and small reciprocal links with descriptive anchor text when natural;
 - starts with two distinct image concepts, reviews at most six generated candidates, and selects one using a documented rubric;
 - after six candidates, publishes the highest-ranked relevant, safe, technically valid fallback when no candidate clears every aesthetic gate, then discloses the exact exception for owner review;
-- produces a WebP hero and locally derived JPEG social image;
+- produces an exact 1280 x 720 WebP hero and a locally derived matching JPEG social image;
 - uses external checkpoints and locks to resume safely;
 - validates the expected diff before commit;
 - stops on secrets, unsafe claims, dirty/diverged repositories, auth failures, or conflicts;
 - verifies live content, metadata, assets, crawlers, and configured search notifications;
+- validates Google AI features, ChatGPT Search, and Perplexity search readiness from fresh same-site evidence without inventing an LLM score;
 - optionally verifies exact GA4 property/hostname access and creates immutable aggregate Organic Search snapshots.
 
 ## SEO principles and expectations
@@ -52,19 +53,20 @@ Read:
 1. `references/quickstart.md`
 2. `references/repository-onboarding.md`
 3. `references/search-engine-onboarding.md`
-4. `references/google-analytics-onboarding.md`
-5. `references/content-intelligence.md`
-6. `references/site-profile-schema.md`
-7. `references/agent-runtime-onboarding.md`
-8. `references/runtime-setup.md`
-9. `references/image-system.md`
-10. `references/troubleshooting.md`
+4. `references/ai-search-discoverability.md`
+5. `references/google-analytics-onboarding.md`
+6. `references/content-intelligence.md`
+7. `references/site-profile-schema.md`
+8. `references/agent-runtime-onboarding.md`
+9. `references/runtime-setup.md`
+10. `references/image-system.md`
+11. `references/troubleshooting.md`
 
 ## Safe first run
 
 1. Follow `references/repository-onboarding.md` and add reviewed site repository instructions from `templates/site-repository-instructions.md`.
 2. Follow `references/search-engine-onboarding.md` for Google Cloud/Search Console API, Bing, and IndexNow.
-3. Copy `examples/generic-git-site-profile.json` outside the repository.
+3. Copy the Git example profile outside the repository.
 4. Replace every placeholder and keep `autopilot_enabled` set to `false`.
 5. Validate the profile:
 
@@ -81,7 +83,8 @@ The disposable fixture in `examples/demo-site/` can be copied to a temporary loc
 ## Bundled adapters
 
 - `scripts/validate-profile.mjs`: structural JSON profile validation; no shell, Git, credential, or network execution.
-- `scripts/markdown-content-adapter.mjs`: creates a Markdown article and updates a simple XML sitemap from explicit JSON input.
+- `scripts/markdown-content-adapter.mjs`: creates a Markdown article and updates a simple XML sitemap.
+- `scripts/ai-search-readiness.mjs`: deterministic AI-search evidence validation.
 - `scripts/google-search-console-check.mjs`: read-only Google property/sitemap test.
 - `scripts/google-analytics-check.mjs`: read-only GA4 property/hostname/Data API verification.
 - `scripts/google-analytics-snapshot.mjs`: immutable aggregate Organic Search 7/28/90-day snapshots.

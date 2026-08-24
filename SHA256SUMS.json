@@ -8,8 +8,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "42519a6b878a1f50bfab832e226627a3bec84eea57777049b944821209be5a69",
-      "bytes": 2213
+      "sha256": "64472e63f95f15e88c63d478f1343134ae4d833f7fa5173e0f400566d508fc9a",
+      "bytes": 3571
     },
     {
       "path": "COMMERCIAL-LICENSE.md",
@@ -20,6 +20,11 @@
       "path": "CONTRIBUTING.md",
       "sha256": "7f8a0d1d4313cfb6cb768bac0cbb06b507a1d5f867438536a071c58776042158",
       "bytes": 702
+    },
+    {
+      "path": "examples/ai-search-readiness-evidence.json",
+      "sha256": "8b3b4c706e5c86e77b08f2fc8ef6d9d059447ab4cd40dfdd5528499704da38d7",
+      "bytes": 1243
     },
     {
       "path": "examples/demo-site/content/blog/git-content-workflow.md",
@@ -48,8 +53,8 @@
     },
     {
       "path": "examples/generic-git-site-profile.json",
-      "sha256": "d23bbd04ba69fb28f93d4c343a420db31a378671eb714b455fcfbe09cbedd7b0",
-      "bytes": 1930
+      "sha256": "8134525953789c220a773bb76e8cecfda4dbcfd43ad48d44f0a5431840a00e1b",
+      "bytes": 2249
     },
     {
       "path": "examples/hermes-site-profile.md",
@@ -123,18 +128,23 @@
     },
     {
       "path": "README.md",
-      "sha256": "1470225f3b0f673b8974a8534397d045724612d89cd83165ba24e8971fc73948",
-      "bytes": 8698
+      "sha256": "34867874167568584ffbf2d123940fd1965e7c2d45d86c43b04fa422c8df3a89",
+      "bytes": 8931
     },
     {
       "path": "references/adapter-contract.md",
-      "sha256": "dec16003628ec0e93db7c846d10a1817eb8b977b653c6799e1f52dc8eaf448b0",
-      "bytes": 2366
+      "sha256": "00de1228045c7531d65dcaab7c076d1ef5e56001ed21b1af97ef3f1b0fa369c2",
+      "bytes": 2541
     },
     {
       "path": "references/agent-runtime-onboarding.md",
       "sha256": "10bb1741da187bd555e319931df62b78763ab130316235b16a16275478680f91",
       "bytes": 4841
+    },
+    {
+      "path": "references/ai-search-discoverability.md",
+      "sha256": "525a5c294b1bae339a3ab7d3fa3cdc244a20fd6806cd5f2ed4f68c268768f731",
+      "bytes": 2947
     },
     {
       "path": "references/compatibility.md",
@@ -163,18 +173,18 @@
     },
     {
       "path": "references/image-system.md",
-      "sha256": "4e1f77697ef8d7ca37c3459b0d728009baa2fef06f3304845d331abbcd8cfb57",
-      "bytes": 9217
+      "sha256": "527994c0451018696320f33591049643fc4ada16e1541cfd101a3bce16267aee",
+      "bytes": 10951
     },
     {
       "path": "references/quickstart.md",
-      "sha256": "9c724ab4dd16fc386d82d014d69e45e2715267c21f5413d40dfd7b0a525bd83c",
-      "bytes": 3227
+      "sha256": "14ef5f9bd7dd73e471559e83d5598a5a9a75503d6de8aedd827688c6a90471c9",
+      "bytes": 3377
     },
     {
       "path": "references/release-validation.md",
-      "sha256": "c2fb80a262e892c6d77b886e59929b4544f3e353a0b0961030952af0aee6152a",
-      "bytes": 3418
+      "sha256": "e9d8d8f6394e4d0cfcbff095b14954430faf538d6a444130b550acbbce585f31",
+      "bytes": 3676
     },
     {
       "path": "references/repository-onboarding.md",
@@ -198,8 +208,8 @@
     },
     {
       "path": "references/site-profile-schema.md",
-      "sha256": "421529e0ef87db9b840a16800cefb7bebae900095d2a41f3046f559e588f48ac",
-      "bytes": 5995
+      "sha256": "3aad0b430b1ff003c2a079010ba8acbbd160804465e047d6da1713bf813b5e4c",
+      "bytes": 6567
     },
     {
       "path": "references/troubleshooting.md",
@@ -210,6 +220,16 @@
       "path": "references/unattended-run.md",
       "sha256": "0244d35fa79c4ba763832cb3cfd1b6a421d4ff41630dfcecdd862a3b29d72eee",
       "bytes": 2737
+    },
+    {
+      "path": "scripts/ai-search-readiness-core.mjs",
+      "sha256": "c3dc02a4c7f14ca1cdf1ca4344f81a0254e10ac1c4573a0361dcd0fe37da6962",
+      "bytes": 3709
+    },
+    {
+      "path": "scripts/ai-search-readiness.mjs",
+      "sha256": "3c44f49b382edb50a98746b5b4842b1b47f555217b2a94a72fd7708d60e50be0",
+      "bytes": 1063
     },
     {
       "path": "scripts/bing-webmaster-submit.sh",
@@ -277,6 +297,11 @@
       "bytes": 5369
     },
     {
+      "path": "scripts/test-ai-search-readiness.mjs",
+      "sha256": "36b93111572d8ec16823de2c0b76601d2681120b7bcefa0a151bd1678db14610",
+      "bytes": 1325
+    },
+    {
       "path": "scripts/test-controlled-attempt.sh",
       "sha256": "fc5838c8ceb2fd234b437dc799153341562e5eddbc2744f309813a6e9569f7ec",
       "bytes": 1178
@@ -288,8 +313,8 @@
     },
     {
       "path": "scripts/test-profile-validation.sh",
-      "sha256": "91979549a983f60e67ac984694670f4529a607914b749f329077fbf5ad68d25b",
-      "bytes": 3088
+      "sha256": "ea532ecb365a79c595091dc9bb44e819cb0d72bfc6be1ecafe77539494ace11d",
+      "bytes": 3526
     },
     {
       "path": "scripts/test-prune-completed-runs.mjs",
@@ -303,13 +328,13 @@
     },
     {
       "path": "scripts/test-user-onboarding-docs.sh",
-      "sha256": "a15717c9da06043d6951064e207cdda76cc2fc4e6497f917179b511b69574c41",
-      "bytes": 4552
+      "sha256": "6c98deacdf6a40f4986ea73d293e9e8b8b8e7a7f955411b57330155145eb127f",
+      "bytes": 5151
     },
     {
       "path": "scripts/validate-profile.mjs",
-      "sha256": "eea753bd0ed67825ed2cc6cb788349b024b8f961e76e619f243d08779ba6010b",
-      "bytes": 16472
+      "sha256": "fb2d35b17d8280bee86b1959bf91415d3e4d9f1ac871054e40e260d050192470",
+      "bytes": 17984
     },
     {
       "path": "SECURITY.md",
@@ -318,8 +343,8 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "9487bc92cf7e09363bfafcba90a6c3808c2df18b81617d3510765b8757a3c878",
-      "bytes": 26084
+      "sha256": "2fba149e54f4e36851ab80b0c347d67ab210041ee282936ac594f70beb750f41",
+      "bytes": 29276
     },
     {
       "path": "templates/runtime-capability-map.md",
@@ -328,12 +353,12 @@
     },
     {
       "path": "templates/site-repository-instructions.md",
-      "sha256": "7977e8810ca9571f8526242835ba791dcd3ffa5447ebb4a205226be0e9720f45",
-      "bytes": 1791
+      "sha256": "285c15ed4dbf5fb0fbb0bdf3bc4fa188f71fbae3432eaaf57c1e0e72cba7900f",
+      "bytes": 2152
     },
     {
       "path": "VERSION",
-      "sha256": "cd3a330dd51b60d621e3f45b75cfe75adde46dc4732c783c8b8867eee09e25d5",
+      "sha256": "ade4fba74f7b9ebd628fde0ae61e98c59f9275c1a1b2221febc1cd72fd3487e7",
       "bytes": 14
     }
   ]

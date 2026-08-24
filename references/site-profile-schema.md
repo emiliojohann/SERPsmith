@@ -2,17 +2,28 @@
 
 Real profiles stay outside the repository. The bundled validator accepts JSON only. YAML requires conversion to identical JSON before bundled validation.
 
-Every active profile declares `core_policy_version: serpsmith-core-v9`.
+Every active profile declares `core_policy_version: serpsmith-core-v14`.
 
 ## Required
 
-`core_policy_version`, `site_key`, `repository`, `branch`, `remote`, `public_base_url`, `article_route`, `content_adapter`, `image_directory`, `image_policy`, `deployment_adapter`, `checkpoint_root`, `lock_root`, `timezone`, `editorial_guardrails`, `repository_instruction_files`, and `autopilot_enabled`.
+All profiles require `core_policy_version`, `site_key`, `repository`, `branch`, `remote`, `public_base_url`, `article_route`, `content_adapter`, `image_directory`, `image_policy`, `deployment_adapter`, `checkpoint_root`, `lock_root`, `timezone`, `editorial_guardrails`, `repository_instruction_files`, and `autopilot_enabled`.
 
 Repository content/image/discovery/instruction paths are relative and traversal-free. Repository/state roots are absolute. State stays outside the repository and is namespaced by site_key. Timezones are valid IANA names.
 
 ## Search
 
 Profiles contain only public `search_console_property`, `bing_site_url`, `indexnow_host`, `sitemap_url`, and `required_notifications`. `sitemap_url` is mandatory whenever Google Search Console or Bing Webmaster Tools notification is required. Identifiers must cover the profile host. Evidence is validated with both evidence and profile paths. Unknown fields, secret-like values, wrong sites, and required-flag mismatches fail closed.
+
+## AI-search readiness
+
+The optional `ai_search` object contains:
+
+- `enabled`: boolean.
+- `platforms`: unique subset of `google-ai-features`, `chatgpt-search`, and `perplexity-search`.
+- `llms_txt_policy`: `optional`, `validate-if-present`, or `required`.
+- `measurement`: unique subset of `search-console-generative-ai`, `ga4-ai-referrals`, and `prompt-citation-benchmark`.
+
+When llms.txt is required, the profile must declare `llms_file`. Per-article evidence stays external. Readiness never guarantees selection, citation, rankings, or traffic.
 
 ## Google Analytics 4
 

@@ -56,3 +56,6 @@ Complete and review this file before SERPsmith changes the repository. Remove al
 
 Approval: [repository owner name or role]
 Reviewed date: [YYYY-MM-DD]
+## AI-search readiness
+
+Preserve crawlability, canonical, structured-data, sitemap, visible-author/date, internal-link, rendered-text, and accessible-image behavior. If this repository publishes llms.txt, every listed URL must be non-empty, canonical, same-site, and live. Do not add artificial bot-focused chunking, unsupported schema, or ranking guarantees.
