@@ -8,8 +8,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "64472e63f95f15e88c63d478f1343134ae4d833f7fa5173e0f400566d508fc9a",
-      "bytes": 3571
+      "sha256": "034e7ebd93119d19b23694ef1d552e33648beaa93f184a0374b499b964e37591",
+      "bytes": 4294
     },
     {
       "path": "COMMERCIAL-LICENSE.md",
@@ -53,7 +53,7 @@
     },
     {
       "path": "examples/generic-git-site-profile.json",
-      "sha256": "8134525953789c220a773bb76e8cecfda4dbcfd43ad48d44f0a5431840a00e1b",
+      "sha256": "a6e790f581bc678f96179af57171b45396e306f0d17ade9a5a75ab1fe68a0a2e",
       "bytes": 2249
     },
     {
@@ -78,33 +78,33 @@
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/openclaw.plugin.json",
-      "sha256": "c3f44d6473c013fccb5bfaccb590a197bfad03e4db921d29dadb3364e34c4d95",
+      "sha256": "93383042379b442970d1cb6a9cba9e06881ec831cc12f81f9030ccc5dcfc977b",
       "bytes": 727
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/package-lock.json",
-      "sha256": "b7b36044e7ed1d90088b7bf523da5c5e7d3ded0f36d7610fe3e84b9a8f5887af",
+      "sha256": "ef0719c0cdf2fd58d238d8f25f752dd381741beea1e0efd46716a097c15d72db",
       "bytes": 53769
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/package.json",
-      "sha256": "f7b9b037736b5204005e95187bbf61493ff6f588e23359415ecbb7e7fbdc2f87",
+      "sha256": "c0efe1ecbaadb15d95c247c57b78929af5c6536daebb95c1306365a539256ea1",
       "bytes": 885
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/README.md",
-      "sha256": "fa0a64bf75e30bf20ee816add8f896b931d203d1c001d81824dc477015f20856",
-      "bytes": 1147
+      "sha256": "2f2736df6a31db7be674acd85f9374583657993f8d740432ba919248bfe785da",
+      "bytes": 1185
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/src/index.test.ts",
-      "sha256": "b340382be76ac84f76d5ff62e5448921118029d5e919932fa9b7e74d3be69ec3",
-      "bytes": 3317
+      "sha256": "c77d52b2e098ac273fc47d6ec97802784f5e516bb9ab2f55d4e424697cc5ae17",
+      "bytes": 5246
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/src/index.ts",
-      "sha256": "ce661089d4ec16d1683a1a68e34af851f1602d8f410f570fbd978e3734c57ea0",
-      "bytes": 9064
+      "sha256": "055a7dbd1dd77701be374036ad741c14f43367f5d5c1647546564758fbbeaa17",
+      "bytes": 10117
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/src/openclaw-tool-plugin.d.ts",
@@ -128,13 +128,13 @@
     },
     {
       "path": "README.md",
-      "sha256": "34867874167568584ffbf2d123940fd1965e7c2d45d86c43b04fa422c8df3a89",
-      "bytes": 8931
+      "sha256": "d569ad6a200b9a1fb188a3f6ae2b55dc4490776246e041af94b3dd6479bf6512",
+      "bytes": 9097
     },
     {
       "path": "references/adapter-contract.md",
-      "sha256": "00de1228045c7531d65dcaab7c076d1ef5e56001ed21b1af97ef3f1b0fa369c2",
-      "bytes": 2541
+      "sha256": "3bd51c5d06c5c156760ba9da289f650dafecfb08b79da4c748c7b9fe2e86132e",
+      "bytes": 2607
     },
     {
       "path": "references/agent-runtime-onboarding.md",
@@ -172,6 +172,11 @@
       "bytes": 5270
     },
     {
+      "path": "references/grok-build-onboarding.md",
+      "sha256": "9c01350022253d5e177c1a8596d9648c545dbf4f0d74fbc58de4efbd5a834f65",
+      "bytes": 3164
+    },
+    {
       "path": "references/image-system.md",
       "sha256": "527994c0451018696320f33591049643fc4ada16e1541cfd101a3bce16267aee",
       "bytes": 10951
@@ -183,8 +188,8 @@
     },
     {
       "path": "references/release-validation.md",
-      "sha256": "e9d8d8f6394e4d0cfcbff095b14954430faf538d6a444130b550acbbce585f31",
-      "bytes": 3676
+      "sha256": "a487c7d5dd5db877f94171113498f3817443381843888eed67c26bab830d3bc4",
+      "bytes": 3829
     },
     {
       "path": "references/repository-onboarding.md",
@@ -193,13 +198,13 @@
     },
     {
       "path": "references/retention.md",
-      "sha256": "172d474e5b369beb3ec1b4ec88ad52224d14c66f81aebdf4266f997a2a665d16",
-      "bytes": 1395
+      "sha256": "fcc048f597db92263e741b61d84ddf821342611a2cee8670a76a09487c39fa61",
+      "bytes": 1439
     },
     {
       "path": "references/runtime-setup.md",
-      "sha256": "4984dc2b2bf9301b81b9666bec3bcad9aa20ea85b6e29486574f5b3a88729484",
-      "bytes": 1011
+      "sha256": "ba72a7bc835a5d9fd42d9d9216bc5caa3f7640fc31c8dbf1a94d6606e5d58af1",
+      "bytes": 1128
     },
     {
       "path": "references/search-engine-onboarding.md",
@@ -208,18 +213,18 @@
     },
     {
       "path": "references/site-profile-schema.md",
-      "sha256": "3aad0b430b1ff003c2a079010ba8acbbd160804465e047d6da1713bf813b5e4c",
+      "sha256": "f8f4e05f9b727a72cb22daef22bd1dcf660bea91c37ecb8b529a646d89f66635",
       "bytes": 6567
     },
     {
       "path": "references/troubleshooting.md",
-      "sha256": "667b2a256651d3d7a505af8f3a340f469a8d967234fd1202bfbb3e48db9ce112",
-      "bytes": 6447
+      "sha256": "21516e23d04884bd8de40a7c743518251490fc6e02f5a8bbe5d64da262d54d90",
+      "bytes": 7147
     },
     {
       "path": "references/unattended-run.md",
-      "sha256": "0244d35fa79c4ba763832cb3cfd1b6a421d4ff41630dfcecdd862a3b29d72eee",
-      "bytes": 2737
+      "sha256": "19f0a1e274beca75fe51a2065bb298c9c13c182990a82325cfe6dfed2e283ad5",
+      "bytes": 3145
     },
     {
       "path": "scripts/ai-search-readiness-core.mjs",
@@ -282,6 +287,16 @@
       "bytes": 2797
     },
     {
+      "path": "scripts/live-http-check-core.mjs",
+      "sha256": "43e8680adb1fa5084baee98cafd11e52b3bf505b4e8686fb607b440fa5a12e50",
+      "bytes": 2845
+    },
+    {
+      "path": "scripts/live-http-check.mjs",
+      "sha256": "a03d1d43517b175a2692091a5258d2184574ccb07877c96edf0f6281243f1f4a",
+      "bytes": 1427
+    },
+    {
       "path": "scripts/markdown-content-adapter.mjs",
       "sha256": "3721f789563e59b018074f94b8161aaef19255a71071ad5c93089443d5c8ae2b",
       "bytes": 3841
@@ -312,6 +327,11 @@
       "bytes": 3352
     },
     {
+      "path": "scripts/test-live-http-check.mjs",
+      "sha256": "9d3de9041fb9421a55377f7224c04721e040ad32fdbdf32d77b8651423228d8b",
+      "bytes": 1923
+    },
+    {
       "path": "scripts/test-profile-validation.sh",
       "sha256": "ea532ecb365a79c595091dc9bb44e819cb0d72bfc6be1ecafe77539494ace11d",
       "bytes": 3526
@@ -328,12 +348,12 @@
     },
     {
       "path": "scripts/test-user-onboarding-docs.sh",
-      "sha256": "6c98deacdf6a40f4986ea73d293e9e8b8b8e7a7f955411b57330155145eb127f",
+      "sha256": "734a21b6c8a9ce9f9c630c1fbe443ff3c501cdefa8596c29039fb75f2a625626",
       "bytes": 5151
     },
     {
       "path": "scripts/validate-profile.mjs",
-      "sha256": "fb2d35b17d8280bee86b1959bf91415d3e4d9f1ac871054e40e260d050192470",
+      "sha256": "c19fda9986dbda36f44017313b4e423d49fda43d0727ea4c0097616eaa3769ee",
       "bytes": 17984
     },
     {
@@ -343,8 +363,8 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "2fba149e54f4e36851ab80b0c347d67ab210041ee282936ac594f70beb750f41",
-      "bytes": 29276
+      "sha256": "eedd0468193f1eb23c34a62fd531491ff4fbecc2e6823e93cae10a15b834f02d",
+      "bytes": 31376
     },
     {
       "path": "templates/runtime-capability-map.md",
@@ -358,7 +378,7 @@
     },
     {
       "path": "VERSION",
-      "sha256": "ade4fba74f7b9ebd628fde0ae61e98c59f9275c1a1b2221febc1cd72fd3487e7",
+      "sha256": "9bedcb747179f8ba47f9c7c3501a3cb2410566f0eba741894f4b4282d9f19613",
       "bytes": 14
     }
   ]

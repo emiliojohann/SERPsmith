@@ -27,6 +27,7 @@ Test:
 - simulated Google/Bing/IndexNow results;
 - deterministic GA4 property/hostname access, 7/28/90-day snapshots, preceding windows, configured event counts, normalization, immutable output, auth failure, timeout, and cross-site rejection;
 - Content Intelligence recommendation states, 7–14 day observation gate, two-snapshot confirmation, explicit owner authorization boundary, and post-change measurement cooldown;
+- `scripts/test-live-http-check.mjs`, including complete-body marker matching, MIME mismatch, retryable HTTP status, and reset/transport classification;
 - `scripts/test-search-onboarding.sh`, including ready, action-required, and secret-rejection fixtures;
 - `scripts/test-ai-search-readiness.mjs`, including ready, crawler-blocked, invalid llms.txt, cross-site, stale-evidence, and secret-rejection fixtures;
 - `scripts/test-user-onboarding-docs.sh`, including repository instructions and complete Google Cloud/Search Console and GA4 setup;

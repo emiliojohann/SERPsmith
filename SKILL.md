@@ -9,7 +9,7 @@ Multi-platform AI agent support for evidence-led SEO and AI-search-ready publish
 
 ## Start here
 
-New operators read `references/quickstart.md`. Use `references/agent-runtime-onboarding.md` for runtime capability mapping, `references/repository-onboarding.md` for Git repository connection, `references/site-profile-schema.md` for configuration, `references/search-engine-onboarding.md` for Google Cloud, Google Search Console, Bing Webmaster Tools, and IndexNow setup, `references/image-system.md` for images, `references/runtime-setup.md` for runtime mapping, and `references/troubleshooting.md` for safe stops. Use `references/ai-search-discoverability.md` for AI-search readiness, `references/humanizer-integration.md` for the required portable prose-editing pass and `references/retention.md` for completed-run cleanup. The production read-only Google Analytics 4 extension is documented in `references/google-analytics-integration.md`; use `references/google-analytics-onboarding.md` for setup and verification and `references/content-intelligence.md` for the recommendation observation and authorization lifecycle.
+New operators read `references/quickstart.md`. Grok Build operators also read `references/grok-build-onboarding.md`. Use `references/agent-runtime-onboarding.md` for runtime capability mapping, `references/repository-onboarding.md` for Git repository connection, `references/site-profile-schema.md` for configuration, `references/search-engine-onboarding.md` for Google Cloud, Google Search Console, Bing Webmaster Tools, and IndexNow setup, `references/image-system.md` for images, `references/runtime-setup.md` for runtime mapping, and `references/troubleshooting.md` for safe stops. Use `references/ai-search-discoverability.md` for AI-search readiness, `references/humanizer-integration.md` for the required portable prose-editing pass and `references/retention.md` for completed-run cleanup. The production read-only Google Analytics 4 extension is documented in `references/google-analytics-integration.md`; use `references/google-analytics-onboarding.md` for setup and verification and `references/content-intelligence.md` for the recommendation observation and authorization lifecycle.
 
 ## v0.4 Boundary
 
@@ -19,7 +19,7 @@ Real profiles, credentials, destinations, drafts, reports, checkpoints, locks, a
 
 ## Shared core policy
 
-Current core policy version: `serpsmith-core-v14`.
+Current core policy version: `serpsmith-core-v18`.
 
 All active profiles MUST declare the exact `core_policy_version` required by the live validator. Universal behavior belongs to SERPsmith's skill and references, never to an individual site profile.
 
@@ -113,6 +113,8 @@ A fallback may have documented clarity, composition, anatomy, or responsive-crop
 
 Default production is an exact 1280 x 720 WebP hero plus a locally derived matching JPEG social image. Focal-crop; never stretch. Inspect original candidates and every required desktop hero, mobile hero, blog-card, and social render. Responsive-crop weaknesses may use the six-candidate fallback whenever the image remains recognizable and technically usable; blank, corrupt, missing, or invalid assets may not. Strip metadata, verify dimensions/MIME, never overwrite, and validate live assets/crawlers.
 
+In OpenClaw unattended runs, treat an `image_generate` response that says the task is running or instructs the caller to wait for a completion event as a hard turn boundary. Persist the checkpoint, make no further tool calls in that turn, and yield/end immediately. Resume only from the completion event in the dedicated SERPsmith runner, revalidate that `serpsmith_exec`, `serpsmith_finalize`, `serpsmith_fail`, and the configured messaging tool are callable, then continue the same run key. Never search generated-media directories, mutate the repository, or start validation while asynchronous image delivery is pending; never duplicate the active generation request.
+
 ## Content and target validation
 
 The bundled content adapter is `scripts/markdown-content-adapter.mjs`.
@@ -127,6 +129,8 @@ A pre-push failure leaves the article unpublished. After publication, resume onl
 
 Validate live HTML semantically where possible. Accept equivalent valid serialization such as attribute-order and closing-tag variations. Use exact literal matching only when the selected site profile explicitly guarantees that template output.
 
+Use the bundled `scripts/live-http-check.mjs` for live endpoint status, MIME, and required-marker checks. It MUST consume the complete response before matching and report transport failures separately from semantic mismatches. Never pipe a live HTTP response into `grep -q`, `head`, or another early-exit consumer; that can close the pipe after a successful match and misclassify curl exit 23 as a network or deployment failure. Download a response completely before any additional local matcher when the bundled adapter does not cover the semantic check.
+
 ## Completed-run retention
 
 SERPsmith keeps the published website and its Git history as the canonical content record. It inventories the current repository and live website on every run for slugs, links, sitemap state, and recent published images; completed working directories are not the source of truth for internal linking.
@@ -138,6 +142,8 @@ Use `node scripts/prune-completed-runs.mjs PROFILE --keep 3 --apply` only after 
 ## Retries and safe stops
 
 Persist checkpoints and sanitized attempts externally. Retry only transient timeouts, resets, rate limits, temporary provider/server failures, incomplete responses, propagation delays, reporting outages, or local diagnostic/matcher construction errors that have not changed repository or remote state. Use bounded attempts: initial, about 30 seconds, about 2 minutes, then at most one delayed recovery around 15 minutes when supported.
+
+Classify failures from the actual structured adapter result. A matcher-induced broken pipe, including curl exit 23 caused by an early-exit downstream reader, is a local verification defect rather than evidence of a transport or deployment failure. Correct the matcher and resume the same checkpoint; do not describe it as Hostinger propagation or a network outage.
 
 Never retry secrets/privacy findings, unsafe claims, invalid config, auth/permission/ownership failures, dirty/diverged repos, merge conflicts, malformed content requiring judgment, or unknown destructive state. Preserve state and report the exact next action.
 
@@ -188,7 +194,7 @@ Do not use fail-fast shell behavior inside retryable checks. Do not reproduce ei
 
 After the permitted attempts, reread the checkpoint. If the gate is still incomplete, emit one explicit exhausted-gate failure with the stage, attempts, safe state, and next action. Immediately non-retryable failures may fail directly. A recovered attempt remains in the log but must never override a completed checkpoint or successful final report.
 
-Before reporting success, confirm every required publication, live-verification, notification, and reporting gate is complete. Never convert a genuinely exhausted failure into success merely to silence scheduler alerts.
+Before reporting success, confirm every required publication, live-verification, and notification gate is complete and the final report is prepared. For the JSON production checkpoint, set `status` to `complete` and set every canonical `completed` boolean before the first finalizer call: `repository_preflight`, `article_validation`, `structural_validation`, `metadata_validation`, `secret_scan`, `commit`, `push`, `deployment`, `live_article`, `live_assets`, `google_notification`, `bing_notification`, `indexnow_notification`, and `report_prepared`. Site-local aliases may remain for resume history but never replace this contract. Then call the finalizer, send the report, and record `report_delivered` only after confirmed delivery. Never require `report_delivered` before the finalizer, and never mark it before the delivery result confirms success. Never convert a genuinely exhausted failure into success merely to silence scheduler alerts.
 
 Before unattended release, validate the selected integration. For the OpenClaw reference integration, run the guard plugin build, unit tests, plugin validation, plugin doctor, and a real isolated scheduler validation that executes one failing command and one passing command through `serpsmith_exec`, calls `serpsmith_finalize` against a complete checkpoint, finishes with scheduler status `ok`, and confirms the recorded trajectory contains no raw execution tools. Inspect the live production cron payload to prove its tool allowlist excludes raw execution. For the portable fallback, run `/bin/zsh scripts/test-controlled-attempt.sh`; the regression must verify both failing and passing commands through a non-executable copy of the wrapper.
 
@@ -198,43 +204,19 @@ Onboard manually: follow `references/repository-onboarding.md`, `references/agen
 
 ## Portability and reporting
 
-SERPsmith provides multi-platform AI agent support through the adapter contract. The agent environment must provide the required tools; chat-only agents or environments missing required capabilities cannot automate the workflow. Keep every platform's test status accurate: OpenClaw is the production-tested reference integration, while Hermes, Claude-based agent environments, ChatGPT agent environments, and others remain certification-pending until their exact setup passes the documented tests. Report title/URL, time/timezone, keyword evidence, metrics when available, configured AI-search readiness without a fabricated score, portable Humanizer version/result without a fabricated score, old-page changes, images/crawlers, notifications, commit/deployment, and failures/recovery. Never expose secrets, credential paths, private identifiers, or secret-bearing URLs.
+SERPsmith provides multi-platform AI agent support through the adapter contract. The agent environment must provide the required tools; chat-only agents or environments missing required capabilities cannot automate the workflow. Keep every platform's test status accurate: OpenClaw is the production-tested reference integration, while Hermes, Grok Build, Claude-based agent environments, ChatGPT agent environments, and others remain certification-pending until their exact setup passes the documented tests. Report title/URL, time/timezone, keyword evidence, metrics when available, configured AI-search readiness without a fabricated score, portable Humanizer version/result without a fabricated score, old-page changes, images/crawlers, notifications, commit/deployment, and failures/recovery. Never expose secrets, credential paths, private identifiers, or secret-bearing URLs.
 
-Format every final publication report as clearly separated labeled sections, never as one dense paragraph or uninterrupted block. Put each major field on its own line and insert a blank line between fields or logical groups. Use this plain-text pattern, omitting only fields that do not apply:
+Keep Telegram publication reports about 50% shorter than the legacy sectioned format. Use plain text with no blank lines and at most eight nonblank lines on success:
 
-Title: <article title>
+Published: <article title>
+<link>
+Time: <local time/timezone> | <configured secondary time/timezone>
+Evidence: <keyword label>; Analytics: <one short aggregate finding when configured>
+Checks: Humanizer <result>; AI search <readiness>; image <standard or exact fallback exception>; old-page changes <summary>; live <verified>
+Commit: <short hash>
+Search: Google <status> | Bing <status> | IndexNow <status>
+Note: <only a material exception, recovery, limitation, or owner action; otherwise omit>
 
-Live URL: <public URL>
+Do not list image filenames, dimensions, routine crawler details, or boilerplate limitations when their checks passed. Keep failure reports to at most five nonblank lines: Failed, Stage/attempts, Completed, Safe state, and Next action. Preserve every required checkpoint and verification detail in durable state even when omitted from Telegram.
 
-Published: <local publication time and timezone, plus any configured secondary timezone>
-
-Keyword evidence: <measured or directional evidence, with no unsupported volume claim>
-
-Analytics evidence: <GA4 snapshot window/status and concise aggregate finding, when configured>
-
-AI-search readiness: <platforms, crawler access, technical/content evidence, measurement status, and limitations>
-
-Images:
-- <hero asset and dimensions>
-- <social asset and dimensions>
-- <"Standard selection" or "Best-available fallback after six candidates; owner review recommended: exact quality exception">
-
-Old-post changes:
-- <reciprocal links or "None">
-
-Commit: <short commit hash>
-
-Deployment checks:
-- <concise verified checks>
-
-Search notifications:
-- Google Search Console: <status>
-- Bing Webmaster Tools: <status>
-- IndexNow: <status>
-
-Failures/recovery:
-- <only when applicable>
-
-Keep labels short, leave one blank line before the next labeled section, and use bullets only inside multi-item sections. Plain text remains required for unattended OpenClaw delivery.
-
-For unattended OpenClaw delivery, prefer an explicit final `message` tool call after `serpsmith_finalize`, restricted to the configured owner destination. Send plain text only: no attachments, media, generated-image references, or file paths. After a confirmed explicit send, return `NO_REPLY` so fallback announce delivery does not duplicate the report or inherit transient generated-media attachments. Do not move, trash, or delete generated source candidates before final reporting is acknowledged. After confirmed delivery, run the configured completed-run retention cleanup and keep exactly the latest three completed article runs for the selected site.
+For unattended OpenClaw delivery, prepare the final report and persist `report_prepared`, then call `serpsmith_finalize`. After it passes, make an explicit final `message` tool call restricted to the configured owner destination. Send plain text only: no attachments, media, generated-image references, or file paths. After a confirmed explicit send, persist `report_delivered`, then run the configured completed-run retention cleanup and return `NO_REPLY` so fallback announce delivery does not duplicate the report or inherit transient generated-media attachments. Do not move, trash, or delete generated source candidates before final reporting is acknowledged. Keep exactly the latest three completed article runs for the selected site.

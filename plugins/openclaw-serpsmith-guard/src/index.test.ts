@@ -60,7 +60,7 @@ describe("SERPsmith Guard", () => {
     });
   });
 
-  it("recognizes complete JSON and Markdown checkpoints", async () => {
+  it("recognizes report-prepared JSON and Markdown checkpoints", async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), "serpsmith-guard-"));
     temporaryPaths.push(root);
     await mkdir(path.join(root, "state"));
@@ -77,7 +77,7 @@ describe("SERPsmith Guard", () => {
         "google_search_console_notified",
         "bing_webmaster_notified",
         "indexnow_notified",
-        "report_completed",
+        "report_prepared",
       ],
     });
     expect(validateCheckpointText(json)).toEqual({ format: "json", complete: true });
@@ -89,11 +89,37 @@ describe("SERPsmith Guard", () => {
       "- Google notified: yes",
       "- Bing notified: yes",
       "- IndexNow notified: yes",
+      "- Report prepared: yes",
     ].join("\n");
     expect(validateCheckpointText(markdown)).toEqual({
       format: "markdown",
       complete: true,
     });
+  });
+
+  it("recognizes the current run-checkpoint v1 shape", () => {
+    const json = JSON.stringify({
+      schema: "serpsmith.run-checkpoint.v1",
+      status: "complete",
+      completed: {
+        repository_preflight: true,
+        article_validation: true,
+        structural_validation: true,
+        metadata_validation: true,
+        secret_scan: true,
+        commit: true,
+        push: true,
+        deployment: true,
+        live_article: true,
+        live_assets: true,
+        google_notification: true,
+        bing_notification: true,
+        indexnow_notification: true,
+        report_prepared: true,
+        report_delivered: false,
+      },
+    });
+    expect(validateCheckpointText(json)).toEqual({ format: "json", complete: true });
   });
 
   it("rejects incomplete checkpoints", () => {
@@ -105,5 +131,40 @@ describe("SERPsmith Guard", () => {
       format: "markdown",
       complete: false,
     });
+  });
+
+  it("rejects a complete publication checkpoint before report preparation", () => {
+    const json = JSON.stringify({
+      status: "complete",
+      completed_checkpoints: [
+        "repository_preflight_passed",
+        "precommit_gate_passed",
+        "push_completed",
+        "live_article_verified",
+        "live_assets_verified",
+        "google_search_console_notified",
+        "bing_webmaster_notified",
+        "indexnow_notified",
+      ],
+    });
+    expect(validateCheckpointText(json)).toEqual({ format: "json", complete: false });
+  });
+
+  it("accepts the legacy report_completed checkpoint during migration", () => {
+    const json = JSON.stringify({
+      status: "complete",
+      completed_checkpoints: [
+        "repository_preflight_passed",
+        "precommit_gate_passed",
+        "push_completed",
+        "live_article_verified",
+        "live_assets_verified",
+        "google_search_console_notified",
+        "bing_webmaster_notified",
+        "indexnow_notified",
+        "report_completed",
+      ],
+    });
+    expect(validateCheckpointText(json)).toEqual({ format: "json", complete: true });
   });
 });

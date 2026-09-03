@@ -46,6 +46,12 @@ Cause: propagation delay or deployment provider outage.
 
 Action: resume live verification against the existing commit. Do not create a second article or publication commit and do not roll back automatically.
 
+## Live verification reports curl exit 23
+
+Cause: a live response was streamed into an early-exit matcher such as `grep -q` or `head`. The matcher succeeded and closed the pipe before curl finished writing, so curl reported a false write failure even though the endpoint may be healthy.
+
+Action: treat this as a local verifier defect, not a deployment or transport failure. Use `node scripts/live-http-check.mjs` for status, MIME, and marker checks. For additional semantic checks, download the complete response to a temporary file and inspect the file. Retry the same verification checkpoint without republishing, and record the recovery as `matcher_corrected`, not `transient_transport_failure`.
+
 ## Search notification fails after publication
 
 Cause: provider timeout, rate limit, authentication, property ownership, or endpoint failure.

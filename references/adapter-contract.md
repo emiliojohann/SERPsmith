@@ -7,7 +7,7 @@ Deterministic wrapper adapters should:
 - accept JSON on stdin or explicit non-secret arguments;
 - return one JSON object on stdout;
 - return diagnostics without secrets on stderr;
-- use exit `0` for success, `64` for invalid input/configuration, `69` for retryable transport/provider failure, and `77` for non-retryable authentication/permission/ownership failure;
+- use exit `0` for success, `64` for invalid input/configuration, `65` for a deterministic non-retryable response/content mismatch, `69` for retryable transport/provider failure, and `77` for non-retryable authentication/permission/ownership failure;
 - enforce bounded timeouts;
 - never print credentials or secret-bearing URLs;
 - remain idempotent for a stable run key.

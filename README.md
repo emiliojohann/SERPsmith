@@ -4,7 +4,7 @@ SERPsmith provides multi-platform AI agent support for evidence-led SEO and AI-s
 
 ## Beta status
 
-Version: `v0.4.0-beta.1`
+Version: `v0.4.0-beta.2`
 
 SERPsmith is beta software. The bundled publishing path targets Git-backed Markdown sites with deterministic sitemap updates. Runtime portability is capability-based; each runtime/version must be certified independently.
 
@@ -58,9 +58,10 @@ Read:
 6. `references/content-intelligence.md`
 7. `references/site-profile-schema.md`
 8. `references/agent-runtime-onboarding.md`
-9. `references/runtime-setup.md`
-10. `references/image-system.md`
-11. `references/troubleshooting.md`
+9. `references/grok-build-onboarding.md` when using Grok Build
+10. `references/runtime-setup.md`
+11. `references/image-system.md`
+12. `references/troubleshooting.md`
 
 ## Safe first run
 
@@ -108,6 +109,7 @@ For OpenClaw unattended mode, `plugins/openclaw-serpsmith-guard/` provides guard
 
 - **OpenClaw:** production-tested reference integration.
 - **Hermes:** designed to work; certification pending.
+- **Grok Build:** designed to work; certification pending. See `references/grok-build-onboarding.md`.
 - **Claude-based agent environments:** designed to work; certification pending.
 - **ChatGPT agent environments:** designed to work; certification pending.
 - **Other AI agent platforms:** designed to work; certification pending.

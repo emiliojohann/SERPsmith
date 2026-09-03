@@ -16,4 +16,4 @@ Designed to work when the exact coding/agent environment can load the complete s
 
 ## Portable fallback
 
-`controlled-attempt.sh` reports bounded attempts but is not enforced autopilot safety while raw execution remains available.
+`controlled-attempt.sh` reports bounded attempts but is not enforced autopilot safety while raw execution remains available. `live-http-check.mjs` provides deterministic status, MIME, and marker verification without early-exit pipe failures.

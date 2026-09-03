@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+## v0.4.0-beta.2
+
+- Advanced shared policy to `serpsmith-core-v18` and migrated the bundled validator and example profiles.
+- Fixed guarded report finalization so canonical completion gates are validated before delivery and delivery is recorded only after confirmation.
+- Added a hard asynchronous image-generation turn boundary for unattended OpenClaw runs to prevent duplicate generation and unsafe continuation.
+- Reclassified matcher-induced broken pipes separately from real transport and deployment failures.
+- Shortened unattended Telegram success and failure reports while preserving full durable checkpoint evidence.
+- Added Grok Build onboarding with certification-pending compatibility language.
+
 ## v0.4.0-beta.1
 
 - Added a six-image visual-motif inventory and rotation budget for article artwork.

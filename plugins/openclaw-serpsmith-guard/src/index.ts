@@ -160,11 +160,16 @@ export function validateCheckpointText(text: string): {
     const parsed = JSON.parse(text) as {
       status?: unknown;
       completed_checkpoints?: unknown;
+      completed?: unknown;
     };
     const checkpoints = Array.isArray(parsed.completed_checkpoints)
       ? parsed.completed_checkpoints
       : [];
-    const required = [
+    const completed =
+      parsed.completed && typeof parsed.completed === "object" && !Array.isArray(parsed.completed)
+        ? (parsed.completed as Record<string, unknown>)
+        : null;
+    const legacyRequired = [
       "repository_preflight_passed",
       "precommit_gate_passed",
       "push_completed",
@@ -173,13 +178,35 @@ export function validateCheckpointText(text: string): {
       "google_search_console_notified",
       "bing_webmaster_notified",
       "indexnow_notified",
-      "report_completed",
     ];
+    const legacyReportPrepared =
+      checkpoints.includes("report_prepared") ||
+      checkpoints.includes("report_completed");
+    const legacyComplete =
+      legacyRequired.every((checkpoint) => checkpoints.includes(checkpoint)) &&
+      legacyReportPrepared;
+    const currentRequired = [
+      "repository_preflight",
+      "article_validation",
+      "structural_validation",
+      "metadata_validation",
+      "secret_scan",
+      "commit",
+      "push",
+      "deployment",
+      "live_article",
+      "live_assets",
+      "google_notification",
+      "bing_notification",
+      "indexnow_notification",
+      "report_prepared",
+    ];
+    const currentComplete =
+      completed !== null &&
+      currentRequired.every((checkpoint) => completed[checkpoint] === true);
     return {
       format: "json",
-      complete:
-        parsed.status === "complete" &&
-        required.every((checkpoint) => checkpoints.includes(checkpoint)),
+      complete: parsed.status === "complete" && (currentComplete || legacyComplete),
     };
   } catch {
     const required = [
@@ -190,9 +217,10 @@ export function validateCheckpointText(text: string): {
       /^- Bing notified: yes$/m,
       /^- IndexNow notified: yes$/m,
     ];
+    const reportPrepared = /^- Report (?:prepared|completed): yes$/m.test(text);
     return {
       format: "markdown",
-      complete: required.every((pattern) => pattern.test(text)),
+      complete: required.every((pattern) => pattern.test(text)) && reportPrepared,
     };
   }
 }
@@ -251,7 +279,7 @@ export default defineToolPlugin({
       name: "serpsmith_finalize",
       label: "SERPsmith checkpoint finalizer",
       description:
-        "Validate the durable SERPsmith checkpoint before reporting success. An incomplete checkpoint intentionally fails the run.",
+        "Validate the durable SERPsmith checkpoint after report preparation and before delivery. An incomplete checkpoint intentionally fails the run.",
       parameters: Type.Object({
         checkpointPath: Type.String({ minLength: 1 }),
       }),

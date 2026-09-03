@@ -2,7 +2,7 @@
   "id": "serpsmith-guard",
   "name": "SERPsmith Guard",
   "description": "Contain recoverable command failures in unattended SERPsmith jobs.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "configSchema": {
     "type": "object",
     "properties": {

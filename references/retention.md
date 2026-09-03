@@ -4,7 +4,7 @@ SERPsmith's website repository and live site are canonical after publication. Ea
 
 The private checkpoint root remains useful for interruption recovery and for comparing the three most recent image concepts. Retain exactly the latest three completed article runs per site. Preserve all incomplete or failed resumable runs regardless of age, the `analytics/` directory and recommendation ledger, locks, and anything outside the selected site's checkpoint root.
 
-After `serpsmith_finalize` succeeds and the final report message returns a confirmed delivery result:
+After `serpsmith_finalize` succeeds, the final report message returns a confirmed delivery result, and the checkpoint records `report_delivered`:
 
 ```sh
 node scripts/prune-completed-runs.mjs /absolute/private/site-profile.json --keep 3 --apply

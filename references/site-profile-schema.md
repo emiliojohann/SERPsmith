@@ -2,7 +2,7 @@
 
 Real profiles stay outside the repository. The bundled validator accepts JSON only. YAML requires conversion to identical JSON before bundled validation.
 
-Every active profile declares `core_policy_version: serpsmith-core-v14`.
+Every active profile declares `core_policy_version: serpsmith-core-v18`.
 
 ## Required
 
