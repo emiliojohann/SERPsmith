@@ -31,7 +31,7 @@ await writeFile(mockPath, `#!/usr/bin/env node
 import { readFileSync, writeFileSync } from "node:fs";
 const args=process.argv.slice(2); const statePath=process.env.MOCK_STATE;
 const tools=["read","write","edit","view_image","image_generate","message","serpsmith_admit","serpsmith_exec","serpsmith_finalize","serpsmith_fail"];
-const source={id:"source",declarationKey:"serpsmith.example-site.autopilot",enabled:true,agentId:"serpsmith",sessionTarget:"isolated",payload:{kind:"agentTurn",message:"SOURCE PRODUCTION CONTRACT",model:"openai/gpt-test",fallbacks:["openai/gpt-fallback"],thinking:"high",timeoutSeconds:7200,toolsAllow:tools},delivery:{mode:"none"},failureAlert:{after:1,mode:"announce",channel:"telegram",to:"owner",cooldownMs:3600000,includeSkipped:false,accountId:"default"}};
+const source={id:"source",declarationKey:"serpsmith.example-site.autopilot.mon-tue-thu-fri",enabled:true,agentId:"serpsmith",sessionTarget:"isolated",payload:{kind:"agentTurn",message:"SOURCE PRODUCTION CONTRACT",model:"openai/gpt-test",fallbacks:["openai/gpt-fallback"],thinking:"high",timeoutSeconds:7200,toolsAllow:tools},delivery:{mode:"none"},failureAlert:{after:1,mode:"announce",channel:"telegram",to:"owner",cooldownMs:3600000,includeSkipped:false,accountId:"default"}};
 if(args[0]==="cron"&&args[1]==="list"){process.stdout.write(JSON.stringify({jobs:[source]}));process.exit(0)}
 let state=[];try{state=JSON.parse(readFileSync(statePath,"utf8"))}catch{}
 state.push(args);writeFileSync(statePath,JSON.stringify(state));
@@ -47,7 +47,7 @@ const child = spawn(process.execPath, [
   media,
 ], {
   env: { ...process.env, SERPSMITH_OPENCLAW_BIN: mockPath, MOCK_STATE: statePath,
-    SERPSMITH_PRODUCTION_DECLARATIONS_JSON: JSON.stringify({ "example-site": "serpsmith.example-site.autopilot" }) },
+    SERPSMITH_PRODUCTION_DECLARATIONS_JSON: JSON.stringify({ "example-site": "serpsmith.example-site.autopilot.mon-tue-thu-fri" }) },
   stdio: ["ignore", "pipe", "pipe"],
 });
 let stdout = ""; let stderr = "";
@@ -84,7 +84,7 @@ const supervised = spawn(process.execPath, [
   "--dispatch",
 ], {
   env: { ...process.env, SERPSMITH_OPENCLAW_BIN: mockPath, MOCK_STATE: statePath,
-    SERPSMITH_PRODUCTION_DECLARATIONS_JSON: JSON.stringify({ "example-site": "serpsmith.example-site.autopilot" }) },
+    SERPSMITH_PRODUCTION_DECLARATIONS_JSON: JSON.stringify({ "example-site": "serpsmith.example-site.autopilot.mon-tue-thu-fri" }) },
   stdio: ["ignore", "pipe", "pipe"],
 });
 let supervisedOut = ""; let supervisedErr = "";

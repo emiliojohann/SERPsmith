@@ -22,9 +22,9 @@ grep -q 'explicit owner approval' "$root/references/content-intelligence.md" || 
 grep -q 'production-tested reference integration' "$root/references/compatibility.md" || exit 1
 grep -q 'Claude-based agent environments' "$root/references/compatibility.md" || exit 1
 grep -q 'ChatGPT agent environments' "$root/references/compatibility.md" || exit 1
-grep -q 'Version: `v0.4.0-beta.4`' "$public_readme" || exit 1
+grep -q 'Version: `v0.4.0-beta.5`' "$public_readme" || exit 1
 grep -q 'multi-platform AI agent support' "$public_readme" || exit 1
-[[ "$(<"$public_version")" == 'v0.4.0-beta.4' ]] || exit 1
+[[ "$(<"$public_version")" == 'v0.4.0-beta.5' ]] || exit 1
 grep -q 'ai-search-readiness.mjs' "$public_readme" || exit 1
 grep -q 'OAI-SearchBot' "$root/references/ai-search-discoverability.md" || exit 1
 grep -q 'PerplexityBot' "$root/references/ai-search-discoverability.md" || exit 1
@@ -51,4 +51,5 @@ fi
 node "$root/scripts/test-ai-search-readiness.mjs" || exit 1
 node "$root/scripts/test-google-analytics.mjs" || exit 1
 node "$root/scripts/test-prune-completed-runs.mjs" || exit 1
+if [[ -f "$root/scripts/test-public-export.mjs" ]]; then node "$root/scripts/test-public-export.mjs" || exit 1; fi
 print -r -- "user onboarding documentation tests passed"

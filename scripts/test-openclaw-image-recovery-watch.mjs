@@ -9,10 +9,10 @@ const fixture = await mkdtemp(path.join(os.tmpdir(), "serpsmith-recovery-"));
 const runs = path.join(fixture, "runs");
 const media = path.join(fixture, "media");
 const run = path.join(runs, "site-alpha", "run-1");
-const pendingRun = path.join(runs, "serpsmith", "run-2");
+const pendingRun = path.join(runs, "site-delta", "run-2");
 const candidateLedgerRun = path.join(runs, "site-beta", "run-3");
 const requestedFilenameRun = path.join(runs, "site-gamma", "run-4");
-const rootCandidateRun = path.join(runs, "serpsmith", "run-5");
+const rootCandidateRun = path.join(runs, "site-delta", "run-5");
 const pendingRequestedStageRun = path.join(runs, "site-alpha", "run-6");
 const pendingLedgerRun = path.join(runs, "site-beta", "run-7");
 const canonicalRun = path.join(runs, "site-gamma", "run-v25");
@@ -40,7 +40,7 @@ await writeFile(path.join(run, "checkpoint.json"), JSON.stringify({
   }] },
 }));
 await writeFile(path.join(pendingRun, "checkpoint.json"), JSON.stringify({
-  site_key: "serpsmith",
+  site_key: "site-delta",
   run_key: "run-2",
   status: "in_progress",
   // Some runners mirror the pending retry in the top-level stage while only
@@ -50,7 +50,7 @@ await writeFile(path.join(pendingRun, "checkpoint.json"), JSON.stringify({
   stage: "image_generation_candidate_b_retry_requested",
   images: { pending_request: {
     candidate: "B",
-    filename: "serpsmith-2026-09-03-1300-image-alt-text-seo-workflow-candidate-b.webp",
+    filename: "site-delta-candidate-b.webp",
     request_token: "run-2-B-1",
     requested_at: new Date().toISOString(),
     stage: "image_generation_candidate_b_retry",
@@ -91,13 +91,13 @@ await writeFile(path.join(requestedFilenameRun, "checkpoint.json"), JSON.stringi
   }] },
 }));
 await writeFile(path.join(rootCandidateRun, "checkpoint.json"), JSON.stringify({
-  site_key: "serpsmith",
+  site_key: "site-delta",
   run_key: "run-5",
   status: "in_progress",
   stage: "image_generation",
   image_candidates: { A: {
     candidate: "A",
-    requested_output_filename: "serpsmith-candidate-a.png",
+    requested_output_filename: "site-delta-candidate-a.png",
     request_token: "run-5-A-1",
     requested_at: new Date().toISOString(),
     requested_stage: "image_candidate_a_generation",
@@ -199,10 +199,10 @@ watcher.stdout.on("data", (chunk) => { stdout += chunk; });
 watcher.stderr.on("data", (chunk) => { stderr += chunk; });
 await new Promise((resolve) => setTimeout(resolve, 350));
 await writeFile(path.join(media, "candidate-a---fixture.png"), "fixture");
-await writeFile(path.join(media, "serpsmith-2026-09-03-1300-image-alt-text-seo-workflow-candid---fixture.webp"), "fixture");
+await writeFile(path.join(media, "site-delta-candidate-b---fixture.webp"), "fixture");
 await writeFile(path.join(media, "site-beta-candidate-a---fixture.png"), "fixture");
 await writeFile(path.join(media, "site-gamma-candidate-a---fixture.png"), "fixture");
-await writeFile(path.join(media, "serpsmith-candidate-a---fixture.png"), "fixture");
+await writeFile(path.join(media, "site-delta-candidate-a---fixture.png"), "fixture");
 await writeFile(path.join(media, "site-alpha-task-assignment-a---fixture.png"), "fixture");
 await writeFile(path.join(media, "site-beta-preview-video-a---fixture.png"), "fixture");
 await writeFile(path.join(media, "canonical-candidate-a---fixture.png"), "fixture");
@@ -231,9 +231,9 @@ assert.deepEqual({ site_key: event.site_key, run_key: event.run_key, candidate: 
 assert.equal(event.source, path.join(media, "candidate-a---fixture.png"));
 const pendingEvent = events.find((item) => item.run_key === "run-2");
 assert.deepEqual({ site_key: pendingEvent.site_key, run_key: pendingEvent.run_key, candidate: pendingEvent.candidate, token: pendingEvent.token }, {
-  site_key: "serpsmith", run_key: "run-2", candidate: "B", token: "run-2-B-1",
+  site_key: "site-delta", run_key: "run-2", candidate: "B", token: "run-2-B-1",
 });
-assert.equal(pendingEvent.source, path.join(media, "serpsmith-2026-09-03-1300-image-alt-text-seo-workflow-candid---fixture.webp"));
+assert.equal(pendingEvent.source, path.join(media, "site-delta-candidate-b---fixture.webp"));
 const candidateLedgerEvent = events.find((item) => item.run_key === "run-3");
 assert.deepEqual({
   site_key: candidateLedgerEvent.site_key,
@@ -281,7 +281,7 @@ assert.deepEqual({
   candidate: rootCandidateEvent.candidate,
   token: rootCandidateEvent.token,
 }, {
-  site_key: "serpsmith", run_key: "run-5", candidate: "A", token: "run-5-A-1",
+  site_key: "site-delta", run_key: "run-5", candidate: "A", token: "run-5-A-1",
 });
-assert.equal(rootCandidateEvent.source, path.join(media, "serpsmith-candidate-a---fixture.png"));
+assert.equal(rootCandidateEvent.source, path.join(media, "site-delta-candidate-a---fixture.png"));
 console.log(JSON.stringify({ result: "passed" }));

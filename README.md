@@ -4,7 +4,7 @@ SERPsmith provides multi-platform AI agent support for evidence-led SEO and AI-s
 
 ## Beta status
 
-Version: `v0.4.0-beta.4`
+Version: `v0.4.0-beta.5`
 
 SERPsmith is beta software. The bundled publishing path targets Git-backed Markdown sites with deterministic sitemap updates. Runtime portability is capability-based; each runtime/version must be certified independently.
 
@@ -119,7 +119,7 @@ A normal chat without repository and execution tools cannot automate the workflo
 
 ## Security
 
-Never commit credentials, real profiles, local paths, private identifiers, state, drafts, reports, or publishing history. See `SECURITY.md`.
+Never commit credentials, real profiles, local paths, private identifiers, state, drafts, reports, or publishing history.
 
 ## License
 

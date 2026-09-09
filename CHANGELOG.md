@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+## v0.4.0-beta.5
+
+- Removed internal release-policy and checksum artifacts from the distributable repository.
+- Added release-boundary regression coverage so unwanted public files and placeholder changelog headings cannot return.
 
 ## v0.4.0-beta.4
 

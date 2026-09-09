@@ -21,8 +21,6 @@ Start each production or recovery turn with `serpsmith_admit`. If unavailable, s
 
 The watcher reads canonical v25 `pending_operation` first. It accepts bounded v24 ledgers only for incomplete migration runs. The dispatcher rescans, binds one source production job, deduplicates by checkpoint/token/source hash, and creates one isolated auto-deleting continuation. The generic completion lane returns `NO_REPLY` and never publishes or reports.
 
-Before starting the dispatcher, set `SERPSMITH_PRODUCTION_DECLARATIONS_JSON` to a JSON object that maps each configured profile's `site_key` to its reviewed source automation declaration key. Keep this runtime-specific mapping outside the distributable skill and never commit production identifiers.
-
 ## Reporting
 
 After all gates pass, record `report_prepared` and finalize in `pre_delivery` mode. Send one plain-text message with no attachments. Record `report_acknowledged` with its non-secret identifier and finalize in `complete` mode. Only then run retention and return `NO_REPLY`.
