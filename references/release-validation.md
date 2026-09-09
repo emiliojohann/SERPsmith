@@ -33,7 +33,8 @@ Test:
 - `scripts/test-user-onboarding-docs.sh`, including repository instructions and complete Google Cloud/Search Console and GA4 setup;
 - `scripts/test-google-analytics.mjs`;
 - final report with an explicit AI-search readiness section and no fabricated ranking score;
-- checkpoint resume after interruption;
+- canonical v25 checkpoint transitions, stale-writer rejection, scheduler-independent reconciliation, and checkpoint resume after interruption;
+- report acknowledgment enforcement: pre-delivery passes only after all publication gates, and complete passes only after a non-secret delivery receipt;
 - completed-run retention dry-run and apply behavior, including protection for the newest three completed runs, incomplete runs, and analytics state;
 - prevention of duplicate article, image, commit, sitemap entry, notification, and report.
 

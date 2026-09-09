@@ -2,7 +2,7 @@
 
 Real profiles stay outside the repository. The bundled validator accepts JSON only. YAML requires conversion to identical JSON before bundled validation.
 
-Every active profile declares `core_policy_version: serpsmith-core-v18`.
+Every active profile declares `core_policy_version: serpsmith-core-v25`.
 
 ## Required
 
@@ -44,9 +44,13 @@ When autopilot is true, require recorded owner approval/scope, schedule weekdays
 
 Runtime preflight still verifies adapters, Git, credentials, ownership, deployment, scheduler payload, and tool restrictions.
 
+## Canonical v25 run state
+
+New runs use `serpsmith.run-checkpoint.v2` and `scripts/checkpoint-state.mjs`. Scheduler and agent results never replace checkpoint truth. Runtime certification is external to the site profile because it binds an agent, host, tools, and permissions rather than a website.
+
 ## Completed-run retention
 
-Completed run artifacts are operational state, not the canonical article inventory. The current repository, sitemap, and live site remain canonical. Keep exactly the latest three completed article runs per site after confirmed final-report delivery. Preserve all resumable incomplete runs, analytics snapshots and recommendation ledgers, and locks. Use the bundled dry-run-by-default retention command documented in `retention.md`.
+Completed run artifacts are operational state, not the canonical article inventory. The current repository, sitemap, and live site remain canonical. Keep exactly the latest three completed article runs per site after confirmed final-report delivery. Preserve only the checkpoint-selected source image in each retained completed run; remove rejected candidates, derivatives, previews, crop inspections, screenshots, and the exact matching transient inspection directory. Preserve all resumable incomplete runs, analytics snapshots and recommendation ledgers, and locks. Use the bundled dry-run-by-default, fail-closed retention command documented in `retention.md`.
 
 ## Workflow
 

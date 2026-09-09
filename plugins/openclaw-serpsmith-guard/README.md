@@ -4,8 +4,9 @@ OpenClaw tool plugin for unattended SERPsmith jobs.
 
 It replaces raw `exec` access with:
 
+- `serpsmith_admit`: proves the effective Guard plugin and v25 finalization capabilities are present.
 - `serpsmith_exec`: runs a shell attempt and converts every process failure into structured data instead of a runtime tool error.
-- `serpsmith_finalize`: validates the durable SERPsmith checkpoint after the final report is prepared and before it is delivered.
+- `serpsmith_finalize`: validates canonical v25 state before delivery and again after acknowledged delivery.
 - `serpsmith_fail`: emits one intentional runtime error only after a gate is genuinely exhausted.
 
 Configure `allowedRoots` in the plugin entry before use. Restrict each SERPsmith cron job with a per-job tool allowlist that includes these tools and excludes raw `exec`.

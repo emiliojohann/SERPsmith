@@ -4,7 +4,7 @@ Read `agent-runtime-onboarding.md` first.
 
 ## OpenClaw
 
-Production-tested reference integration. Install under `skills/serpsmith/`, keep profiles/state outside, and use one isolated job per site. Unattended jobs use the guard plugin and exclude raw shell/exec/process tools.
+Production-tested reference integration. Install under `skills/serpsmith/`, keep profiles/state outside, and use one isolated production job per site. Unattended jobs use the guard plugin and exclude raw shell/exec/process tools. Route each completed asynchronous image through the read-only watcher and headless dispatcher into a unique isolated one-shot recovery job; never send stream batches to a shared agent session.
 
 ## Hermes
 

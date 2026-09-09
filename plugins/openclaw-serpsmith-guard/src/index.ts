@@ -6,17 +6,27 @@ import { defineToolPlugin } from "openclaw/plugin-sdk/tool-plugin";
 
 const stagePattern = /^[a-z0-9][a-z0-9_-]{0,63}$/;
 
-type AttemptResult = {
-  stage: string;
-  attempt: number;
-  status: "passed" | "failed" | "timed_out" | "aborted";
-  exitCode: number | null;
-  signal: NodeJS.Signals | null;
-  stdout?: string;
-  stderr?: string;
-  outputSuppressed?: true;
-  truncated: boolean;
-};
+type AttemptResult =
+  | {
+      stage: string;
+      attempt: number;
+      status: "passed";
+      exitCode: 0;
+      signal: null;
+      stdout: string;
+      stderr: string;
+      truncated: boolean;
+    }
+  | {
+      stage: string;
+      attempt: number;
+      status: "completed";
+      attemptStatus: "failed" | "timed_out" | "aborted";
+      processExitCode: number | null;
+      processSignal: NodeJS.Signals | null;
+      outputSuppressed: true;
+      truncated: boolean;
+    };
 
 type GuardConfig = {
   allowedRoots?: string[];
@@ -111,9 +121,10 @@ export async function runAttempt(params: {
       resolve({
         stage,
         attempt,
-        status: "failed",
-        exitCode: null,
-        signal: null,
+        status: "completed",
+        attemptStatus: "failed",
+        processExitCode: null,
+        processSignal: null,
         outputSuppressed: true,
         truncated,
       });
@@ -129,9 +140,10 @@ export async function runAttempt(params: {
         resolve({
           stage,
           attempt,
-          status: aborted ? "aborted" : timedOut ? "timed_out" : "failed",
-          exitCode,
-          signal: closeSignal,
+          status: "completed",
+          attemptStatus: aborted ? "aborted" : timedOut ? "timed_out" : "failed",
+          processExitCode: exitCode,
+          processSignal: closeSignal,
           outputSuppressed: true,
           truncated,
         });
@@ -142,8 +154,8 @@ export async function runAttempt(params: {
         stage,
         attempt,
         status: "passed",
-        exitCode,
-        signal: closeSignal,
+        exitCode: 0,
+        signal: null,
         stdout: stdout.trim(),
         stderr: stderr.trim(),
         truncated,
@@ -152,16 +164,37 @@ export async function runAttempt(params: {
   });
 }
 
-export function validateCheckpointText(text: string): {
+export function validateCheckpointText(
+  text: string,
+  mode: "pre_delivery" | "complete" = "pre_delivery",
+): {
   format: "json" | "markdown";
   complete: boolean;
 } {
   try {
     const parsed = JSON.parse(text) as {
+      schema?: unknown;
       status?: unknown;
       completed_checkpoints?: unknown;
       completed?: unknown;
+      lifecycle?: { state?: unknown };
+      gates?: Record<string, unknown>;
+      report?: { state?: unknown; receipt?: unknown };
     };
+    if (parsed.schema === "serpsmith.run-checkpoint.v2") {
+      const required = [
+        "repository_preflight", "article_validation", "structural_validation",
+        "metadata_validation", "secret_scan", "commit", "push", "deployment",
+        "live_article", "live_assets", "google_notification", "bing_notification",
+        "indexnow_notification",
+      ];
+      const gatesComplete = required.every((gate) => parsed.gates?.[gate] === true);
+      const stateComplete = mode === "pre_delivery"
+        ? parsed.lifecycle?.state === "awaiting_report_ack" && parsed.report?.state === "prepared"
+        : parsed.lifecycle?.state === "complete" && parsed.report?.state === "acknowledged" &&
+          typeof parsed.report?.receipt === "string" && parsed.report.receipt.length > 0;
+      return { format: "json", complete: gatesComplete && stateComplete };
+    }
     const checkpoints = Array.isArray(parsed.completed_checkpoints)
       ? parsed.completed_checkpoints
       : [];
@@ -206,7 +239,8 @@ export function validateCheckpointText(text: string): {
       currentRequired.every((checkpoint) => completed[checkpoint] === true);
     return {
       format: "json",
-      complete: parsed.status === "complete" && (currentComplete || legacyComplete),
+      complete: mode === "pre_delivery" && parsed.status === "complete" &&
+        (currentComplete || legacyComplete),
     };
   } catch {
     const required = [
@@ -220,7 +254,8 @@ export function validateCheckpointText(text: string): {
     const reportPrepared = /^- Report (?:prepared|completed): yes$/m.test(text);
     return {
       format: "markdown",
-      complete: required.every((pattern) => pattern.test(text)) && reportPrepared,
+      complete: mode === "pre_delivery" &&
+        required.every((pattern) => pattern.test(text)) && reportPrepared,
     };
   }
 }
@@ -240,6 +275,26 @@ export default defineToolPlugin({
   description: "Contain recoverable command failures in unattended SERPsmith jobs.",
   configSchema,
   tools: (tool) => [
+    tool({
+      name: "serpsmith_admit",
+      label: "SERPsmith runtime admission",
+      description:
+        "Prove the effective OpenClaw Guard plugin is available before an unattended turn mutates state.",
+      parameters: Type.Object({
+        corePolicyVersion: Type.Literal("serpsmith-core-v25"),
+      }),
+      execute() {
+        return {
+          status: "admitted",
+          adapter: "openclaw-serpsmith-guard",
+          pluginVersion: "0.2.0",
+          capabilities: [
+            "guarded_execution", "checkpoint_pre_delivery",
+            "checkpoint_complete", "exhausted_failure",
+          ],
+        };
+      },
+    }),
     tool({
       name: "serpsmith_exec",
       label: "SERPsmith guarded execution",
@@ -279,21 +334,28 @@ export default defineToolPlugin({
       name: "serpsmith_finalize",
       label: "SERPsmith checkpoint finalizer",
       description:
-        "Validate the durable SERPsmith checkpoint after report preparation and before delivery. An incomplete checkpoint intentionally fails the run.",
+        "Validate the durable SERPsmith checkpoint before delivery or after acknowledged delivery. An incomplete checkpoint intentionally fails the run.",
       parameters: Type.Object({
         checkpointPath: Type.String({ minLength: 1 }),
+        mode: Type.Optional(
+          Type.Union(
+            [Type.Literal("pre_delivery"), Type.Literal("complete")],
+            { default: "pre_delivery" },
+          ),
+        ),
       }),
-      async execute({ checkpointPath }, config: GuardConfig) {
+      async execute({ checkpointPath, mode = "pre_delivery" }, config: GuardConfig) {
         const allowedRoots = config.allowedRoots ?? [];
         const parent = await resolveAllowedCwd(path.dirname(checkpointPath), allowedRoots);
         const resolvedPath = path.join(parent, path.basename(checkpointPath));
         const text = await readFile(resolvedPath, "utf8");
-        const result = validateCheckpointText(text);
+        const result = validateCheckpointText(text, mode);
         if (!result.complete) {
           throw new Error("SERPsmith checkpoint is incomplete; success is forbidden");
         }
         return {
-          status: "complete",
+          status: mode === "complete" ? "complete" : "ready_for_delivery",
+          mode,
           checkpointFormat: result.format,
         };
       },

@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## v0.4.0-beta.3
+
+- Advanced the shared policy from `serpsmith-core-v18` to the platform-neutral `serpsmith-core-v25` contract.
+- Added canonical versioned checkpoints, atomic revision-checked transitions, scheduler-independent reconciliation, runtime capability certification, and acknowledged-report completion.
+- Added OpenClaw Guard 0.2.0 with runtime admission, contained attempt failures, and two-phase pre-delivery/completion finalization.
+- Rebuilt OpenClaw asynchronous image recovery around checkpoint-bound, isolated per-event jobs with normalized candidate and refinement correlation.
+- Added deterministic image-operation IDs and deadlines so provider or scheduler success cannot be mistaken for publication success.
+- Hardened unattended research and command execution around restricted tool surfaces and Guard-approved working roots.
+- Hardened completed-run retention to keep only the latest three completed runs per site and one hash-verified selected source image per retained run.
+
 ## v0.4.0-beta.2
 
 - Advanced shared policy to `serpsmith-core-v18` and migrated the bundled validator and example profiles.

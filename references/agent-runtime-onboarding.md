@@ -7,12 +7,12 @@ SERPsmith provides multi-platform AI agent support. An agent can run manual mode
 1. Put the complete SERPsmith directory where the runtime can read skills. If it supports AgentSkills, install one directory containing SKILL.md.
 2. Otherwise configure every run to read the complete SKILL.md and referenced files.
 3. Keep JSON profiles, secrets, checkpoints, locks, drafts, and reports outside skill and website repositories.
-4. Complete templates/runtime-capability-map.md for the exact runtime/version.
-5. Run bundled tests and the disposable fixture before production.
+4. Complete a JSON capability certification from templates/runtime-capability-map.md for the exact runtime/version.
+5. Run `node scripts/validate-runtime-capabilities.mjs MAP unattended` and the disposable end-to-end fixture before production.
 
 ## Manual capabilities
 
-Map filesystem, normal Git, web research, image generation/conversion, bounded HTTP, secret retrieval, durable checkpoints, per-site locks, content adapter execution, and final reporting.
+Map filesystem, normal Git, web research, image generation/conversion, bounded HTTP, secret retrieval, canonical checkpoint state, per-site locks, content execution, deployment, search notifications, and final reporting.
 
 ## Unattended requirements
 
@@ -64,3 +64,8 @@ Classify the exact runtime/version as one of:
 - `unsupported`: a required capability is absent.
 
 A certification never transfers automatically to another agent, version, model, host, plugin set, or permission configuration.
+
+
+## v25 completion proof
+
+Use `references/reliability-contract.md`. Prove that an asynchronous wait remains `waiting_external`, a stale deadline classifies for recovery, a delivery failure remains `awaiting_report_ack`, and only an acknowledged receipt reaches `complete`. A successful scheduler or agent turn is never a substitute.

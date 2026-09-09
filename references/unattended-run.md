@@ -24,8 +24,10 @@ Before enabling a recurring job, complete `repository-onboarding.md` and `search
 
 Stagger site jobs so their maximum runtimes do not normally overlap. Keep each site in a separate recurring job and checkpoint namespace.
 
-## Enforced OpenClaw mode
+## Runtime-neutral completion
 
-For OpenClaw production jobs, raw shell access is forbidden. Route every shell command through `serpsmith_exec`, including commands expected to pass. Use native file, web, and image tools directly only when they are present in the reviewed job allowlist. Prepare the final report and persist `report_prepared`, call `serpsmith_finalize`, send the report, and persist `report_delivered` only after confirmed delivery. Use `serpsmith_fail` only for an immediately non-retryable or exhausted gate.
+Use the v25 checkpoint and reconciliation contract in `reliability-contract.md`. The scheduler wakes work but never decides publication success. Require effective runtime capability admission before unattended use. Prepare the report only after all publication gates pass, validate pre-delivery state, deliver once, record the non-secret acknowledgment receipt, then validate complete state.
 
-Release verification must inspect the live stored job payload, not a migrated JSON file or a prose prompt, and prove the schedule is unchanged and raw execution tools are absent.
+## OpenClaw reference mode
+
+Follow `openclaw-adapter.md`. Raw shell access is forbidden. Route shell work through `serpsmith_exec`, call `serpsmith_admit` at the beginning of production and recovery turns, and use `serpsmith_finalize` in both `pre_delivery` and `complete` modes. Release verification inspects the live stored job payload, proves schedules unchanged, and proves raw execution tools absent.

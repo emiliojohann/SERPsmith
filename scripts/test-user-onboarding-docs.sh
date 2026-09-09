@@ -22,9 +22,9 @@ grep -q 'explicit owner approval' "$root/references/content-intelligence.md" || 
 grep -q 'production-tested reference integration' "$root/references/compatibility.md" || exit 1
 grep -q 'Claude-based agent environments' "$root/references/compatibility.md" || exit 1
 grep -q 'ChatGPT agent environments' "$root/references/compatibility.md" || exit 1
-grep -q 'Version: `v0.4.0-beta.2`' "$public_readme" || exit 1
+grep -q 'Version: `v0.4.0-beta.3`' "$public_readme" || exit 1
 grep -q 'multi-platform AI agent support' "$public_readme" || exit 1
-[[ "$(<"$public_version")" == 'v0.4.0-beta.2' ]] || exit 1
+[[ "$(<"$public_version")" == 'v0.4.0-beta.3' ]] || exit 1
 grep -q 'ai-search-readiness.mjs' "$public_readme" || exit 1
 grep -q 'OAI-SearchBot' "$root/references/ai-search-discoverability.md" || exit 1
 grep -q 'PerplexityBot' "$root/references/ai-search-discoverability.md" || exit 1

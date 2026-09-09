@@ -17,6 +17,7 @@ afterEach(async () => {
 describe("SERPsmith Guard", () => {
   it("declares only the guarded execution contract", () => {
     expect(getToolPluginMetadata(entry)?.tools.map((tool) => tool.name)).toEqual([
+      "serpsmith_admit",
       "serpsmith_exec",
       "serpsmith_finalize",
       "serpsmith_fail",
@@ -35,10 +36,12 @@ describe("SERPsmith Guard", () => {
       outputLimit: 1_000,
     });
     expect(result).toMatchObject({
-      status: "failed",
-      exitCode: 64,
+      status: "completed",
+      attemptStatus: "failed",
+      processExitCode: 64,
       outputSuppressed: true,
     });
+    expect(result).not.toHaveProperty("exitCode");
     expect(result).not.toHaveProperty("stderr");
   });
 
@@ -120,6 +123,26 @@ describe("SERPsmith Guard", () => {
       },
     });
     expect(validateCheckpointText(json)).toEqual({ format: "json", complete: true });
+  });
+
+  it("enforces v25 pre-delivery and acknowledged completion", () => {
+    const gates = Object.fromEntries([
+      "repository_preflight", "article_validation", "structural_validation",
+      "metadata_validation", "secret_scan", "commit", "push", "deployment",
+      "live_article", "live_assets", "google_notification", "bing_notification",
+      "indexnow_notification",
+    ].map((gate) => [gate, true]));
+    const checkpoint = {
+      schema: "serpsmith.run-checkpoint.v2",
+      lifecycle: { state: "awaiting_report_ack" },
+      gates,
+      report: { state: "prepared", receipt: null },
+    };
+    expect(validateCheckpointText(JSON.stringify(checkpoint), "pre_delivery").complete).toBe(true);
+    expect(validateCheckpointText(JSON.stringify(checkpoint), "complete").complete).toBe(false);
+    checkpoint.lifecycle.state = "complete";
+    checkpoint.report = { state: "acknowledged", receipt: "message-1" };
+    expect(validateCheckpointText(JSON.stringify(checkpoint), "complete").complete).toBe(true);
   });
 
   it("rejects incomplete checkpoints", () => {

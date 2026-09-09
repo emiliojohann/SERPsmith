@@ -8,8 +8,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "034e7ebd93119d19b23694ef1d552e33648beaa93f184a0374b499b964e37591",
-      "bytes": 4294
+      "sha256": "2028cc616b942c2286a435a939d36896dd23e93dff9a47948cf4b31593dbdebd",
+      "bytes": 5295
     },
     {
       "path": "COMMERCIAL-LICENSE.md",
@@ -22,9 +22,39 @@
       "bytes": 702
     },
     {
+      "path": "LICENSE",
+      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+      "bytes": 34523
+    },
+    {
+      "path": "README.md",
+      "sha256": "8dec3878937339c30b781b5a3079d9677523fe91c7b2bc4b4f8685960e9bf21d",
+      "bytes": 9097
+    },
+    {
+      "path": "SECURITY.md",
+      "sha256": "06c4487f80f013e3da14ec951d95180e891466f2cd6b23fd483213a48c2ee9f6",
+      "bytes": 984
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "e3ad333a5481b67463d12341915ca1a6c535ea494fe4832b91eb65e2babe71ac",
+      "bytes": 5960
+    },
+    {
+      "path": "VERSION",
+      "sha256": "a6c3fecd785e1914eb9a377a8663a4a6e1847a8faf8046f34d36370011f97d57",
+      "bytes": 14
+    },
+    {
       "path": "examples/ai-search-readiness-evidence.json",
       "sha256": "8b3b4c706e5c86e77b08f2fc8ef6d9d059447ab4cd40dfdd5528499704da38d7",
       "bytes": 1243
+    },
+    {
+      "path": "examples/demo-site/README.md",
+      "sha256": "a8995479dac2d9272fe76d578583ec66794b68399fb0962e8bad4b678e03a831",
+      "bytes": 466
     },
     {
       "path": "examples/demo-site/content/blog/git-content-workflow.md",
@@ -47,24 +77,19 @@
       "bytes": 321
     },
     {
-      "path": "examples/demo-site/README.md",
-      "sha256": "a8995479dac2d9272fe76d578583ec66794b68399fb0962e8bad4b678e03a831",
-      "bytes": 466
-    },
-    {
       "path": "examples/generic-git-site-profile.json",
-      "sha256": "a6e790f581bc678f96179af57171b45396e306f0d17ade9a5a75ab1fe68a0a2e",
+      "sha256": "36a9059a855cb0b793884e2138200e7fd3b67c6c2636b3ee624b9630caa64d3b",
       "bytes": 2249
     },
     {
       "path": "examples/hermes-site-profile.md",
-      "sha256": "16e932f94816296f8ffec0ba61e22f2b1bbd55d51ecdce9e634ab5e8299c13a9",
-      "bytes": 280
+      "sha256": "7c0e5e7e614f8d8d37e9340768635741cbcc8a0c333cd1edb82300aa0122e41b",
+      "bytes": 281
     },
     {
       "path": "examples/openclaw-site-profile.md",
-      "sha256": "aa0e62f2689d209b57667a1be722a33924fd27fc2926f9c18f091a15b812a9c8",
-      "bytes": 281
+      "sha256": "95eb2cc446ff7c1b413483a64d6abfa9325dc354b4c1f1c7fe606c7bd2b417c9",
+      "bytes": 282
     },
     {
       "path": "examples/search-onboarding-sample.json",
@@ -72,39 +97,34 @@
       "bytes": 716
     },
     {
-      "path": "LICENSE",
-      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
-      "bytes": 34523
+      "path": "plugins/openclaw-serpsmith-guard/README.md",
+      "sha256": "c32a07058fe065afaf551f6c8915007f91f6186f05ef7263a329d26cd6ebaa23",
+      "bytes": 1266
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/openclaw.plugin.json",
-      "sha256": "93383042379b442970d1cb6a9cba9e06881ec831cc12f81f9030ccc5dcfc977b",
-      "bytes": 727
+      "sha256": "c4a00a8b3bc1f64e489f0f706f6724e384ec0695c0ee06e882cedc27fda56c08",
+      "bytes": 752
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/package-lock.json",
-      "sha256": "ef0719c0cdf2fd58d238d8f25f752dd381741beea1e0efd46716a097c15d72db",
+      "sha256": "00fc2c3e9aca31d55d22d0aad571a3d38cd86e7ae8fef5501b97b45b1350a46e",
       "bytes": 53769
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/package.json",
-      "sha256": "c0efe1ecbaadb15d95c247c57b78929af5c6536daebb95c1306365a539256ea1",
+      "sha256": "b14e745ddf19818bc20b48ce36a5a47976058849e425a1de59b97c63706ca9ab",
       "bytes": 885
     },
     {
-      "path": "plugins/openclaw-serpsmith-guard/README.md",
-      "sha256": "2f2736df6a31db7be674acd85f9374583657993f8d740432ba919248bfe785da",
-      "bytes": 1185
-    },
-    {
       "path": "plugins/openclaw-serpsmith-guard/src/index.test.ts",
-      "sha256": "c77d52b2e098ac273fc47d6ec97802784f5e516bb9ab2f55d4e424697cc5ae17",
-      "bytes": 5246
+      "sha256": "2a2d9c692ad296989e176182b577aca93fd9dfc66d926d2c9b88ff78251ec0fe",
+      "bytes": 6384
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/src/index.ts",
-      "sha256": "055a7dbd1dd77701be374036ad741c14f43367f5d5c1647546564758fbbeaa17",
-      "bytes": 10117
+      "sha256": "0251ac9c1db1a97f8b61e44861648fac403fcffa160b99e5a3a1da85fab648f3",
+      "bytes": 12526
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/src/openclaw-tool-plugin.d.ts",
@@ -127,19 +147,14 @@
       "bytes": 349
     },
     {
-      "path": "README.md",
-      "sha256": "d569ad6a200b9a1fb188a3f6ae2b55dc4490776246e041af94b3dd6479bf6512",
-      "bytes": 9097
-    },
-    {
       "path": "references/adapter-contract.md",
-      "sha256": "3bd51c5d06c5c156760ba9da289f650dafecfb08b79da4c748c7b9fe2e86132e",
-      "bytes": 2607
+      "sha256": "5af3241350ae6ca675a610240da2c148671a644a7e7ddfee36ea7de15a08673c",
+      "bytes": 3101
     },
     {
       "path": "references/agent-runtime-onboarding.md",
-      "sha256": "10bb1741da187bd555e319931df62b78763ab130316235b16a16275478680f91",
-      "bytes": 4841
+      "sha256": "9d291ddb882fddcc3d12d35ccbbac76cfdb951292ca548c514437c81b0dc1ea0",
+      "bytes": 5306
     },
     {
       "path": "references/ai-search-discoverability.md",
@@ -162,6 +177,11 @@
       "bytes": 5466
     },
     {
+      "path": "references/core-policy.md",
+      "sha256": "616ee01430e71700870a9b9c6d5cc09337b98d61a07bcff94f3d6042ba850aaf",
+      "bytes": 32889
+    },
+    {
       "path": "references/google-analytics-integration.md",
       "sha256": "72141ddce38ee304dadfc899b64ee72b1218401279126360ef380936eb64a75d",
       "bytes": 4623
@@ -178,8 +198,13 @@
     },
     {
       "path": "references/image-system.md",
-      "sha256": "527994c0451018696320f33591049643fc4ada16e1541cfd101a3bce16267aee",
-      "bytes": 10951
+      "sha256": "16f5bdbb1887fdfeb4aa643d1bff7d460dbb03121a0db120cfba0d675428fdfa",
+      "bytes": 11159
+    },
+    {
+      "path": "references/openclaw-adapter.md",
+      "sha256": "0f788c0e35a92303bd5929eedbb02ea387d15393afcf1183e59679b286a01e82",
+      "bytes": 2263
     },
     {
       "path": "references/quickstart.md",
@@ -188,8 +213,13 @@
     },
     {
       "path": "references/release-validation.md",
-      "sha256": "a487c7d5dd5db877f94171113498f3817443381843888eed67c26bab830d3bc4",
-      "bytes": 3829
+      "sha256": "79098201e86d8dfd964f1febcd1cf70320a438e971ea7e1ae9bd9db3214ef8b5",
+      "bytes": 4086
+    },
+    {
+      "path": "references/reliability-contract.md",
+      "sha256": "5bf5542f7c2152bad632ea854818e30acf5989fa4b04caaa50982c314eb261f1",
+      "bytes": 4501
     },
     {
       "path": "references/repository-onboarding.md",
@@ -198,13 +228,13 @@
     },
     {
       "path": "references/retention.md",
-      "sha256": "fcc048f597db92263e741b61d84ddf821342611a2cee8670a76a09487c39fa61",
-      "bytes": 1439
+      "sha256": "19bae79c280b688dfc593cca763a4f47d160a2ad677775b983bed99441c12201",
+      "bytes": 1804
     },
     {
       "path": "references/runtime-setup.md",
-      "sha256": "ba72a7bc835a5d9fd42d9d9216bc5caa3f7640fc31c8dbf1a94d6606e5d58af1",
-      "bytes": 1128
+      "sha256": "81106bfd20aec502662a879fd83983928b27d35706bac9b80676be363891e452",
+      "bytes": 1332
     },
     {
       "path": "references/search-engine-onboarding.md",
@@ -213,8 +243,8 @@
     },
     {
       "path": "references/site-profile-schema.md",
-      "sha256": "f8f4e05f9b727a72cb22daef22bd1dcf660bea91c37ecb8b529a646d89f66635",
-      "bytes": 6567
+      "sha256": "5b64876b7430a3b14553560f4f6fd82b75bd76740fa8ebcd55f0f6c237b2b30d",
+      "bytes": 7101
     },
     {
       "path": "references/troubleshooting.md",
@@ -223,8 +253,8 @@
     },
     {
       "path": "references/unattended-run.md",
-      "sha256": "19f0a1e274beca75fe51a2065bb298c9c13c182990a82325cfe6dfed2e283ad5",
-      "bytes": 3145
+      "sha256": "6a312b2b7a2eca0915456cfebeebeaa9cad12e670629bf6eabcec2a1056871b1",
+      "bytes": 3273
     },
     {
       "path": "scripts/ai-search-readiness-core.mjs",
@@ -240,6 +270,11 @@
       "path": "scripts/bing-webmaster-submit.sh",
       "sha256": "de5af4b3c2c975c2430866942a087688a914e12592c61d7149ea5e169f0c02e8",
       "bytes": 2546
+    },
+    {
+      "path": "scripts/checkpoint-state.mjs",
+      "sha256": "e334c80ac8b365bea8425f1522410e53805699201f32292b8b3bdf86df0951ff",
+      "bytes": 11078
     },
     {
       "path": "scripts/controlled-attempt.sh",
@@ -302,9 +337,24 @@
       "bytes": 3841
     },
     {
+      "path": "scripts/openclaw-image-recovery-dispatch.mjs",
+      "sha256": "da62f1f7b20844c9d434b6775086812e6cd58e6546c5fee952bc9da55805bb53",
+      "bytes": 7383
+    },
+    {
+      "path": "scripts/openclaw-image-recovery-watch.mjs",
+      "sha256": "fd861e57fe4270e4de82c85e01c843356bd8723ceab79a027235e4625e2749bc",
+      "bytes": 10362
+    },
+    {
       "path": "scripts/prune-completed-runs.mjs",
-      "sha256": "89be9b1e2ae724e72fc51ad2aece34efa2a8664b8e5e54cf050345898c595c43",
-      "bytes": 4722
+      "sha256": "11f999522d1042df501c75d92b5411619b88ff90cfe03b0778ffa9156f0cf1cc",
+      "bytes": 16096
+    },
+    {
+      "path": "scripts/reconcile-runs.mjs",
+      "sha256": "3d0aac0c260caaeff25b0bdda5b3ba85567382c553141563c24d8c4fe5f45f2b",
+      "bytes": 2737
     },
     {
       "path": "scripts/search-onboarding-report.mjs",
@@ -315,6 +365,11 @@
       "path": "scripts/test-ai-search-readiness.mjs",
       "sha256": "36b93111572d8ec16823de2c0b76601d2681120b7bcefa0a151bd1678db14610",
       "bytes": 1325
+    },
+    {
+      "path": "scripts/test-checkpoint-state.mjs",
+      "sha256": "42519b6c39262429eee7d455eebba72d271b42ab4f6fd0c29a209321f6a27366",
+      "bytes": 2220
     },
     {
       "path": "scripts/test-controlled-attempt.sh",
@@ -332,14 +387,34 @@
       "bytes": 1923
     },
     {
+      "path": "scripts/test-openclaw-image-recovery-dispatch.mjs",
+      "sha256": "345e5209bba6881b6c2d0537e935561ea92330789f9dab5acc0f4fad80f641a4",
+      "bytes": 5268
+    },
+    {
+      "path": "scripts/test-openclaw-image-recovery-watch.mjs",
+      "sha256": "416a38bcd3c25892a4c21f3cd70ac52f31afc41712e885b26c4432c341b67c19",
+      "bytes": 12420
+    },
+    {
       "path": "scripts/test-profile-validation.sh",
       "sha256": "ea532ecb365a79c595091dc9bb44e819cb0d72bfc6be1ecafe77539494ace11d",
       "bytes": 3526
     },
     {
       "path": "scripts/test-prune-completed-runs.mjs",
-      "sha256": "a423503e6164884fe3c74a03bd45abb6906977754aea62c33f4981a926a1a3b8",
-      "bytes": 2431
+      "sha256": "91997916135aeca2aacb6414cde077e4115916bbe916c6c7d4eb1e4aa33fe64c",
+      "bytes": 6010
+    },
+    {
+      "path": "scripts/test-reconcile-runs.mjs",
+      "sha256": "d35ad940027d94701f646c8235693375dcb28cea6af374efc42b13804d10785c",
+      "bytes": 1984
+    },
+    {
+      "path": "scripts/test-runtime-capabilities.mjs",
+      "sha256": "994b91a038efd1a8c62ff5701d480d6cd7ecb57d4c23eda511708241d7dc0757",
+      "bytes": 1680
     },
     {
       "path": "scripts/test-search-onboarding.sh",
@@ -348,38 +423,28 @@
     },
     {
       "path": "scripts/test-user-onboarding-docs.sh",
-      "sha256": "734a21b6c8a9ce9f9c630c1fbe443ff3c501cdefa8596c29039fb75f2a625626",
+      "sha256": "cb5645ea8c099a2ccf619b7a97b0bb8849bc749a37e98c68ff051bb16fa45e11",
       "bytes": 5151
     },
     {
       "path": "scripts/validate-profile.mjs",
-      "sha256": "c19fda9986dbda36f44017313b4e423d49fda43d0727ea4c0097616eaa3769ee",
+      "sha256": "94c6e7026f1b82f05c0949a76b6ea86904b5ad2db5167a2d9b4dd76fdb9061e7",
       "bytes": 17984
     },
     {
-      "path": "SECURITY.md",
-      "sha256": "06c4487f80f013e3da14ec951d95180e891466f2cd6b23fd483213a48c2ee9f6",
-      "bytes": 984
-    },
-    {
-      "path": "SKILL.md",
-      "sha256": "eedd0468193f1eb23c34a62fd531491ff4fbecc2e6823e93cae10a15b834f02d",
-      "bytes": 31376
+      "path": "scripts/validate-runtime-capabilities.mjs",
+      "sha256": "2f6125f127b2f15a61d291aedce0877a0201c5133db3ed8315c2dd6aa06b7597",
+      "bytes": 1907
     },
     {
       "path": "templates/runtime-capability-map.md",
-      "sha256": "f9c3ab4b192e1939f35697ecf4a886497b65e1046c4dfce2eeab1f351acb1d14",
-      "bytes": 2578
+      "sha256": "4a61422c3185442c56b39fdfa5bd159a9d808dcf434cb25d3887a986d4f455bc",
+      "bytes": 1148
     },
     {
       "path": "templates/site-repository-instructions.md",
       "sha256": "285c15ed4dbf5fb0fbb0bdf3bc4fa188f71fbae3432eaaf57c1e0e72cba7900f",
       "bytes": 2152
-    },
-    {
-      "path": "VERSION",
-      "sha256": "9bedcb747179f8ba47f9c7c3501a3cb2410566f0eba741894f4b4282d9f19613",
-      "bytes": 14
     }
   ]
 }

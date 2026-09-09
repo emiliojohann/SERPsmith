@@ -1,31 +1,24 @@
-# SERPsmith runtime capability map
+# SERPsmith runtime capability certification
 
-Complete this for the exact agent, version, model, host, plugin/tool set, and permission configuration. Do not reuse a certification after any of those change.
+Use JSON schema `serpsmith.runtime-capabilities.v1`. Certification is bound to the exact agent, runtime version, host, plugin/tool set, model policy, and permissions; repeat it whenever any changes.
 
-| Capability | Required mode | Tool or adapter | Permission boundary | Passing fixture | Safe failure fixture | Result |
-|---|---|---|---|---|---|---|
-| Skill/reference loading | Manual | [value] | Read-only skill directory | [evidence] | Missing reference stops | [status] |
-| Bounded filesystem | Manual | [value] | Site repo + external state only | [evidence] | Out-of-scope path denied | [status] |
-| Git read/fetch/push | Manual | [value] | One repo/branch, normal push | [evidence] | Dirty/diverged tree stops | [status] |
-| Web research | Manual | [value] | HTTPS research sources | [evidence] | Timeout/rate limit classified | [status] |
-| Image generation | Manual | [value] | New candidates only | [evidence] | Invalid candidate rejected | [status] |
-| Image conversion/inspection | Manual | [value] | Approved asset paths | [evidence] | Wrong MIME/crop rejected | [status] |
-| Bounded HTTP | Manual | [value] | Approved hosts, timeouts | [evidence] | Wrong host/status stops | [status] |
-| Secret retrieval | Manual | [value] | Named secret only, never logged | [evidence] | Missing secret stops | [status] |
-| Content adapter | Manual | [value] | Documented repo paths | [evidence] | Schema/path mismatch stops | [status] |
-| Deployment verification | Manual | [value] | Read-only until approval | [evidence] | Failed deployment stops | [status] |
-| Google Search Console | As configured | [value] | Exact property | [evidence] | Other property rejected | [status] |
-| Bing Webmaster Tools | As configured | [value] | Exact verified site | [evidence] | Other site rejected | [status] |
-| IndexNow | As configured | [value] | Exact host/key file | [evidence] | Wrong key/host rejected | [status] |
-| Checkpoints and locks | Unattended | [value] | External/site-namespaced | [evidence] | Duplicate/interruption test | [status] |
-| Scheduler | Unattended | [value] | Approved site/slot only | [evidence] | Unauthorized slot denied | [status] |
-| Tool/action restriction | Unattended | [value] | No raw bypass path | [evidence] | Forbidden tool unavailable | [status] |
-| Final reporting | Unattended | [value] | Approved destination reference | [evidence] | Delivery failure preserved | [status] |
+Required runtime identity:
 
-Certification owner: [name/role]
+- `runtime_id`
+- `agent`
+- `runtime_version`
+- `host_id`
+- `certified_at`
+- optional `expires_at`
 
-Certification date: [date]
+Each capability entry contains `status: "passed"`, `effective: true`, and a non-secret `fixture` reference. Unattended certification requires:
 
-Overall result: [manual-ready / unattended-ready / experimental / unsupported]
+`skill_load`, `filesystem`, `git`, `research`, `image_generate`, `image_convert`, `http_verify`, `secret_access`, `content`, `deploy`, `gsc`, `bing`, `indexnow`, `checkpoint_state`, `scheduler`, `tool_restriction`, `notify`, and `reconciliation`.
 
-Notes and limitations: [value]
+Validate with:
+
+    node scripts/validate-runtime-capabilities.mjs CAPABILITY_MAP unattended
+
+Tool names belong in fixture evidence, not the core capability names. OpenClaw is the first production-tested adapter. Other runtimes remain certification-pending until their exact map and fixtures pass.
+
+Certification result: manual-ready / unattended-ready / experimental / unsupported.

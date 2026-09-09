@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+import assert from "node:assert/strict";
+import { createCheckpoint, validateCheckpoint, applyTransition, classifyCheckpoint, GATES } from "./checkpoint-state.mjs";
+const now="2026-09-08T20:00:00.000Z";
+let state=createCheckpoint({site_key:"demo",run_key:"demo-slot-article",slot_key:"slot-1",slug:"article"},now);
+assert.equal(classifyCheckpoint(state,now).classification,"running");
+state=applyTransition(state,{type:"external_requested",expected_revision:0,operation_id:"img-a-1",capability:"image_generate",candidate:"A",requested_at:now,deadline_at:"2026-09-08T20:10:00.000Z",requested_filename:"candidate-a.png"},now);
+assert.equal(classifyCheckpoint(state,"2026-09-08T20:05:00.000Z").classification,"waiting");
+assert.equal(classifyCheckpoint(state,"2026-09-08T20:11:00.000Z").classification,"stale_external");
+assert.throws(()=>applyTransition(state,{type:"external_completed",expected_revision:0,operation_id:"img-a-1",artifact_ref:"artifact-1"},now),/stale/);
+state=applyTransition(state,{type:"external_completed",expected_revision:1,operation_id:"img-a-1",artifact_ref:"artifact-1"},"2026-09-08T20:06:00.000Z");
+for (const gate of GATES) state=applyTransition(state,{type:"gate_passed",expected_revision:state.revision,gate},"2026-09-08T20:07:00.000Z");
+assert.throws(()=>applyTransition(state,{type:"report_acknowledged",expected_revision:state.revision,receipt:"msg-1"},now),/invalid report/);
+state=applyTransition(state,{type:"report_prepared",expected_revision:state.revision},"2026-09-08T20:08:00.000Z");
+assert.equal(classifyCheckpoint(state,"2026-09-08T20:20:00.000Z").classification,"report_pending");
+assert.equal(classifyCheckpoint(state,"2026-09-08T20:20:00.000Z").overdue,true);
+assert.throws(()=>{const broken=structuredClone(state);broken.lifecycle.state="complete";validateCheckpoint(broken);},/lacks report acknowledgment/);
+state=applyTransition(state,{type:"report_acknowledged",expected_revision:state.revision,receipt:"msg-1"},"2026-09-08T20:09:00.000Z");
+assert.equal(classifyCheckpoint(state,now).classification,"complete");
+assert.equal(validateCheckpoint(state),state);
+process.stdout.write(JSON.stringify({adapter:"checkpoint_state_test",result:"passed"})+"\n");

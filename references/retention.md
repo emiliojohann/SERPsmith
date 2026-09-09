@@ -1,15 +1,26 @@
 # Completed-run retention
 
-SERPsmith's website repository and live site are canonical after publication. Each new run inventories the current content tree, sitemap, internal links, and recent production images directly; it does not need old working renders or source candidates to choose internal links.
+Run retention only after the final publication report is confirmed delivered.
 
-The private checkpoint root remains useful for interruption recovery and for comparing the three most recent image concepts. Retain exactly the latest three completed article runs per site. Preserve all incomplete or failed resumable runs regardless of age, the `analytics/` directory and recommendation ledger, locks, and anything outside the selected site's checkpoint root.
-
-After `serpsmith_finalize` succeeds, the final report message returns a confirmed delivery result, and the checkpoint records `report_delivered`:
-
-```sh
-node scripts/prune-completed-runs.mjs /absolute/private/site-profile.json --keep 3 --apply
+```bash
+node scripts/prune-completed-runs.mjs /absolute/private/site-profile.json --keep 3 --source-root /absolute/generated-media --transient-media-root /absolute/inspection-media --apply
 ```
 
-Without `--apply`, the command is a dry run. It recognizes completed article checkpoints by a valid site/date/slot/slug run key, a non-empty slug, and `status: complete`. It keeps the newest three, protects resumable runs, and removes only older run-keyed artifacts beneath the exact profile checkpoint root. It never edits the website repository or published assets.
+The command is a dry run unless `--apply` is present. Repeat `--source-root` for each exact external root a checkpoint-selected image may reference. Omit optional roots when the selected source is already inside its run directory.
 
-If cleanup fails, do not roll back or republish. Fail the unattended job so its configured failure alert reports the maintenance problem.
+For every site:
+
+- keep exactly the newest three completed article runs;
+- preserve every incomplete or failed resumable run regardless of age;
+- preserve analytics snapshots, recommendation ledgers, locks, and unrelated namespaced state;
+- resolve the checkpoint-selected source image before deletion;
+- copy and hash-verify that image at `selected-image/source.<ext>` inside each retained completed run;
+- remove all other candidate images, production derivatives, preview renders, screenshots, and crop-inspection images from retained completed run directories;
+- remove only the exact matching transient inspection directory when `--transient-media-root` is configured;
+- never touch website repositories, canonical production assets, Git history, or media outside the exact run key.
+
+The resolver accepts current and legacy checkpoint selection fields. It fails closed without deleting anything when a retained run has images but the selected source is missing or ambiguous.
+
+Record the sanitized JSON result in the checkpoint or run log. A cleanup failure after publication does not roll back or republish the article; it fails the unattended job so the owner can repair retention safely.
+
+Run `node scripts/test-prune-completed-runs.mjs` before unattended release.
