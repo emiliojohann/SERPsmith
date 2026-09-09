@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## v0.4.0-beta.4
+
+- Upgraded the Guard test toolchain to Vitest 5.0.0, removing the vulnerable `@vitest/mocker` dependency and clearing the related path-traversal advisories.
+- Kept the Guard runtime contract at 0.2.0; this maintenance release changes development and verification dependencies only.
+
 ## v0.4.0-beta.3
 
 - Advanced the shared policy from `serpsmith-core-v18` to the platform-neutral `serpsmith-core-v25` contract.

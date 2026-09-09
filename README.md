@@ -4,7 +4,7 @@ SERPsmith provides multi-platform AI agent support for evidence-led SEO and AI-s
 
 ## Beta status
 
-Version: `v0.4.0-beta.3`
+Version: `v0.4.0-beta.4`
 
 SERPsmith is beta software. The bundled publishing path targets Git-backed Markdown sites with deterministic sitemap updates. Runtime portability is capability-based; each runtime/version must be certified independently.
 
@@ -36,7 +36,8 @@ See Google's guidance on [helpful, reliable, people-first content](https://devel
 
 ## Requirements
 
-- Node.js 20 or later;
+- Node.js 20 or later for the publishing runtime;
+- Node.js 22.12 or later when building or testing the bundled OpenClaw Guard plugin;
 - a Git-backed website with a configured branch/upstream;
 - a tool-capable agent with filesystem/Git, web research, image generation, local conversion, HTTP verification, and secret access;
 - external directories for profiles, state, locks, drafts, and reports;

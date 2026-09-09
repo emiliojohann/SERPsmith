@@ -8,8 +8,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "2028cc616b942c2286a435a939d36896dd23e93dff9a47948cf4b31593dbdebd",
-      "bytes": 5295
+      "sha256": "3146ab45b3ba375bdc2ee7981cb15142b716e08d2ef34234e5f6208c8252a385",
+      "bytes": 5596
     },
     {
       "path": "COMMERCIAL-LICENSE.md",
@@ -22,39 +22,9 @@
       "bytes": 702
     },
     {
-      "path": "LICENSE",
-      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
-      "bytes": 34523
-    },
-    {
-      "path": "README.md",
-      "sha256": "8dec3878937339c30b781b5a3079d9677523fe91c7b2bc4b4f8685960e9bf21d",
-      "bytes": 9097
-    },
-    {
-      "path": "SECURITY.md",
-      "sha256": "06c4487f80f013e3da14ec951d95180e891466f2cd6b23fd483213a48c2ee9f6",
-      "bytes": 984
-    },
-    {
-      "path": "SKILL.md",
-      "sha256": "e3ad333a5481b67463d12341915ca1a6c535ea494fe4832b91eb65e2babe71ac",
-      "bytes": 5960
-    },
-    {
-      "path": "VERSION",
-      "sha256": "a6c3fecd785e1914eb9a377a8663a4a6e1847a8faf8046f34d36370011f97d57",
-      "bytes": 14
-    },
-    {
       "path": "examples/ai-search-readiness-evidence.json",
       "sha256": "8b3b4c706e5c86e77b08f2fc8ef6d9d059447ab4cd40dfdd5528499704da38d7",
       "bytes": 1243
-    },
-    {
-      "path": "examples/demo-site/README.md",
-      "sha256": "a8995479dac2d9272fe76d578583ec66794b68399fb0962e8bad4b678e03a831",
-      "bytes": 466
     },
     {
       "path": "examples/demo-site/content/blog/git-content-workflow.md",
@@ -77,6 +47,11 @@
       "bytes": 321
     },
     {
+      "path": "examples/demo-site/README.md",
+      "sha256": "a8995479dac2d9272fe76d578583ec66794b68399fb0962e8bad4b678e03a831",
+      "bytes": 466
+    },
+    {
       "path": "examples/generic-git-site-profile.json",
       "sha256": "36a9059a855cb0b793884e2138200e7fd3b67c6c2636b3ee624b9630caa64d3b",
       "bytes": 2249
@@ -97,9 +72,9 @@
       "bytes": 716
     },
     {
-      "path": "plugins/openclaw-serpsmith-guard/README.md",
-      "sha256": "c32a07058fe065afaf551f6c8915007f91f6186f05ef7263a329d26cd6ebaa23",
-      "bytes": 1266
+      "path": "LICENSE",
+      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+      "bytes": 34523
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/openclaw.plugin.json",
@@ -108,13 +83,18 @@
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/package-lock.json",
-      "sha256": "00fc2c3e9aca31d55d22d0aad571a3d38cd86e7ae8fef5501b97b45b1350a46e",
-      "bytes": 53769
+      "sha256": "3851b98356dc573c5958187aefdbe9e96e09c2870a80c8befae4602210035b37",
+      "bytes": 38030
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/package.json",
-      "sha256": "b14e745ddf19818bc20b48ce36a5a47976058849e425a1de59b97c63706ca9ab",
+      "sha256": "63979be3e91dd63faea510ecbf010a63a8fed0300108acd4d5638845eef7b6ed",
       "bytes": 885
+    },
+    {
+      "path": "plugins/openclaw-serpsmith-guard/README.md",
+      "sha256": "c32a07058fe065afaf551f6c8915007f91f6186f05ef7263a329d26cd6ebaa23",
+      "bytes": 1266
     },
     {
       "path": "plugins/openclaw-serpsmith-guard/src/index.test.ts",
@@ -145,6 +125,11 @@
       "path": "plugins/openclaw-serpsmith-guard/vitest.config.ts",
       "sha256": "a5cfd31053349c56ec0528ce54bae7402b793c19fead5d7028985817385aac4e",
       "bytes": 349
+    },
+    {
+      "path": "README.md",
+      "sha256": "36a5c68cb2a3e4026c99eefafa65d07c353daef2371b04724f1a1fc8134b77c9",
+      "bytes": 9209
     },
     {
       "path": "references/adapter-contract.md",
@@ -423,7 +408,7 @@
     },
     {
       "path": "scripts/test-user-onboarding-docs.sh",
-      "sha256": "cb5645ea8c099a2ccf619b7a97b0bb8849bc749a37e98c68ff051bb16fa45e11",
+      "sha256": "e61d758624d6911f3a28c69dfed09f8935991a080263228b9e2858a7a0284d74",
       "bytes": 5151
     },
     {
@@ -437,6 +422,16 @@
       "bytes": 1907
     },
     {
+      "path": "SECURITY.md",
+      "sha256": "06c4487f80f013e3da14ec951d95180e891466f2cd6b23fd483213a48c2ee9f6",
+      "bytes": 984
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "e3ad333a5481b67463d12341915ca1a6c535ea494fe4832b91eb65e2babe71ac",
+      "bytes": 5960
+    },
+    {
       "path": "templates/runtime-capability-map.md",
       "sha256": "4a61422c3185442c56b39fdfa5bd159a9d808dcf434cb25d3887a986d4f455bc",
       "bytes": 1148
@@ -445,6 +440,11 @@
       "path": "templates/site-repository-instructions.md",
       "sha256": "285c15ed4dbf5fb0fbb0bdf3bc4fa188f71fbae3432eaaf57c1e0e72cba7900f",
       "bytes": 2152
+    },
+    {
+      "path": "VERSION",
+      "sha256": "c17b54ded47dc32703f5b80ad7563f5604df852a1adce4b18366c7aef4021d41",
+      "bytes": 14
     }
   ]
 }
