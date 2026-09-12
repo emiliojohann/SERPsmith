@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 import { promises as fs, watch } from "node:fs";
-import { spawnSync } from "node:child_process";
 import path from "node:path";
+import { dispatchEvent } from "./openclaw-image-recovery-dispatch.mjs";
 
 const runsRoot = path.resolve(process.argv[2] ?? "");
 const mediaRoot = path.resolve(process.argv[3] ?? "");
 const once = process.argv.includes("--once");
 const dispatch = process.argv.includes("--dispatch");
+const queueFlag = process.argv.indexOf("--queue-root");
+const queueRoot = queueFlag >= 0 ? path.resolve(process.argv[queueFlag + 1] ?? "") : null;
 for (const [label, root] of [["runs", runsRoot], ["generated-media", mediaRoot]]) {
   if (!root || root === path.parse(root).root) throw new Error(`A bounded ${label} root is required`);
 }
+if(dispatch&&(!queueRoot||queueRoot===path.parse(queueRoot).root))throw new Error("A bounded queue root is required for dispatch");
 
 const emitted = new Map();
 // Stream schedulers may drop a matching line while the prior recovery turn is
@@ -174,18 +177,10 @@ async function scan() {
       candidate,
       source,
       token: request.request_token,
+      revision: Number.isInteger(checkpoint.revision) ? checkpoint.revision : 0,
     };
     if (dispatch) {
-      const dispatcher = new URL("./openclaw-image-recovery-dispatch.mjs", import.meta.url).pathname;
-      const result = spawnSync(process.execPath, [dispatcher, runsRoot, mediaRoot], {
-        encoding: "utf8",
-        maxBuffer: 8 * 1024 * 1024,
-        env: process.env,
-      });
-      if (result.error) throw result.error;
-      if (result.status !== 0) throw new Error(`Recovery dispatcher exited ${result.status}`);
-      const output = result.stdout.trim().split("\n").at(-1);
-      const dispatched = JSON.parse(output);
+      const dispatched = await dispatchEvent(event,queueRoot);
       process.stdout.write(`SERPSMITH_DISPATCH ${JSON.stringify(dispatched)}\n`);
     } else {
       process.stdout.write(`SERPSMITH_RECOVERY ${JSON.stringify(event)}\n`);

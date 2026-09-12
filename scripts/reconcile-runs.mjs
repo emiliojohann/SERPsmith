@@ -1,11 +1,16 @@
 #!/usr/bin/env node
 import { promises as fs } from "node:fs";
+import crypto from "node:crypto";
 import path from "node:path";
 import { classifyCheckpoint, validateCheckpoint } from "./checkpoint-state.mjs";
+import { enqueue } from "./durable-work-queue.mjs";
+import { nextAction } from "./run-controller.mjs";
 
 const profilePath = process.argv[2];
 const nowFlag = process.argv.indexOf("--now");
 const now = nowFlag >= 0 ? process.argv[nowFlag + 1] : new Date().toISOString();
+const queueFlag = process.argv.indexOf("--queue-root");
+const queueRoot = queueFlag >= 0 ? path.resolve(process.argv[queueFlag + 1] ?? "") : null;
 if (!profilePath || !Number.isFinite(Date.parse(now))) throw new Error("usage: reconcile-runs.mjs PROFILE [--now ISO]");
 const profile = JSON.parse(await fs.readFile(path.resolve(profilePath), "utf8"));
 const root = path.resolve(profile.checkpoint_root ?? "");
@@ -36,18 +41,35 @@ for (const file of await checkpoints(root)) {
   }
   try {
     validateCheckpoint(checkpoint);
-    runs.push({ checkpoint: file, run_key: checkpoint.run.run_key, ...classifyCheckpoint(checkpoint, now) });
+    runs.push({ checkpoint: file, run_key: checkpoint.run.run_key, revision:checkpoint.revision, ...classifyCheckpoint(checkpoint, now) });
   } catch {
     runs.push({ checkpoint: file, run_key: checkpoint.run?.run_key ?? null, classification: "invalid", retryable: false });
   }
 }
-const actionable = new Set(["stale_external", "recovery_required", "report_pending", "invalid"]);
+const actionable = new Set(["stale_external", "recovery_required", "report_pending", "report_ambiguous", "invalid"]);
 const actionRequired = runs.filter((run) =>
   actionable.has(run.classification) &&
   (run.classification !== "report_pending" || run.overdue === true));
+const queued=[];
+if(queueRoot){
+  if(queueRoot===path.parse(queueRoot).root||!queueRoot.split(path.sep).includes(profile.site_key))throw new Error("bounded site-namespaced queue root required");
+  for(const run of actionRequired){
+    if(["invalid","report_ambiguous"].includes(run.classification))continue;
+    const checkpoint=JSON.parse(await fs.readFile(run.checkpoint,"utf8"));
+    const action=nextAction(checkpoint,now);
+    if(action.automatic!==true)continue;
+    const operationId="reconcile:"+crypto.createHash("sha256").update(run.run_key+":"+run.revision+":"+action.action).digest("hex").slice(0,24);
+    try{
+      await enqueue(queueRoot,{operation_id:operationId,site_key:profile.site_key,run_key:run.run_key,kind:action.action==="deliver_report"?"report_delivery":"stage_resume",checkpoint:run.checkpoint,expected_revision:run.revision,payload:{action:action.action,operation_id:action.operation_id??null}},now);
+      queued.push({run_key:run.run_key,operation_id:operationId,action:action.action});
+    }catch(error){
+      if(error?.code!=="EEXIST")throw error;
+    }
+  }
+}
 process.stdout.write(JSON.stringify({
   adapter: "run_reconciliation", result: actionRequired.length ? "action_required" : "verified",
   retryable: actionRequired.some((run) => run.retryable), site_key: profile.site_key,
   counts: Object.fromEntries([...new Set(runs.map((run) => run.classification))].sort().map((key) => [key, runs.filter((run) => run.classification === key).length])),
-  actionable: actionRequired,
+  actionable: actionRequired, queued,
 }) + "\n");

@@ -14,7 +14,7 @@ Real profiles, credentials, destinations, drafts, reports, checkpoints, locks, a
 
 ## Shared core policy
 
-Current core policy version: `serpsmith-core-v25`.
+Current core policy version: `serpsmith-core-v27`.
 
 All active profiles MUST declare the exact `core_policy_version` required by the live validator. Universal behavior belongs to SERPsmith's skill and references, never to an individual site profile.
 
@@ -80,7 +80,9 @@ Apply the pass to article prose, not frontmatter, code, structured data, quoted 
 
 The portable skill performs an editorial rewrite, not deterministic authorship detection. Do not manufacture or report a numerical Humanizer score. After the pass, rerun factual, citation, link, metadata, heading, product-claim, and site validation. A missing or incompatible Humanizer skill is a safe stop before publication, not permission to fall back to the retired local CLI or publish without the pass.
 
-## Read-only Google Analytics 4
+## Read-only Search Console and Google Analytics 4
+
+Create private immutable Search Console snapshots for 7, 14, 28, and 90 days plus preceding windows. Use them for query/page visibility, position, CTR, and milestone observations. The snapshot is advisory and never authorizes an existing-page edit.
 
 When `analytics` is configured, use the bundled adapter and exact selected profile. Bind every request and snapshot to the private numeric property ID and exact hostname. Collect aggregate Organic Search landing-page metrics for 7, 28, and 90 days plus preceding windows. Allowed fields are sessions, engaged sessions, engagement rate, active users, page views, aggregate engagement duration, and counts for explicitly configured events.
 
@@ -110,9 +112,9 @@ A fallback may have documented clarity, composition, anatomy, or responsive-crop
 
 Default production is an exact 1280 x 720 WebP hero plus a locally derived matching JPEG social image. Focal-crop; never stretch. Inspect original candidates and every required desktop hero, mobile hero, blog-card, and social render. Responsive-crop weaknesses may use the six-candidate fallback whenever the image remains recognizable and technically usable; blank, corrupt, missing, or invalid assets may not. Strip metadata, verify dimensions/MIME, never overwrite, and validate live assets/crawlers.
 
-Use the canonical v25 checkpoint state machine for every external image request. Before calling any image provider, record one `external_requested` transition with a stable operation ID, candidate, bounded requested filename, request timestamp, and deadline. An asynchronous provider response is a hard turn boundary: end the current agent turn while the checkpoint remains `waiting_external`. Provider completion is not publication success. A runtime adapter must correlate exactly one bounded artifact, record `external_completed`, and resume the same run key. Missing, ambiguous, stale, or root-escaping artifacts fail closed.
+Use the canonical v27 checkpoint state machine for every external image request. Before calling any image provider, record one `external_requested` transition with a stable operation ID, candidate, bounded requested filename, request timestamp, and deadline. An asynchronous provider response is a hard turn boundary: end the current agent turn while the checkpoint remains `waiting_external`. Provider completion is not publication success. A runtime adapter must correlate exactly one bounded artifact, record `external_completed`, and resume the same run key. Missing, ambiguous, stale, or root-escaping artifacts fail closed.
 
-Keep provider correlation and scheduler behavior in runtime adapters. Follow `references/reliability-contract.md` for the platform-neutral state and reconciliation rules. OpenClaw uses `scripts/openclaw-image-recovery-watch.mjs` and `scripts/openclaw-image-recovery-dispatch.mjs` as the first reference adapter; other agents implement the same capability contract without copying OpenClaw tool names or session semantics. Legacy checkpoint aliases are migration input only and MUST NOT be written by new v25 runs. Never invent or broadly search for a source path, start a second run, duplicate the active request, or let a generic completion lane publish or report.
+Keep provider correlation and scheduler behavior in runtime adapters. Follow `references/reliability-contract.md` for the platform-neutral state and reconciliation rules. OpenClaw uses `scripts/openclaw-image-recovery-watch.mjs` and `scripts/openclaw-image-recovery-dispatch.mjs` as the first reference adapter; other agents implement the same capability contract without copying OpenClaw tool names or session semantics. Legacy checkpoint aliases are migration input only and MUST NOT be written by new v27 runs. Never invent or broadly search for a source path, start a second run, duplicate the active request, or let a generic completion lane publish or report.
 
 ## Content and target validation
 
@@ -154,7 +156,7 @@ When the repository, branch, upstream, or worktree changes after preflight:
 
 1. Stop before commit or push and preserve the checkpoint, lock, article package, assets, and sanitized attempt history.
 2. Identify the exact concurrent files and commits. Never overwrite, revert, stage, or absorb unrelated work.
-3. Notify the owner immediately with the affected article, safe state, exact conflict/change, and whether automatic recovery is possible.
+3. If automatic recovery is safe and available, record the affected article, safe state, and exact conflict internally without sending an attempt alert. Notify the owner only when recovery cannot proceed safely or the bounded retry budget is exhausted.
 4. Wait until the other writer has finished or the repository is stable. Do not poll destructively and do not modify another process's files.
 5. Once stable, fetch normally, verify the configured branch can be fast-forwarded without conflict, and re-run repository preflight against the new upstream state.
 6. Revalidate the preserved publication diff against the new base, including content, images, reciprocal links, discovery files, secret scan, and allowed checks.
@@ -193,9 +195,9 @@ Do not use fail-fast shell behavior inside retryable checks. Do not reproduce ei
 
 After the permitted attempts, reread the checkpoint. If the gate is still incomplete, emit one explicit exhausted-gate failure with the stage, attempts, safe state, and next action. Immediately non-retryable failures may fail directly. A recovered attempt remains in the log but must never override a completed checkpoint or successful final report.
 
-Before reporting success, confirm every required publication, live-verification, and notification gate is complete. Record `report_prepared`, validate the pre-delivery checkpoint, send through the configured notification adapter, then record `report_acknowledged` with the adapter's non-secret receipt. Run the completion finalizer only after acknowledgment. A prepared or sent report is not complete without an acknowledgment, and a scheduler result never overrides checkpoint state. Never convert a genuinely exhausted failure into success merely to silence scheduler alerts.
+Before reporting success, confirm every required publication, live-verification, and notification gate is complete. Record `report_prepared`, validate the pre-delivery checkpoint, record `report_delivery_started`, send through the configured notification adapter, then record `report_acknowledged` with the adapter's non-secret receipt. Run the completion finalizer only after acknowledgment. A delivery started without a receipt is ambiguous and must never be resent automatically. A prepared or sent report is not complete without an acknowledgment, and a scheduler result never overrides checkpoint state. Never convert a genuinely exhausted failure into success merely to silence scheduler alerts.
 
-Before unattended release, validate the selected integration. For the OpenClaw reference integration, run the guard plugin build, unit tests, plugin validation, plugin doctor, and a real isolated scheduler validation that executes one failing command and one passing command through `serpsmith_exec`, calls `serpsmith_finalize` against a complete checkpoint, finishes with scheduler status `ok`, and confirms the recorded trajectory contains no raw execution tools. Inspect the live production cron payload to prove its tool allowlist excludes raw execution. For the portable fallback, run `/bin/zsh scripts/test-controlled-attempt.sh`; the regression must verify both failing and passing commands through a non-executable copy of the wrapper.
+Before unattended release, validate the selected integration. For the OpenClaw reference integration, run the Guard verification suite, plugin validation, plugin doctor, and a real isolated scheduler canary that executes one contained failing command and one passing command through `serpsmith_exec`, calls `serpsmith_finalize` against a complete checkpoint, finishes with scheduler status `ok`, and confirms the recorded trajectory contains no raw execution tools. Inspect the live production job payload to prove its tool allowlist excludes raw execution. Exclude failure-simulation fixtures from the distributable runtime.
 
 ## Manual and unattended modes
 
@@ -216,6 +218,6 @@ Commit: <short hash>
 Search: Google <status> | Bing <status> | IndexNow <status>
 Note: <only a material exception, recovery, limitation, or owner action; otherwise omit>
 
-Do not list image filenames, dimensions, routine crawler details, or boilerplate limitations when their checks passed. Keep failure reports to at most five nonblank lines: Failed, Stage/attempts, Completed, Safe state, and Next action. Preserve every required checkpoint and verification detail in durable state even when omitted from Telegram.
+Do not list image filenames, dimensions, routine crawler details, or boilerplate limitations when their checks passed. Keep final failure reports to at most five nonblank lines: Failed, Stage/attempts, Completed, Safe state, and Next action. Never send an attempt-level failure while bounded retry or recovery remains available or active. Preserve every required checkpoint and verification detail in durable state even when omitted from Telegram.
 
-For unattended OpenClaw delivery, prepare the final report, record `report_prepared`, and call `serpsmith_finalize` in pre-delivery mode. Then make one explicit `message` call to the configured owner destination with plain text only: no attachments, media, generated-image references, or file paths. Record `report_acknowledged` with the non-secret message receipt and call `serpsmith_finalize` in complete mode. Only then run retention and return `NO_REPLY`; fallback announcement remains disabled. Do not delete generated sources before acknowledgment.
+For unattended OpenClaw delivery, prepare the final report, record `report_prepared`, and call `serpsmith_finalize` in pre-delivery mode. Record `report_delivery_started`, then make one explicit `message` call to the configured owner destination with plain text only: no attachments, media, generated-image references, or file paths. Record `report_acknowledged` with the non-secret message receipt and call `serpsmith_finalize` in complete mode. Only then run retention and return `NO_REPLY`; fallback announcement remains disabled. Do not delete generated sources before acknowledgment.

@@ -30,7 +30,7 @@ Never request or persist user identifiers, advertising identifiers, demographics
 - `scripts/google-analytics-config.mjs`: profile, credential-reference, path, and URL normalization.
 - `scripts/google-analytics-client.mjs`: bounded Google authentication and read-only API requests.
 - `scripts/google-analytics-snapshot-core.mjs`: standard windows, organic filters, page normalization, and configured event joins.
-- `scripts/test-google-analytics.mjs`: in-process local regression with no shell execution.
+The project verification suite covers property binding, aggregate-only output, site isolation, immutable snapshots, and credential failures. Its fixtures are excluded from the distributable runtime.
 
 ## Credentials and property binding
 

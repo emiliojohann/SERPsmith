@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.5.0-beta.3
+
+- Removed development-environment terminology from the distributable documentation.
+- Added a release-boundary regression that rejects internal release wording from exported runtime packages.
+- Required distribution and installed-runtime promotion to use the same checksum-verified artifact.
+
+## v0.5.0-beta.2
+
+- Separated development tests from the distributable runtime manifest and added a regression that rejects test-like export paths.
+- Added a generic leased worker harness with exact site, run, checkpoint, and revision binding.
+- Added bounded reliability intelligence that learns recurring failure signatures continuously and produces approval-only owner recommendations.
+- Added 28-day evidence thresholds, weekly review support, decision memory, and bounded 180-day telemetry retention.
+
+## v0.5.0-beta.1
+
+- Added a deterministic stage controller that derives the next action exclusively from canonical checkpoint state.
+- Added a durable filesystem work queue with atomic leasing, bounded retries, lease expiry recovery, and terminal exhaustion.
+- Added two-phase report delivery intent so an interrupted send becomes an ambiguous state requiring reconciliation instead of an automatic duplicate.
+- Added immutable Google Search Console snapshots and approval-gated 7/14/28/90-day article milestone observations.
+- Added a private owner image-feedback ledger so repeatedly rejected concept families are excluded from future candidates.
+- Added failure-injection coverage for worker interruption, lease expiry, retry exhaustion, and report-delivery ambiguity.
+
 ## v0.4.0-beta.5
 
 - Removed internal release-policy and checksum artifacts from the distributable repository.

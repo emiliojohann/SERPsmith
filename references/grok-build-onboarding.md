@@ -27,18 +27,15 @@ Copy `examples/generic-git-site-profile.json` outside the skill directory, keep 
 
 Give Grok Build the universal read-only run instruction from `references/agent-runtime-onboarding.md`. The first test must not create or edit content, commit, push, deploy, notify search engines, change credentials, or change schedules.
 
-Run the bundled deterministic tests before a real site:
+Run a disposable runtime canary before a real site:
 
 ```bash
-node scripts/test-live-http-check.mjs
-/bin/zsh scripts/test-profile-validation.sh
-/bin/zsh scripts/test-search-onboarding.sh
-node scripts/test-ai-search-readiness.mjs
-node scripts/test-google-analytics.mjs
-node scripts/test-prune-completed-runs.mjs
-/bin/zsh scripts/test-controlled-attempt.sh
-/bin/zsh scripts/test-user-onboarding-docs.sh
+node scripts/validate-profile.mjs /absolute/path/to/disposable-profile.json
+node scripts/ai-search-readiness.mjs /absolute/path/to/disposable-profile.json /absolute/path/to/evidence.json
+node scripts/validate-runtime-capabilities.mjs /absolute/path/to/runtime-capability-map.json manual
 ```
+
+The project verification suite separately proves failure injection, adapters, retention, and documentation completeness; its fixtures are excluded from the distributable runtime.
 
 ## Capability map
 

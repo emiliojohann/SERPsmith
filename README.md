@@ -4,7 +4,7 @@ SERPsmith provides multi-platform AI agent support for evidence-led SEO and AI-s
 
 ## Beta status
 
-Version: `v0.4.0-beta.5`
+Version: `v0.5.0-beta.3`
 
 SERPsmith is beta software. The bundled publishing path targets Git-backed Markdown sites with deterministic sitemap updates. Runtime portability is capability-based; each runtime/version must be certified independently.
 
@@ -17,12 +17,15 @@ SERPsmith is beta software. The bundled publishing path targets Git-backed Markd
 - starts with two distinct image concepts, reviews at most six generated candidates, and selects one using a documented rubric;
 - after six candidates, publishes the highest-ranked relevant, safe, technically valid fallback when no candidate clears every aesthetic gate, then discloses the exact exception for owner review;
 - produces an exact 1280 x 720 WebP hero and a locally derived matching JPEG social image;
-- uses external checkpoints and locks to resume safely;
+- uses a deterministic stage controller, external checkpoints, and a durable leased queue to resume safely;
+- records report-delivery intent before sending so an interruption cannot trigger an automatic duplicate;
 - validates the expected diff before commit;
 - stops on secrets, unsafe claims, dirty/diverged repositories, auth failures, or conflicts;
 - verifies live content, metadata, assets, crawlers, and configured search notifications;
 - validates Google AI features, ChatGPT Search, and Perplexity search readiness from fresh same-site evidence without inventing an LLM score;
-- optionally verifies exact GA4 property/hostname access and creates immutable aggregate Organic Search snapshots.
+- optionally verifies exact GA4 property/hostname access and creates immutable aggregate Organic Search snapshots;
+- records immutable Search Console evidence and approval-gated 7/14/28/90-day article milestones;
+- maintains a private owner image-feedback ledger that excludes repeatedly rejected concept families.
 
 ## SEO principles and expectations
 
@@ -37,7 +40,7 @@ See Google's guidance on [helpful, reliable, people-first content](https://devel
 ## Requirements
 
 - Node.js 20 or later for the publishing runtime;
-- Node.js 22.12 or later when building or testing the bundled OpenClaw Guard plugin;
+- Node.js 22.12 or later when building the bundled OpenClaw Guard plugin;
 - a Git-backed website with a configured branch/upstream;
 - a tool-capable agent with filesystem/Git, web research, image generation, local conversion, HTTP verification, and secret access;
 - external directories for profiles, state, locks, drafts, and reports;
@@ -88,13 +91,19 @@ The disposable fixture in `examples/demo-site/` can be copied to a temporary loc
 - `scripts/markdown-content-adapter.mjs`: creates a Markdown article and updates a simple XML sitemap.
 - `scripts/ai-search-readiness.mjs`: deterministic AI-search evidence validation.
 - `scripts/google-search-console-check.mjs`: read-only Google property/sitemap test.
+- `scripts/google-search-console-snapshot.mjs`: immutable aggregate Search Console 7/14/28/90-day snapshots.
+- `scripts/content-milestones.mjs`: approval-gated article milestone observations.
 - `scripts/google-analytics-check.mjs`: read-only GA4 property/hostname/Data API verification.
 - `scripts/google-analytics-snapshot.mjs`: immutable aggregate Organic Search 7/28/90-day snapshots.
 - `scripts/google-search-console-submit.mjs`: Google sitemap submission adapter.
 - `scripts/bing-webmaster-submit.sh`: portable Bing check/submission adapter.
 - `scripts/indexnow-submit.sh`: explicit-key-file IndexNow check/submission adapter.
 - `scripts/search-onboarding-report.mjs`: sanitized Google, Bing, and IndexNow readiness report.
-- `scripts/test-user-onboarding-docs.sh`: documentation completeness regression.
+- `scripts/run-controller.mjs`: deterministic checkpoint-to-next-action planner.
+- `scripts/durable-work-queue.mjs`: atomic leased work queue with bounded retries.
+- `scripts/durable-worker.mjs`: site/run/revision-bound queue worker harness.
+- `scripts/image-feedback-ledger.mjs`: private owner rejection memory.
+- `scripts/reliability-intelligence.mjs`: bounded, approval-only operational learning.
 
 Git preflight, image generation/conversion, deployment, scheduling, and reporting may be supplied by the agent runtime or separately reviewed adapters.
 

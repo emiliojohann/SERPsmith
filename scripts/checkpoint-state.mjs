@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import { promises as fs } from "node:fs";
+import crypto from "node:crypto";
 import path from "node:path";
 
 export const SCHEMA = "serpsmith.run-checkpoint.v2";
-export const CORE = "serpsmith-core-v25";
+export const CORE = "serpsmith-core-v27";
 export const GATES = Object.freeze([
   "repository_preflight","article_validation","structural_validation","metadata_validation",
   "secret_scan","commit","push","deployment","live_article","live_assets",
@@ -19,6 +20,8 @@ const iso = (value) => typeof value === "string" && Number.isFinite(Date.parse(v
 const identifier = (value) => typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/.test(value);
 const clone = (value) => structuredClone(value);
 const fail = (message) => { throw new Error(message); };
+const deliveryId = (runKey, preparedAt) =>
+  "report-" + crypto.createHash("sha256").update(runKey + ":" + preparedAt).digest("hex").slice(0, 24);
 
 export function createCheckpoint(input, now = new Date().toISOString()) {
   for (const key of ["site_key","run_key","slot_key","slug"]) if (!identifier(input?.[key])) fail("invalid " + key);
@@ -31,7 +34,7 @@ export function createCheckpoint(input, now = new Date().toISOString()) {
     lifecycle: {state:"running",phase:"preflight"},
     pending_operation: null,
     gates: Object.fromEntries(GATES.map((gate) => [gate,false])),
-    report: {state:"not_prepared",prepared_at:null,deadline_at:null,acknowledged_at:null,receipt:null},
+    report: {state:"not_prepared",prepared_at:null,deadline_at:null,delivery_id:null,delivery_state:"not_started",delivery_started_at:null,acknowledged_at:null,receipt:null},
     failure: null,
     attempts: [],
     data: {},
@@ -51,6 +54,10 @@ export function validateCheckpoint(value) {
   for (const gate of GATES) if (typeof value.gates[gate] !== "boolean") fail("invalid gate " + gate);
   if (!REPORT_STATES.has(value.report?.state)) fail("invalid report state");
   if (value.report.state === "prepared" && !iso(value.report.deadline_at)) fail("prepared report lacks deadline");
+  if (!["not_started","started","acknowledged"].includes(value.report?.delivery_state)) fail("invalid report delivery state");
+  if (value.report.state === "prepared" && !identifier(value.report.delivery_id)) fail("prepared report lacks delivery id");
+  if (value.report.delivery_state === "started" && !iso(value.report.delivery_started_at)) fail("started report lacks timestamp");
+  if (value.report.state === "acknowledged" && value.report.delivery_state !== "acknowledged") fail("acknowledged report delivery mismatch");
   if (!Array.isArray(value.attempts) || !value.data || typeof value.data !== "object" || Array.isArray(value.data)) fail("invalid checkpoint extension data");
   if (value.pending_operation !== null) {
     const op = value.pending_operation;
@@ -101,12 +108,18 @@ export function applyTransition(current, event, now = new Date().toISOString()) 
     if (current.lifecycle.state !== "running" || !GATES.every((gate) => current.gates[gate] === true)) fail("publication gates incomplete");
     const deadline = event.deadline_at ?? new Date(Date.parse(now) + 10 * 60 * 1000).toISOString();
     if (!iso(deadline) || Date.parse(deadline) <= Date.parse(now)) fail("invalid report deadline");
-    next.report = {state:"prepared",prepared_at:now,deadline_at:deadline,acknowledged_at:null,receipt:null};
+    next.report = {state:"prepared",prepared_at:now,deadline_at:deadline,delivery_id:deliveryId(current.run.run_key,now),delivery_state:"not_started",delivery_started_at:null,acknowledged_at:null,receipt:null};
     next.lifecycle.state = "awaiting_report_ack";
     next.lifecycle.phase = "report";
+  } else if (type === "report_delivery_started") {
+    if (current.lifecycle.state !== "awaiting_report_ack" || current.report.state !== "prepared" ||
+        current.report.delivery_state !== "not_started") fail("invalid report delivery start");
+    next.report.delivery_state = "started";
+    next.report.delivery_started_at = now;
   } else if (type === "report_acknowledged") {
-    if (current.lifecycle.state !== "awaiting_report_ack" || current.report.state !== "prepared" || !identifier(event.receipt)) fail("invalid report acknowledgment");
-    next.report = {...current.report,state:"acknowledged",acknowledged_at:now,receipt:event.receipt};
+    if (current.lifecycle.state !== "awaiting_report_ack" || current.report.state !== "prepared" ||
+        current.report.delivery_state !== "started" || !identifier(event.receipt)) fail("invalid report acknowledgment");
+    next.report = {...current.report,state:"acknowledged",delivery_state:"acknowledged",acknowledged_at:now,receipt:event.receipt};
     next.lifecycle.state = "complete";
     next.lifecycle.phase = "complete";
   } else if (type === "failed") {
@@ -125,7 +138,13 @@ export function classifyCheckpoint(value, now = new Date().toISOString()) {
   validateCheckpoint(value);
   const state = value.lifecycle.state;
   if (state === "waiting_external") return {classification:Date.parse(now) > Date.parse(value.pending_operation.deadline_at) ? "stale_external" : "waiting",retryable:true};
-  if (state === "awaiting_report_ack") return {classification:"report_pending",retryable:true,overdue:Date.parse(now) > Date.parse(value.report.deadline_at)};
+  if (state === "awaiting_report_ack") {
+    const overdue = Date.parse(now) > Date.parse(value.report.deadline_at);
+    if (value.report.delivery_state === "started") {
+      return {classification:overdue ? "report_ambiguous" : "report_delivery_in_progress",retryable:false,overdue};
+    }
+    return {classification:"report_pending",retryable:true,overdue};
+  }
   if (state === "recovery_required") return {classification:"recovery_required",retryable:true};
   if (state === "complete") return {classification:"complete",retryable:false};
   if (state === "failed") return {classification:"failed",retryable:false};

@@ -49,4 +49,4 @@ Scheduling is external to an article run. The scheduler supplies exactly one pro
 Native agent tools may satisfy a capability without a wrapper, but the runtime-specific guide must map inputs, outputs, timeouts, and failure classes explicitly.
 
 
-The canonical v25 checkpoint schema and scheduler-independent completion rules are defined in `reliability-contract.md`. Runtime adapters must not add vendor tool names or session identifiers to that schema.
+The canonical v27 checkpoint schema and scheduler-independent completion rules are defined in `reliability-contract.md`. Runtime adapters must not add vendor tool names or session identifiers to that schema.

@@ -8,8 +8,8 @@ Keep the recommendation ledger private, external to every website repository, an
 
 ## Review workflow
 
-1. Load the exact selected site profile, a fresh verified GA4 snapshot, comparable Search Console evidence, and relevant publication/change history.
-2. Compare 7, 28, and 90-day windows with their preceding equivalent windows. Use the 7-day window for recent direction, 28 days for confirmation, and 90 days for context.
+1. Load the exact selected site profile, a fresh verified GA4 snapshot, a fresh immutable Search Console snapshot, and relevant publication/change history.
+2. Compare 7, 28, and 90-day windows with their preceding equivalent windows. Use the 7-day window for recent direction, 28 days for confirmation, and 90 days for context. Record article-level Search Console observations at 7, 14, 28, and 90 days; a milestone is evidence collection, not automatic authorization.
 3. Separate four layers: Search Console observations, GA4 observations, inference, and recommendation.
 4. Classify each page as Winner, CTR opportunity, Intent mismatch, Visibility opportunity, CTA opportunity, Refresh candidate, or Insufficient evidence.
 5. Record a specific, reversible proposed action and the evidence that would confirm or disconfirm it.

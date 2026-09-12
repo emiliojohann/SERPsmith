@@ -179,7 +179,7 @@ export function validateCheckpointText(
       completed?: unknown;
       lifecycle?: { state?: unknown };
       gates?: Record<string, unknown>;
-      report?: { state?: unknown; receipt?: unknown };
+      report?: { state?: unknown; delivery_id?: unknown; delivery_state?: unknown; receipt?: unknown };
     };
     if (parsed.schema === "serpsmith.run-checkpoint.v2") {
       const required = [
@@ -190,8 +190,11 @@ export function validateCheckpointText(
       ];
       const gatesComplete = required.every((gate) => parsed.gates?.[gate] === true);
       const stateComplete = mode === "pre_delivery"
-        ? parsed.lifecycle?.state === "awaiting_report_ack" && parsed.report?.state === "prepared"
+        ? parsed.lifecycle?.state === "awaiting_report_ack" && parsed.report?.state === "prepared" &&
+          parsed.report?.delivery_state === "not_started" &&
+          typeof parsed.report?.delivery_id === "string" && parsed.report.delivery_id.length > 0
         : parsed.lifecycle?.state === "complete" && parsed.report?.state === "acknowledged" &&
+          parsed.report?.delivery_state === "acknowledged" &&
           typeof parsed.report?.receipt === "string" && parsed.report.receipt.length > 0;
       return { format: "json", complete: gatesComplete && stateComplete };
     }
@@ -281,13 +284,13 @@ export default defineToolPlugin({
       description:
         "Prove the effective OpenClaw Guard plugin is available before an unattended turn mutates state.",
       parameters: Type.Object({
-        corePolicyVersion: Type.Literal("serpsmith-core-v25"),
+        corePolicyVersion: Type.Literal("serpsmith-core-v27"),
       }),
       execute() {
         return {
           status: "admitted",
           adapter: "openclaw-serpsmith-guard",
-          pluginVersion: "0.2.0",
+          pluginVersion: "0.4.0",
           capabilities: [
             "guarded_execution", "checkpoint_pre_delivery",
             "checkpoint_complete", "exhausted_failure",

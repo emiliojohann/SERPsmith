@@ -72,6 +72,8 @@ Before writing candidate prompts, inventory at least the six most recently publi
 
 Turn that inventory into an explicit recent-image conflict list. Count visually equivalent devices as one motif rather than treating cosmetic changes as variety. In particular, loose sheets, document cards, sticky notes, browser-window tiles, clipped page layouts, and floating rectangular panels all belong to the shared paper/card motif.
 
+Load the private site-namespaced owner image-feedback ledger before briefing. Treat concept families rejected twice as forbidden until the owner explicitly clears them. Keep this ledger outside the website repository.
+
 If a motif appears in either of the two most recent images or at least twice in the last six, exclude it from both new candidate briefs unless it is genuinely necessary for the article to pass the three-second clarity test. When that exception is necessary, candidate B must avoid the motif completely and the checkpoint must explain why candidate A needed it. A site's recurring palette, lighting mood, and overall photographic style should remain recognizable, but palette continuity never counts as meaningful concept variation.
 
 Relative to each of the two most recent images, each candidate must change at least two of these axes: subject or character, environment, focal object or action, camera perspective or composition, and metaphor or material. Candidate A and B must still differ meaningfully from each other. Do not solve repetition by merely changing a person's age, gender, clothing, or the color and arrangement of the same cards.
@@ -107,6 +109,7 @@ Inspect both candidates at original detail. Reject an image for:
 - repeated visual language from recent posts;
 - text, pseudo-text, logos, or branded elements;
 - malformed anatomy, hands, materials, lighting, scale, depth, or perspective;
+- contradictory action logic: when the concept depends on a person operating, revealing, handing off, or reviewing something, their pose, gaze, and body orientation must visibly attend to that action or its intended recipient;
 - generic staging or unusable social-card composition;
 - accidental clipping of a face or essential gesture/action, or of an object whose completeness is necessary to understand the scene;
 - a final hero, card, or social crop that cuts through the primary subject or removes the visual evidence connecting the image to the title.
@@ -133,6 +136,8 @@ Focal-crop; never stretch. Preserve the face when present, the essential gesture
 Review at most six generated candidates per run, normally two meaningfully different concepts with up to three candidates or refinements each. A provider retry that returns no usable image does not count as a reviewed candidate. Retry only a definite transient provider failure; keep the prompt unchanged for the first retry and change one execution variable only for the final provider retry. Never duplicate an active request.
 
 If any candidate passes every gate before the sixth review, select it and stop generating. If none passes every quality gate after six reviews, use the highest-ranked fallback-eligible candidate and continue publication under the existing authorization. Mark the checkpoint and final report `best_available_image_fallback`; state the exact clarity or responsive-composition exception and tell the owner to review the live image when convenient. Do not present the fallback as a failed publication.
+
+When the owner rejects the same concept twice, abandon that concept family instead of making another local pose, gaze, crop, or prop correction. Generate a meaningfully different subject, action, or metaphor that still passes the title-clarity and rotation rules. Treat the repeated rejection as evidence that the concept is wrong, not merely that one rendering needs refinement.
 
 Stop before publication only when all candidates fail a hard publication gate, required derivatives cannot be produced, authorization is absent, or another non-image publication gate fails. Never select an unrelated, unsafe, misleading, branded, text-filled, severely corrupted, or technically invalid image merely to complete a run.
 

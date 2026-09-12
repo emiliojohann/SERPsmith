@@ -2,7 +2,7 @@
 
 Real profiles stay outside the repository. The bundled validator accepts JSON only. YAML requires conversion to identical JSON before bundled validation.
 
-Every active profile declares `core_policy_version: serpsmith-core-v25`.
+Every active profile declares `core_policy_version: serpsmith-core-v27`.
 
 ## Required
 
@@ -44,7 +44,7 @@ When autopilot is true, require recorded owner approval/scope, schedule weekdays
 
 Runtime preflight still verifies adapters, Git, credentials, ownership, deployment, scheduler payload, and tool restrictions.
 
-## Canonical v25 run state
+## Canonical v27 run state
 
 New runs use `serpsmith.run-checkpoint.v2` and `scripts/checkpoint-state.mjs`. Scheduler and agent results never replace checkpoint truth. Runtime certification is external to the site profile because it binds an agent, host, tools, and permissions rather than a website.
 

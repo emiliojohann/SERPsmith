@@ -1,4 +1,4 @@
-# SERPsmith v25 reliability contract
+# SERPsmith v27 reliability contract
 
 This contract is runtime-neutral. OpenClaw is the production-tested reference adapter; other AI agents, workflow engines, CI systems, and schedulers implement the same capabilities and state transitions.
 
@@ -6,7 +6,7 @@ This contract is runtime-neutral. OpenClaw is the production-tested reference ad
 
 The canonical checkpoint is authoritative. A scheduler result, agent-turn result, provider result, process exit, or chat delivery is evidence only. A run is complete only when the checkpoint is valid, every publication gate is true, the report is acknowledged, and the lifecycle state is `complete`.
 
-Use `scripts/checkpoint-state.mjs` for v25 checkpoints. New runs write only `serpsmith.run-checkpoint.v2`. Legacy shapes are read only by an explicit migration adapter.
+Use `scripts/checkpoint-state.mjs` for v27 checkpoints. New runs write only `serpsmith.run-checkpoint.v2`. Legacy shapes are read only by an explicit migration adapter.
 
 ## Lifecycle
 
@@ -49,7 +49,11 @@ Run `node scripts/checkpoint-state.mjs classify CHECKPOINT` independently of the
 - `failed`
 - `complete`
 
-A monitor alerts or dispatches recovery for `stale_external`, `recovery_required`, and overdue `report_pending`. It never mutates repositories. The runtime adapter owns wakeups, retries, and alert routing.
+A deterministic controller classifies the checkpoint and selects one next action. Queue that action in the durable work queue, lease it to one short-lived worker through `scripts/durable-worker.mjs`, verify the job/checkpoint site, run, and revision binding, and settle it with a receipt or structured failure. Reap expired leases into bounded retry without resuming a historical agent conversation.
+
+Record retry, recovery, and terminal outcomes through `references/reliability-intelligence.md`. Telemetry is advisory and bounded; it never owns publication state or authorizes a mutation.
+
+A monitor dispatches recovery for `stale_external`, `recovery_required`, and overdue `report_pending`. It never mutates repositories or exposes a recoverable attempt as a final user error. While one matching recovery is queued or running, remain silent. A started report delivery without a receipt is `report_ambiguous`: never resend it automatically. Send one final error only when dispatch is unavailable, unsafe, or exhausted, or when actionable state remains with no active recovery.
 
 ## Capability admission
 
@@ -59,7 +63,7 @@ Stored configuration is not effective proof. The reference adapter must run a ha
 
 ## Reporting
 
-Record `report_prepared` only after all publication gates pass. Validate pre-delivery state, call the notification adapter once, then record `report_acknowledged` with a non-secret receipt and validate complete state. Delivery failure leaves the run resumable at `awaiting_report_ack`; it must not be reported as scheduler success.
+Record `report_prepared` only after all publication gates pass. Record `report_delivery_started` before the notification call, then record `report_acknowledged` with a non-secret receipt and validate complete state. A failure before delivery starts is retryable; a missing receipt after delivery starts is ambiguous and requires receipt reconciliation instead of automatic resend.
 
 ## Image tooling
 
@@ -67,4 +71,4 @@ The runtime capability certification names one tested decode/convert/crop/inspec
 
 ## OpenClaw reference adapter
 
-OpenClaw keeps image correlation and isolated recovery in its watcher/dispatcher. Production and recovery jobs begin with the current v25 contract, use Guard-restricted execution, disable fallback/media delivery, and send only the final text report. OpenClaw-specific session, cron, and tool names never appear in the core checkpoint schema.
+OpenClaw keeps image correlation and isolated recovery in its watcher/dispatcher. Production and recovery jobs begin with the current v27 contract, use Guard-restricted execution, disable fallback/media delivery, and send only the final text report. OpenClaw-specific session, cron, and tool names never appear in the core checkpoint schema.

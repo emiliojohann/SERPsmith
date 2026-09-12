@@ -6,7 +6,7 @@ const fail=(detail)=>{process.stderr.write(JSON.stringify({adapter:"runtime_capa
 const [mapPath,mode="manual"]=process.argv.slice(2);
 if(!mapPath||!["manual","unattended"].includes(mode))fail("usage: validate-runtime-capabilities.mjs MAP manual|unattended");
 let value;try{value=JSON.parse(fs.readFileSync(mapPath,"utf8"));}catch{fail("capability map must be readable JSON");}
-if(value.schema!=="serpsmith.runtime-capabilities.v1"||value.core_policy_version!=="serpsmith-core-v25")fail("schema/core mismatch");
+if(value.schema!=="serpsmith.runtime-capabilities.v1"||value.core_policy_version!=="serpsmith-core-v27")fail("schema/core mismatch");
 for(const key of ["runtime_id","agent","runtime_version","host_id","certified_at"]){if(typeof value.runtime?.[key]!=="string"||!value.runtime[key])fail("missing runtime."+key);}
 if(!Number.isFinite(Date.parse(value.runtime.certified_at)))fail("invalid certification time");
 if(value.runtime.expires_at!==undefined&&(!Number.isFinite(Date.parse(value.runtime.expires_at))||Date.parse(value.runtime.expires_at)<=Date.now()))fail("certification expired");

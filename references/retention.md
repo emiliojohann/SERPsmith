@@ -23,4 +23,4 @@ The resolver accepts current and legacy checkpoint selection fields. It fails cl
 
 Record the sanitized JSON result in the checkpoint or run log. A cleanup failure after publication does not roll back or republish the article; it fails the unattended job so the owner can repair retention safely.
 
-Run `node scripts/test-prune-completed-runs.mjs` before unattended release.
+Run the retention regression before unattended release, then canary the distributable command against a disposable site-namespaced state root.

@@ -1,6 +1,6 @@
 ---
 name: "serpsmith"
-description: "Publish SEO articles reliably across AI-agent runtimes."
+description: "Publish SEO articles, verify unattended health, and gate source-to-runtime releases."
 ---
 
 # SERPsmith
@@ -19,13 +19,13 @@ Map native tools or wrappers to `references/adapter-contract.md`. Complete an ex
 
     node scripts/validate-runtime-capabilities.mjs MAP unattended
 
-Bind certification to the exact agent, runtime version, host, model policy, plugins/tools, and permissions. Repeat it after any change. Stored configuration is not proof; unattended certification needs effective passing and safe-failure fixtures. A runtime that cannot restrict unsafe actions remains manual-only.
+Bind certification to the exact agent, runtime version, host, model policy, plugins/tools, and permissions. Repeat it after any change. For an OpenClaw update or skill relocation, run the post-update health check in `references/openclaw-adapter.md` before trusting enabled jobs or earlier green results. Stored configuration is not proof; unattended certification needs effective passing and safe-failure fixtures. A runtime that cannot restrict unsafe actions remains manual-only.
 
-Completion: every required capability is proven for the exact runtime and mode.
+Completion: every required capability is proven for the exact runtime and mode, and every configured runtime path resolves from the live installation.
 
 ## 3. Create or resume canonical state
 
-Use `scripts/checkpoint-state.mjs` and `references/reliability-contract.md`. New runs write only `serpsmith.run-checkpoint.v2` under `serpsmith-core-v25`. Resume the same run key; never duplicate an article, image request, commit, notification, or report. Every transition supplies the expected revision and uses the atomic writer.
+Use `scripts/checkpoint-state.mjs`, `scripts/run-controller.mjs`, and `references/reliability-contract.md`. New runs write only `serpsmith.run-checkpoint.v2` under `serpsmith-core-v27`. Let the deterministic controller choose one next stage, queue it with `scripts/durable-work-queue.mjs`, and execute the leased action through `scripts/durable-worker.mjs`; never duplicate an article, image request, commit, notification, or report. Every transition supplies the expected revision and uses the atomic writer.
 
 Treat the checkpoint as publication truth. Scheduler results, agent-turn results, provider responses, and process exits are evidence only.
 
@@ -49,7 +49,7 @@ Completion: one selected, responsive, technically valid image pair is recorded.
 
 ## 6. Validate, publish, and verify
 
-Run site checks, expected-diff validation, secret/privacy scan, image checks, configured build/lint/type checks, and AI-search readiness. Create one focused normal commit and push without force. Verify deployment, article, canonical, metadata, sitemap/discovery files, links, assets, crawlers, and search notifications. Resume only incomplete post-push gates.
+Run site checks, expected-diff validation, secret/privacy scan, image checks, configured build/lint/type checks, and AI-search readiness. Create one focused normal commit and push without force. Verify deployment, article, canonical, metadata, sitemap/discovery files, links, assets, crawlers, and search notifications. For ordinary articles, Google notification means a successful Search Console sitemap submission through the bundled adapter with HTTP 204 evidence; never call Google's JobPosting/livestream Indexing API, and never pass the Google gate from a rejected response. Resume only incomplete post-push gates.
 
 Use structured retry classes from `references/adapter-contract.md`. Retry only transient or correctable attempts. Preserve state on concurrent upstream work, then fast-forward and revalidate when safe. Never resolve conflicts or absorb unrelated changes without explicit owner direction.
 
@@ -57,14 +57,38 @@ Completion: every canonical publication gate is true.
 
 ## 7. Acknowledge reporting and reconcile
 
-Prepare the concise report and record `report_prepared`. Validate pre-delivery state, call the notification adapter once, then record `report_acknowledged` with a non-secret receipt. Run the completion finalizer only after acknowledgment. Delivery failure remains resumable at `awaiting_report_ack`.
+Prepare the concise report and record `report_prepared`. Record `report_delivery_started` before the notification adapter call, then record `report_acknowledged` with its non-secret receipt. Never automatically resend a delivery whose started state has no receipt; classify it as ambiguous for bounded receipt reconciliation. Run the completion finalizer only after acknowledgment.
 
-Run `node scripts/checkpoint-state.mjs classify CHECKPOINT` from an independent monitor. Alert or dispatch bounded recovery for `stale_external`, `recovery_required`, and overdue `report_pending`. The monitor never mutates repositories. A run is green only when classification is `complete`.
+Run `node scripts/checkpoint-state.mjs classify CHECKPOINT` from an independent monitor. Dispatch bounded recovery for `stale_external`, `recovery_required`, and overdue `report_pending` without notifying the user while a matching recovery is available or active. Send one final error only when recovery is unavailable, unsafe, or exhausted. The monitor never mutates repositories. A run is green only when classification is `complete`.
 
 After acknowledged delivery, run retention from `references/retention.md`: keep the latest three completed runs per site and only each selected source image.
 
 Completion: checkpoint is `complete`, delivery is acknowledged exactly once, retention is recorded, and the repository is clean/synchronized.
 
+## 8. Measure milestones and owner feedback
+
+Create immutable aggregate Search Console snapshots with `scripts/google-search-console-snapshot.mjs` and evaluate published URLs at 7, 14, 28, and 90 days with `scripts/content-milestones.mjs`. Combine these observations with GA4 and require the existing Content Intelligence observation and owner-authorization gates before any existing-page change.
+
+Record explicit owner image rejections in the private site-namespaced ledger through `scripts/image-feedback-ledger.mjs`. Exclude concept families rejected twice from future briefs and keep the ledger outside website repositories.
+
+Completion: milestone evidence and owner feedback are durable, private, site-isolated, and advisory.
+
+## 9. Learn from reliability evidence
+
+Follow `references/reliability-intelligence.md`. Record structured retry, recovery, and terminal outcomes continuously in one private site-namespaced ledger. Evaluate recurring signatures after each event and summarize unresolved patterns weekly. Send no attempt noise; surface only a newly eligible owner recommendation or one exhausted terminal failure.
+
+Reliability intelligence may propose a reviewed change, but it may never modify its own code, configuration, schedules, runtime, websites, or release state. Record the owner's accepted, rejected, or implemented decision so repeated evidence is interpreted consistently.
+
+Completion: recurring operational failures produce bounded, evidence-backed, approval-only recommendations.
+
 ## Runtime status
 
 OpenClaw is the production-tested reference adapter. Hermes, Grok Build, Claude-based agents, ChatGPT/Codex agents, Gemini-based agents, CI systems, and other runtimes remain certification-pending until their exact capability maps and end-to-end canaries pass. Never infer certification from documentation.
+
+## Product release authorization
+
+Treat source releases, distributable releases, and installed-runtime activation as separate external mutations. A request to prepare, clean up, commit, tag, push, or release the source authorizes the source destination only unless that same user message explicitly authorizes distribution or runtime activation. A plan that mentions a later destination, completion of a source release, or wording such as "continue the cleanup" does not grant promotion authority.
+
+After a source release, stop and report its validated state. Wait for new explicit user approval naming the distribution or installed-runtime destination before copying files, committing, tagging, pushing, creating a release, or activating it there. If the requested destination is ambiguous, ask before mutation.
+
+Completion: the recorded user approval names the exact release destination before the first mutation to that destination.

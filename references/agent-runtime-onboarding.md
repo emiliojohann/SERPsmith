@@ -66,6 +66,6 @@ Classify the exact runtime/version as one of:
 A certification never transfers automatically to another agent, version, model, host, plugin set, or permission configuration.
 
 
-## v25 completion proof
+## v27 completion proof
 
 Use `references/reliability-contract.md`. Prove that an asynchronous wait remains `waiting_external`, a stale deadline classifies for recovery, a delivery failure remains `awaiting_report_ack`, and only an acknowledged receipt reaches `complete`. A successful scheduler or agent turn is never a substitute.
