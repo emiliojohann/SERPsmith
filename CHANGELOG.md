@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.0-beta.6
+
+- Normalized canonical v27 image candidate labels so both `A` and `candidate-a` resume through the same durable watcher path.
+- Added regression coverage for the candidate label used by site adapters.
+
 ## v0.5.0-beta.5
 
 - Resolved selected-source evidence from canonical v27 completed image operations.

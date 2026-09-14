@@ -66,8 +66,10 @@ function activeImageRequest(checkpoint) {
     const request = checkpoint.pending_operation;
     if (checkpoint.lifecycle?.state !== "waiting_external" ||
         request?.state !== "requested" || request?.capability !== "image_generate") return null;
-    const candidate = typeof request.candidate === "string" ? request.candidate.toUpperCase() : null;
-    if (!candidate || !/^[A-Z]$/.test(candidate)) return null;
+    const candidateLabel = typeof request.candidate === "string" ? request.candidate.toUpperCase() : "";
+    const candidateMatch = /^(?:CANDIDATE[-_])?([A-Z])$/.exec(candidateLabel);
+    const candidate = candidateMatch?.[1] ?? null;
+    if (!candidate) return null;
     return {
       candidate,
       request: {
