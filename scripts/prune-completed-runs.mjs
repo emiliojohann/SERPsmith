@@ -118,6 +118,15 @@ const checkpointIdentity=(value)=>{
   }
   return {key:value?.run_key,slug:value?.slug,complete:value?.status==="complete"};
 };
+const checkpointImages=(value)=>{
+  const images=value?.images&&typeof value.images==="object"?value.images:null;
+  const operation=value?.schema==="serpsmith.run-checkpoint.v2"?value?.pending_operation:null;
+  const source=operation?.artifact?.ref;
+  if(operation?.state==="completed"&&operation?.candidate!==undefined&&typeof source==="string"&&source.trim()){
+    return {...(images??{}),selected:operation.candidate,candidates:[...(Array.isArray(images?.candidates)?images.candidates:[]),{candidate:operation.candidate,source,status:"selected"}]};
+  }
+  return images;
+};
 
 export function pruneCompletedRuns(profilePath,{keep=3,apply=false,sourceRoots=[],transientMediaRoot=null}={}){
   if(!profilePath||!Number.isInteger(keep)||keep<1||keep>100)throw failure("usage: prune-completed-runs.mjs PROFILE [--keep 3] [--source-root PATH] [--transient-media-root PATH] [--apply]");
@@ -205,7 +214,7 @@ export function pruneCompletedRuns(profilePath,{keep=3,apply=false,sourceRoots=[
     const runDir=path.join(resolvedRoot,record.key);
     if(!fs.existsSync(runDir)||!fs.lstatSync(runDir).isDirectory())continue;
     const transientRun=resolvedTransient?path.join(resolvedTransient,record.key):null;
-    const images=record.value?.images;
+    const images=checkpointImages(record.value);
     const present=walkImages(runDir);
     if(!present.length&&!transientRun)continue;
     const selected=exactSource(runDir,images,record.value?.retention,resolvedSources,transientRun);

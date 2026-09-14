@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.0-beta.5
+
+- Resolved selected-source evidence from canonical v27 completed image operations.
+- Added regression coverage for v27 checkpoints whose selected source is stored in `pending_operation.artifact`.
+
 ## v0.5.0-beta.4
 
 - Fixed completed-run retention so canonical v27 checkpoints and legacy checkpoints are classified together.
