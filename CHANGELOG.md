@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.5.0-beta.4
+
+- Fixed completed-run retention so canonical v27 checkpoints and legacy checkpoints are classified together.
+- Added deterministic selected-image recovery for migrated runs that already contain one stable source or one unambiguous candidate.
+- Added mixed-format retention regression coverage.
+
 ## v0.5.0-beta.3
 
 - Removed development-environment terminology from the distributable documentation.

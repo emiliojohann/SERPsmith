@@ -76,6 +76,8 @@ const exactSource=(runDir,images,retention,sourceRoots,transientRun)=>{
       throw failure("retained selected image hash mismatch");
     }
   }
+  const stableSources=walkImages(path.join(runDir,"selected-image")).filter((file)=>path.basename(file).toLowerCase().startsWith("source."));
+  if(stableSources.length===1)return stableSources[0];
   const allowed=[runDir,...sourceRoots].map((root)=>path.resolve(root));
   const allImages=[...walkImages(runDir),...(transientRun?walkImages(transientRun):[])];
   const refs=selectedRefs(images);
@@ -103,7 +105,18 @@ const exactSource=(runDir,images,retention,sourceRoots,transientRun)=>{
     });
     if(inferred.length===1)return inferred[0];
   }
+  const candidateSources=walkImages(path.join(runDir,"candidates"));
+  if(candidateSources.length===1)return candidateSources[0];
   return null;
+};
+const checkpointIdentity=(value)=>{
+  if(value?.schema==="serpsmith.run-checkpoint.v2"){
+    const key=value?.run?.run_key;
+    const slug=value?.run?.slug;
+    const complete=value?.lifecycle?.state==="complete"&&value?.lifecycle?.phase==="complete"&&value?.report?.state==="acknowledged";
+    return {key,slug,complete};
+  }
+  return {key:value?.run_key,slug:value?.slug,complete:value?.status==="complete"};
 };
 
 export function pruneCompletedRuns(profilePath,{keep=3,apply=false,sourceRoots=[],transientMediaRoot=null}={}){
@@ -150,10 +163,11 @@ export function pruneCompletedRuns(profilePath,{keep=3,apply=false,sourceRoots=[
   for(const file of jsonFiles){
     let value;
     try{value=JSON.parse(fs.readFileSync(file,"utf8"));}catch{continue;}
-    const key=value?.run_key;
-    if(typeof key!=="string"||typeof value?.slug!=="string"||!value.slug||!runPattern.test(key))continue;
+    const identity=checkpointIdentity(value);
+    const key=identity.key;
+    if(typeof key!=="string"||typeof identity.slug!=="string"||!identity.slug||!runPattern.test(key))continue;
     const prior=records.get(key);
-    const complete=value.status==="complete";
+    const complete=identity.complete;
     const checkpoint=path.basename(file)==="checkpoint.json";
     if(!prior||(complete&&!prior.complete)||(checkpoint&&complete===prior.complete))records.set(key,{key,complete,checkpoint,file,value});
   }
