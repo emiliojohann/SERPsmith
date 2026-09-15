@@ -72,7 +72,9 @@ Before writing candidate prompts, inventory at least the six most recently publi
 
 Turn that inventory into an explicit recent-image conflict list. Count visually equivalent devices as one motif rather than treating cosmetic changes as variety. In particular, loose sheets, document cards, sticky notes, browser-window tiles, clipped page layouts, and floating rectangular panels all belong to the shared paper/card motif.
 
-Load the private site-namespaced owner image-feedback ledger before briefing. Treat concept families rejected twice as forbidden until the owner explicitly clears them. Keep this ledger outside the website repository.
+Load the private site-namespaced owner image-feedback ledger before briefing. Convert each applicable rejection reason into an explicit constraint in both candidate briefs. Treat concept families rejected twice as forbidden until the owner explicitly clears them. Keep this ledger outside the website repository.
+
+When the owner rejects an image, preserve the concrete reason, assign a stable concept family, and record the feedback even when the rejection arrives after publication or outside a scheduled run. Run the ledger's `verify` command before generating the replacement and again before reporting the correction complete. Daily memory, chat history, and the replacement itself do not satisfy this durable-feedback gate.
 
 If a motif appears in either of the two most recent images or at least twice in the last six, exclude it from both new candidate briefs unless it is genuinely necessary for the article to pass the three-second clarity test. When that exception is necessary, candidate B must avoid the motif completely and the checkpoint must explain why candidate A needed it. A site's recurring palette, lighting mood, and overall photographic style should remain recognizable, but palette continuity never counts as meaningful concept variation.
 

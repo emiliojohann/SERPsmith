@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.5.0-beta.7
+
+- Made explicit owner image rejection feedback a required, read-back-verified completion gate for scheduled and post-publication replacements.
+- Added exact rejection verification so a replacement cannot proceed from chat or daily memory alone.
+- Added regression coverage for detailed physical-realism feedback and repeated concept-family exclusion.
+
 ## v0.5.0-beta.6
 
 - Normalized canonical v27 image candidate labels so both `A` and `candidate-a` resume through the same durable watcher path.

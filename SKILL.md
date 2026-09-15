@@ -69,9 +69,9 @@ Completion: checkpoint is `complete`, delivery is acknowledged exactly once, ret
 
 Create immutable aggregate Search Console snapshots with `scripts/google-search-console-snapshot.mjs` and evaluate published URLs at 7, 14, 28, and 90 days with `scripts/content-milestones.mjs`. Combine these observations with GA4 and require the existing Content Intelligence observation and owner-authorization gates before any existing-page change.
 
-Record explicit owner image rejections in the private site-namespaced ledger through `scripts/image-feedback-ledger.mjs`. Exclude concept families rejected twice from future briefs and keep the ledger outside website repositories.
+Treat every explicit owner image rejection as structured feedback, including feedback received after publication or outside a scheduled publisher run. Preserve the owner's concrete reason without weakening it, map it to a stable concept family and reusable visual constraint, and record it immediately in the private site-namespaced ledger through `scripts/image-feedback-ledger.mjs`. Before generating a replacement, read back the ledger and add every applicable constraint to both candidate briefs. Before reporting the replacement complete, verify the new rejection is present in the ledger. Exclude concept families rejected twice from future briefs until the owner explicitly clears them, and keep the ledger outside website repositories. Never treat daily memory, chat history, or a replaced asset as a substitute for the structured ledger.
 
-Completion: milestone evidence and owner feedback are durable, private, site-isolated, and advisory.
+Completion: milestone evidence and owner feedback are durable, private, site-isolated, read-back verified, and advisory.
 
 ## 9. Learn from reliability evidence
 
