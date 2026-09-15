@@ -12,7 +12,7 @@ A scheduler payload for an authorized site must specify:
 - final notification channel and destination;
 - explicit statement that unattended publication is authorized for this site.
 
-The payload must tell the agent to read the live SERPsmith skill and repository AGENTS.md, resume idempotently, publish at most one article for the slot, avoid routine approval prompts, and send only the final success or exhausted failure report. Recoverable attempts and active recovery remain internal.
+The payload must tell the agent to read the live SERPsmith skill and repository AGENTS.md, resume idempotently, publish at most one article for the slot, avoid routine approval prompts, and send only the final success or exhausted failure report. It must name one asynchronous image-completion owner and require the original publisher to ignore generic provider callbacks after recording `waiting_external`. Recoverable attempts, matching stale duplicates, and active recovery remain internal.
 
 For shell work, the payload must require checked-in adapters or small bounded commands, `serpsmith_`-prefixed scratch variables, and a prohibition on assigning shell-special names such as `path`, `PATH`, `status`, `pipestatus`, `IFS`, `HOME`, `CDPATH`, or `FPATH`.
 

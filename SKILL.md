@@ -43,7 +43,7 @@ Completion: sourced prose and the site package pass validation without unrelated
 
 Follow `references/image-system.md`. Build two meaningfully different concepts from the article and recent-image conflict list. Prefer literal or functional clarity. Inspect originals and every configured desktop hero, mobile hero, card, and social crop. Produce the exact formats/dimensions, strip metadata, never stretch, and keep candidates internal.
 
-Before an asynchronous provider call, record `external_requested` with operation ID, capability, candidate, bounded filename, request time, and deadline. End the turn in `waiting_external`. A runtime adapter correlates exactly one artifact, records `external_completed`, and resumes the same run. Provider or scheduler success never means publication success. OpenClaw follows `references/openclaw-adapter.md`.
+Before an asynchronous provider call, record `external_requested` with operation ID, capability, candidate, bounded filename, request time, and deadline. End the turn in `waiting_external`. Assign exactly one runtime completion owner. After entering `waiting_external`, the original publisher must ignore generic provider-completion callbacks; only the declared completion adapter may correlate the artifact, record `external_completed`, and resume the same run. Provider or scheduler success never means publication success. OpenClaw follows `references/openclaw-adapter.md`.
 
 Completion: one selected, responsive, technically valid image pair is recorded.
 

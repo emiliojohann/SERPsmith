@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.5.0-beta.8
+
+- Assigned one owner to asynchronous image completion so publisher callbacks cannot race the durable watcher.
+- Made matching stale image tickets settle silently and resume once from the current checkpoint revision.
+- Added ten-minute revival for completed-image checkpoints stranded without queued or active work.
+- Sealed operation identities across every queue state and added regression coverage for the full race.
+
 ## v0.5.0-beta.7
 
 - Made explicit owner image rejection feedback a required, read-back-verified completion gate for scheduled and post-publication replacements.

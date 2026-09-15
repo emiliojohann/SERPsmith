@@ -3,7 +3,7 @@ import { promises as fs } from "node:fs";
 import crypto from "node:crypto";
 import path from "node:path";
 import { classifyCheckpoint, validateCheckpoint } from "./checkpoint-state.mjs";
-import { enqueue } from "./durable-work-queue.mjs";
+import { activeJobs, enqueue } from "./durable-work-queue.mjs";
 import { nextAction } from "./run-controller.mjs";
 
 const profilePath = process.argv[2];
@@ -46,13 +46,29 @@ for (const file of await checkpoints(root)) {
     runs.push({ checkpoint: file, run_key: checkpoint.run?.run_key ?? null, classification: "invalid", retryable: false });
   }
 }
-const actionable = new Set(["stale_external", "recovery_required", "report_pending", "report_ambiguous", "invalid"]);
+if(queueRoot){
+  if(queueRoot===path.parse(queueRoot).root||!queueRoot.split(path.sep).includes(profile.site_key))throw new Error("bounded site-namespaced queue root required");
+  const active=new Set((await activeJobs(queueRoot)).map(job=>`${job.site_key}\n${job.run_key}`));
+  for(const run of runs){
+    if(run.classification!=="running")continue;
+    const checkpoint=JSON.parse(await fs.readFile(run.checkpoint,"utf8"));
+    const completedImage=checkpoint.lifecycle?.state==="running" &&
+      checkpoint.pending_operation?.capability==="image_generate" &&
+      checkpoint.pending_operation?.state==="completed";
+    const strandedFor=Date.parse(now)-Date.parse(checkpoint.run.updated_at);
+    if(completedImage&&strandedFor>=10*60*1000&&!active.has(`${profile.site_key}\n${run.run_key}`)){
+      run.classification="stranded_completed_image";
+      run.retryable=true;
+      run.stranded_for_seconds=Math.floor(strandedFor/1000);
+    }
+  }
+}
+const actionable = new Set(["stale_external", "recovery_required", "report_pending", "report_ambiguous", "stranded_completed_image", "invalid"]);
 const actionRequired = runs.filter((run) =>
   actionable.has(run.classification) &&
   (run.classification !== "report_pending" || run.overdue === true));
 const queued=[];
 if(queueRoot){
-  if(queueRoot===path.parse(queueRoot).root||!queueRoot.split(path.sep).includes(profile.site_key))throw new Error("bounded site-namespaced queue root required");
   for(const run of actionRequired){
     if(["invalid","report_ambiguous"].includes(run.classification))continue;
     const checkpoint=JSON.parse(await fs.readFile(run.checkpoint,"utf8"));

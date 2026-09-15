@@ -35,7 +35,7 @@ Before an asynchronous call, record `external_requested` with:
 - bounded requested filename when an artifact is expected;
 - candidate identifier when applicable.
 
-The provider completion adapter correlates one exact artifact and records `external_completed`. An agent ending at this boundary leaves the run `waiting_external`; it never marks the run complete. Reconciliation after the deadline produces `recovery_required`. Retry the same operation/run key or record a bounded replacement operation; never create a second article run.
+The runtime declares exactly one provider-completion owner. The original publisher stops owning image completion after it records `waiting_external` and must ignore generic completion callbacks. The declared completion adapter correlates one exact artifact and records `external_completed`. If another lane already completed that exact operation, a matching stale worker settles silently as an idempotent duplicate and queues at most one resume from the current revision. An agent ending at this boundary leaves the run `waiting_external`; it never marks the run complete. Reconciliation after the deadline produces `recovery_required`. Retry the same operation/run key or record a bounded replacement operation; never create a second article run.
 
 ## Reconciliation
 
@@ -53,7 +53,7 @@ A deterministic controller classifies the checkpoint and selects one next action
 
 Record retry, recovery, and terminal outcomes through `references/reliability-intelligence.md`. Telemetry is advisory and bounded; it never owns publication state or authorizes a mutation.
 
-A monitor dispatches recovery for `stale_external`, `recovery_required`, and overdue `report_pending`. It never mutates repositories or exposes a recoverable attempt as a final user error. While one matching recovery is queued or running, remain silent. A started report delivery without a receipt is `report_ambiguous`: never resend it automatically. Send one final error only when dispatch is unavailable, unsafe, or exhausted, or when actionable state remains with no active recovery.
+A monitor dispatches recovery for `stale_external`, `recovery_required`, overdue `report_pending`, and a completed-image checkpoint that has remained `running` for at least ten minutes without a pending or inflight job. It never mutates repositories or exposes a recoverable attempt as a final user error. While one matching recovery is queued or running, remain silent. A started report delivery without a receipt is `report_ambiguous`: never resend it automatically. Send one final error only when dispatch is unavailable, unsafe, or exhausted, or when actionable state remains with no active recovery.
 
 ## Capability admission
 

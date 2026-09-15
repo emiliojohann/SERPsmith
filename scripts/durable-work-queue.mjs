@@ -4,6 +4,8 @@ import path from "node:path";
 import crypto from "node:crypto";
 
 const SCHEMA = "serpsmith.work-queue.v1";
+const OPERATION_SCHEMA = "serpsmith.work-operation.v1";
+const JOB_STATES = Object.freeze(["pending","inflight","complete","failed"]);
 const KINDS = new Set(["stage_resume","image_recovery","report_delivery","retention"]);
 const id = (value) => typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/.test(value);
 const iso = (value) => typeof value === "string" && Number.isFinite(Date.parse(value));
@@ -23,7 +25,7 @@ const atomic = async (target,value) => {
 const roots = async (root) => {
   const resolved=path.resolve(root??"");
   if(!resolved||resolved===path.parse(resolved).root) fail("bounded queue root required");
-  for(const name of ["pending","inflight","complete","failed"]) await fs.mkdir(path.join(resolved,name),{recursive:true,mode:0o700});
+  for(const name of [...JOB_STATES,"operations"]) await fs.mkdir(path.join(resolved,name),{recursive:true,mode:0o700});
   return resolved;
 };
 const jobPath=(root,state,operationId)=>path.join(root,state,operationId+".json");
@@ -41,9 +43,37 @@ export async function enqueue(root,input,now=new Date().toISOString()){
   if(!containsSegment(root,input.site_key)||!containsSegment(input.checkpoint,input.site_key)) fail("queue and checkpoint must be site-namespaced");
   const job={schema:SCHEMA,operation_id:input.operation_id,site_key:input.site_key,run_key:input.run_key,kind:input.kind,checkpoint:path.resolve(input.checkpoint),expected_revision:input.expected_revision,created_at:now,attempt:0,max_attempts:input.max_attempts??3,payload:input.payload??{},lease:null,last_failure:null};
   validateJob(job);
+  for(const state of JOB_STATES){
+    if(await fs.lstat(jobPath(root,state,job.operation_id)).catch(()=>null)){
+      const error=new Error("queue operation already exists");error.code="EEXIST";throw error;
+    }
+  }
+  const operationMarker=jobPath(root,"operations",job.operation_id);
+  try{
+    await fs.writeFile(operationMarker,JSON.stringify({schema:OPERATION_SCHEMA,operation_id:job.operation_id,created_at:now},null,2)+"\n",{flag:"wx",mode:0o600});
+  }catch(error){
+    if(error?.code==="EEXIST"){const duplicate=new Error("queue operation already exists");duplicate.code="EEXIST";throw duplicate;}
+    throw error;
+  }
   const target=jobPath(root,"pending",job.operation_id);
-  await fs.writeFile(target,JSON.stringify(job,null,2)+"\n",{flag:"wx",mode:0o600});
+  try{await fs.writeFile(target,JSON.stringify(job,null,2)+"\n",{flag:"wx",mode:0o600});}
+  catch(error){
+    if(error?.code!=="EEXIST")await fs.unlink(operationMarker).catch(()=>{});
+    throw error;
+  }
   return {result:"enqueued",operation_id:job.operation_id};
+}
+export async function activeJobs(root){
+  root=await roots(root);
+  const jobs=[];
+  for(const state of ["pending","inflight"]){
+    for(const name of (await fs.readdir(path.join(root,state))).filter(item=>item.endsWith(".json")).sort()){
+      const job=validateJob(await read(path.join(root,state,name)));
+      if(!containsSegment(root,job.site_key)||!containsSegment(job.checkpoint,job.site_key))fail("queued job crossed its site boundary");
+      jobs.push({...job,queue_state:state});
+    }
+  }
+  return jobs;
 }
 export async function lease(root,owner,{now=new Date().toISOString(),ttlSeconds=900}={}){
   root=await roots(root);

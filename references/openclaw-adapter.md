@@ -19,9 +19,11 @@ Start each production or recovery turn with `serpsmith_admit`. If unavailable, s
 
 ## Image recovery
 
-The watcher reads canonical v27 `pending_operation` first. It accepts bounded v24 ledgers only for incomplete migration runs. The dispatcher rescans, deduplicates by checkpoint/token/source hash, and enqueues one leased `image_recovery` operation. A fixed restricted worker leases that operation through the bundled worker, rereads the checkpoint revision, verifies the site/run binding, and settles the queue receipt. The dispatcher never creates or addresses a cron session.
+The durable watcher/dispatcher is the sole image-completion owner. After a publisher records `waiting_external`, its generic provider-completion callback is a no-op and must not mutate the checkpoint, copy media, publish, report, or enqueue work. The watcher reads canonical v27 `pending_operation` first. It accepts bounded v24 ledgers only for incomplete migration runs. The dispatcher rescans, deduplicates by checkpoint/token/source hash, and enqueues one leased `image_recovery` operation. A fixed restricted worker leases that operation through the bundled worker, rereads the checkpoint revision, verifies the site/run binding, and settles the queue receipt. If the exact operation was already completed by a racing lane, the worker settles the stale ticket silently and enqueues at most one current-revision stage resume. The dispatcher never creates or addresses a cron session.
 
 Never steer recovery with `sessions_send` to a cron session key. Cron session keys identify historical execution context, and a migrated or completed worker can reject the handoff with a placement mismatch. Reread the canonical checkpoint, then let the watcher/dispatcher enqueue the same run key. Verify the operation is revision-bound, deduplicated, leased to the fixed restricted worker, and has no runner delivery or failure-alert route.
+
+The reconciliation monitor also checks for a checkpoint whose image operation is completed, lifecycle remains `running`, last update is at least ten minutes old, and no matching pending or inflight queue job exists. It queues one revision-bound stage resume and stays silent. Queue operation identities remain sealed across pending, inflight, complete, and failed states so the same recovery cannot be recreated after settlement.
 
 ## Reporting
 
