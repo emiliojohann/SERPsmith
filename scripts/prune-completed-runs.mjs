@@ -245,9 +245,6 @@ export function pruneCompletedRuns(profilePath,{keep=3,apply=false,sourceRoots=[
       const selectedDir=path.dirname(plan.stable);
       for(const entry of fs.readdirSync(selectedDir,{withFileTypes:true}))if(entry.isFile()&&path.join(selectedDir,entry.name)!==plan.stable)fs.rmSync(path.join(selectedDir,entry.name));
       if(plan.transientExists)fs.rmSync(plan.transientRun,{recursive:true,force:false});
-      const checkpoint=JSON.parse(fs.readFileSync(plan.record.file,"utf8"));
-      checkpoint.retention={...(checkpoint.retention&&typeof checkpoint.retention==="object"?checkpoint.retention:{}),selected_image:plan.stableRelative.split(path.sep).join("/"),selected_image_sha256:stableHash,image_cleanup:"complete"};
-      fs.writeFileSync(plan.record.file,JSON.stringify(checkpoint,null,2)+"\n");
     }
     for(const target of targets)if(fs.existsSync(target.path))fs.rmSync(target.path,{recursive:true,force:false});
   }

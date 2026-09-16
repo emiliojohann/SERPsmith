@@ -21,6 +21,6 @@ For every site:
 
 The resolver accepts current and legacy checkpoint selection fields. It fails closed without deleting anything when a retained run has images but the selected source is missing or ambiguous.
 
-Record the sanitized JSON result in the checkpoint or run log. A cleanup failure after publication does not roll back or republish the article; it fails the unattended job so the owner can repair retention safely.
+Record the sanitized JSON result in `retention.json` inside the external run directory. Never add retention fields to the canonical checkpoint; retention evidence is operational history, not publication state. A cleanup failure after publication does not roll back or republish the article; it fails the unattended job so the owner can repair retention safely.
 
 Run the retention regression before unattended release, then canary the distributable command against a disposable site-namespaced state root.

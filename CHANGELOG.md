@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.5.0-beta.10
+
+- Included the required portable Humanizer integration guide in the distributable runtime.
+- Clarified that Humanizer is an external required Agent Skill and documented its installation and validation path in onboarding.
+- Added release-boundary regression coverage so the Humanizer guide and policy reference cannot diverge again.
+
+## v0.5.0-beta.9
+
+- Kept completed-run retention evidence outside canonical publication checkpoints.
+- Added regression coverage proving retention cannot rewrite or invalidate a valid completed checkpoint.
+
 ## v0.5.0-beta.8
 
 - Assigned one owner to asynchronous image completion so publisher callbacks cannot race the durable watcher.
