@@ -4,7 +4,7 @@ SERPsmith provides multi-platform AI agent support for evidence-led SEO and AI-s
 
 ## Beta status
 
-Version: `v0.5.0-beta.10`
+Version: `v0.5.0-beta.11`
 
 SERPsmith is beta software. The bundled publishing path targets Git-backed Markdown sites with deterministic sitemap updates. Runtime portability is capability-based; each runtime/version must be certified independently.
 
@@ -64,10 +64,11 @@ Read:
 7. `references/content-intelligence.md`
 8. `references/site-profile-schema.md`
 9. `references/agent-runtime-onboarding.md`
-10. `references/grok-build-onboarding.md` when using Grok Build
-11. `references/runtime-setup.md`
-12. `references/image-system.md`
-13. `references/troubleshooting.md`
+10. `references/execution-policy.md`
+11. `references/grok-build-onboarding.md` when using Grok Build
+12. `references/runtime-setup.md`
+13. `references/image-system.md`
+14. `references/troubleshooting.md`
 
 ## Safe first run
 
@@ -106,6 +107,7 @@ The disposable fixture in `examples/demo-site/` can be copied to a temporary loc
 - `scripts/durable-worker.mjs`: site/run/revision-bound queue worker harness.
 - `scripts/image-feedback-ledger.mjs`: private owner rejection memory.
 - `scripts/reliability-intelligence.mjs`: bounded, approval-only operational learning.
+- `scripts/validate-execution-policy.mjs`: provider-neutral reasoning, routine, and deterministic task routing validation.
 
 Git preflight, image generation/conversion, deployment, scheduling, and reporting may be supplied by the agent runtime or separately reviewed adapters.
 

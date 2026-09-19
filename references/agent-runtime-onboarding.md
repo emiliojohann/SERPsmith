@@ -9,6 +9,7 @@ SERPsmith provides multi-platform AI agent support. An agent can run manual mode
 3. Keep JSON profiles, secrets, checkpoints, locks, drafts, and reports outside skill and website repositories.
 4. Complete a JSON capability certification from templates/runtime-capability-map.md for the exact runtime/version.
 5. Run `node scripts/validate-runtime-capabilities.mjs MAP unattended` and the disposable end-to-end fixture before production.
+6. Copy and validate `templates/execution-policy.example.json`; map its opaque model references to this runtime without changing the required task classes.
 
 ## Manual capabilities
 
@@ -64,6 +65,10 @@ Classify the exact runtime/version as one of:
 - `unsupported`: a required capability is absent.
 
 A certification never transfers automatically to another agent, version, model, host, plugin set, or permission configuration.
+
+## Model portability
+
+SERPsmith does not require a named provider or a second model. Both `reasoning` and `routine` may resolve to the runtime's one certified default. If a lower-cost model is available, use it for `routine` only after the resulting model/context policy passes certification and canaries. Deterministic work remains model-free on every runtime.
 
 
 ## v27 completion proof

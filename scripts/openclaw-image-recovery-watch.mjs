@@ -7,12 +7,14 @@ const runsRoot = path.resolve(process.argv[2] ?? "");
 const mediaRoot = path.resolve(process.argv[3] ?? "");
 const once = process.argv.includes("--once");
 const dispatch = process.argv.includes("--dispatch");
+const quiet = process.argv.includes("--quiet");
 const queueFlag = process.argv.indexOf("--queue-root");
 const queueRoot = queueFlag >= 0 ? path.resolve(process.argv[queueFlag + 1] ?? "") : null;
 for (const [label, root] of [["runs", runsRoot], ["generated-media", mediaRoot]]) {
   if (!root || root === path.parse(root).root) throw new Error(`A bounded ${label} root is required`);
 }
 if(dispatch&&(!queueRoot||queueRoot===path.parse(queueRoot).root))throw new Error("A bounded queue root is required for dispatch");
+if(quiet&&!dispatch)throw new Error("--quiet requires --dispatch");
 
 const emitted = new Map();
 // Stream schedulers may drop a matching line while the prior recovery turn is
@@ -183,7 +185,7 @@ async function scan() {
     };
     if (dispatch) {
       const dispatched = await dispatchEvent(event,queueRoot);
-      process.stdout.write(`SERPSMITH_DISPATCH ${JSON.stringify(dispatched)}\n`);
+      if (!quiet) process.stdout.write(`SERPSMITH_DISPATCH ${JSON.stringify(dispatched)}\n`);
     } else {
       process.stdout.write(`SERPSMITH_RECOVERY ${JSON.stringify(event)}\n`);
     }

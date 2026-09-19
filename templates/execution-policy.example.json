@@ -1,0 +1,26 @@
+{
+  "schema": "serpsmith.execution-policy.v1",
+  "classes": {
+    "reasoning": {
+      "kind": "agent",
+      "model_ref": "runtime-default"
+    },
+    "routine": {
+      "kind": "agent",
+      "model_ref": "runtime-default"
+    },
+    "deterministic": {
+      "kind": "process"
+    }
+  },
+  "tasks": {
+    "publish_article": "reasoning",
+    "content_review": "reasoning",
+    "recovery_resume": "reasoning",
+    "report_finalization": "routine",
+    "reconciliation": "deterministic",
+    "analytics_snapshot": "deterministic",
+    "image_correlation": "deterministic",
+    "retention": "deterministic"
+  }
+}

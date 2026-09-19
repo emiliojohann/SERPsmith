@@ -21,6 +21,8 @@ Map native tools or wrappers to `references/adapter-contract.md`. Complete an ex
 
 Bind certification to the exact agent, runtime version, host, model policy, plugins/tools, and permissions. Repeat it after any change. For an OpenClaw update or skill relocation, run the post-update health check in `references/openclaw-adapter.md` before trusting enabled jobs or earlier green results. Stored configuration is not proof; unattended certification needs effective passing and safe-failure fixtures. A runtime that cannot restrict unsafe actions remains manual-only.
 
+Use the provider-neutral classes in `references/execution-policy.md`. Run reconciliation, analytics collection, image correlation, and retention as deterministic processes. Reserve agent turns for reasoning or bounded routine work, and certify every model/context policy. A runtime with one model maps both agent classes to its certified default.
+
 Completion: every required capability is proven for the exact runtime and mode, and every configured runtime path resolves from the live installation.
 
 ## 3. Create or resume canonical state

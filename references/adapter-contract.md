@@ -46,6 +46,8 @@ Deterministic wrapper adapters should:
 
 Scheduling is external to an article run. The scheduler supplies exactly one profile, slot, authorization state, checkpoint namespace, lock namespace, retry policy, and reporting destination reference.
 
+Execution classes are defined in `execution-policy.md`. Model routing uses opaque runtime references rather than vendor names. Deterministic tasks execute adapters directly and must never be wrapped in an agent turn merely to restate fixed arguments or return `NO_REPLY`.
+
 Native agent tools may satisfy a capability without a wrapper, but the runtime-specific guide must map inputs, outputs, timeouts, and failure classes explicitly.
 
 

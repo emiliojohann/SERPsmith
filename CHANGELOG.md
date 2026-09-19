@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.5.0-beta.11
+
+- Added provider-neutral reasoning, routine, and deterministic execution classes with a validated safe same-model fallback.
+- Added silent deterministic image correlation and queue dispatch so successful watcher events do not create agent turns.
+- Documented direct process execution for reconciliation, analytics snapshots, and retention without weakening publication or recovery gates.
+
 ## v0.5.0-beta.10
 
 - Included the required portable Humanizer integration guide in the distributable runtime.

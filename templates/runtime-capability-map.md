@@ -21,4 +21,6 @@ Validate with:
 
 Tool names belong in fixture evidence, not the core capability names. OpenClaw is the first production-tested adapter. Other runtimes remain certification-pending until their exact map and fixtures pass.
 
+Also validate a provider-neutral execution policy from `templates/execution-policy.example.json`. Record only opaque runtime model references. One-model runtimes may use the same reference for `reasoning` and `routine`; `deterministic` must remain a model-free process.
+
 Certification result: manual-ready / unattended-ready / experimental / unsupported.
