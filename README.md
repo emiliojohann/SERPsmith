@@ -4,7 +4,7 @@ SERPsmith provides multi-platform AI agent support for evidence-led SEO and AI-s
 
 ## Beta status
 
-Version: `v0.5.0-beta.11`
+Version: `v0.5.0-beta.12`
 
 SERPsmith is beta software. The bundled publishing path targets Git-backed Markdown sites with deterministic sitemap updates. Runtime portability is capability-based; each runtime/version must be certified independently.
 
@@ -14,8 +14,9 @@ SERPsmith is beta software. The bundled publishing path targets Git-backed Markd
 - rejects duplicate or cannibalizing topics;
 - creates people-first articles with site-specific guardrails and at most two categories and three tags;
 - adds useful internal links and small reciprocal links with descriptive anchor text when natural;
-- starts with two distinct image concepts, reviews at most six generated candidates, and selects one using a documented rubric;
-- after six candidates, publishes the highest-ranked relevant, safe, technically valid fallback when no candidate clears every aesthetic gate, then discloses the exact exception for owner review;
+- starts with two distinct image concepts, reviews at most four generated candidates, and selects one using a documented rubric;
+- treats one to four correlated files from one image request as reviewable candidates instead of an ambiguous completion;
+- after four candidates, publishes the highest-ranked relevant, safe, technically valid fallback when no candidate clears every aesthetic gate, then discloses the exact exception for owner review;
 - produces an exact 1280 x 720 WebP hero and a locally derived matching JPEG social image;
 - uses a deterministic stage controller, external checkpoints, and a durable leased queue to resume safely;
 - records report-delivery intent before sending so an interruption cannot trigger an automatic duplicate;

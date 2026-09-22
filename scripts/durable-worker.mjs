@@ -10,9 +10,12 @@ const observe = async (callback,event,result) => {
   try { await callback(event); return result; }
   catch { return {...result,telemetry:"record_failed"}; }
 };
-const candidate = value => typeof value==="string"
-  ? (/^(?:CANDIDATE[-_])?([A-Z])$/.exec(value.toUpperCase())?.[1]??null)
-  : null;
+const candidate = value => {
+  if (typeof value!=="string") return null;
+  const normalized=value.trim().toUpperCase();
+  return /^(?:CANDIDATE[-_])?([A-Z])$/.exec(normalized)?.[1] ??
+    (/^[A-Z][A-Z0-9._:-]{0,63}$/.test(normalized)?normalized:null);
+};
 const completedImageDuplicate = (job,checkpoint) => {
   const checkpointCandidate=candidate(checkpoint.pending_operation?.candidate);
   const jobCandidate=candidate(job.payload?.candidate);

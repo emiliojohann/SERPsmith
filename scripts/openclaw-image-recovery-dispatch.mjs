@@ -6,13 +6,19 @@ import { enqueue } from "./durable-work-queue.mjs";
 export async function dispatchEvent(event,queueRoot){
   queueRoot=path.resolve(queueRoot??"");
   if(!queueRoot||queueRoot===path.parse(queueRoot).root)throw new Error("A bounded queue root is required");
-  for(const key of ["checkpoint","site_key","run_key","candidate","source","token"]){
+  for(const key of ["checkpoint","site_key","run_key","candidate","token"]){
     if(typeof event?.[key]!=="string"||!event[key])throw new Error(`Recovery event is missing ${key}`);
   }
-  if(!path.isAbsolute(event.checkpoint)||!path.isAbsolute(event.source)||!Number.isInteger(event.revision)||event.revision<0)throw new Error("Recovery event paths or revision are invalid");
-  const operationId="image:"+createHash("sha256").update(`${event.checkpoint}\n${event.token}\n${event.source}`).digest("hex").slice(0,24);
+  const rawSources=Array.isArray(event.sources)?event.sources:[event.source];
+  if(rawSources.length<1||rawSources.length>4||rawSources.some(source=>typeof source!=="string"||!source||!path.isAbsolute(source)))throw new Error("Recovery event must contain one to four absolute sources");
+  const sources=[...new Set(rawSources)].sort();
+  if(sources.length!==rawSources.length)throw new Error("Recovery event sources must be unique");
+  if(!path.isAbsolute(event.checkpoint)||!Number.isInteger(event.revision)||event.revision<0)throw new Error("Recovery event paths or revision are invalid");
+  const operationId="image:"+createHash("sha256").update(`${event.checkpoint}\n${event.token}\n${sources.join("\n")}`).digest("hex").slice(0,24);
+  const payload={candidate:event.candidate,sources,token:event.token};
+  if(sources.length===1)payload.source=sources[0];
   try{
-    return{...await enqueue(queueRoot,{operation_id:operationId,site_key:event.site_key,run_key:event.run_key,kind:"image_recovery",checkpoint:event.checkpoint,expected_revision:event.revision,max_attempts:2,payload:{candidate:event.candidate,source:event.source,token:event.token}}),event:operationId};
+    return{...await enqueue(queueRoot,{operation_id:operationId,site_key:event.site_key,run_key:event.run_key,kind:"image_recovery",checkpoint:event.checkpoint,expected_revision:event.revision,max_attempts:2,payload}),event:operationId};
   }catch(error){
     if(error?.code==="EEXIST")return{result:"deduplicated",operation_id:operationId,event:operationId};
     throw error;

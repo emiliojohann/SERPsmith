@@ -56,7 +56,7 @@ Review topic/evidence, article/citations, both image concepts, reciprocal links,
 
 ## Universal Image Fallback
 
-Image attempt limits and publication gates come from the shared core, not a site profile. SERPsmith reviews at most six generated candidates. If none passes every aesthetic quality gate, it publishes the highest-ranked relevant, safe, technically valid candidate under the existing authorization, records the exact exception, and recommends owner review. Unsafe, misleading, branded/text-filled, severely corrupted, missing, or technically invalid images still stop publication.
+Image attempt limits and publication gates come from the shared core, not a site profile. SERPsmith reviews at most four generated candidates. One provider operation may return one to four correlated files; each is reviewed as a candidate rather than rejected as ambiguous output. If none passes every aesthetic quality gate, SERPsmith publishes the highest-ranked relevant, safe, technically valid candidate under the existing authorization, records the exact exception, and recommends owner review. Unsafe, misleading, branded/text-filled, severely corrupted, missing, or technically invalid images still stop publication.
 
 ## 11. Unattended later
 

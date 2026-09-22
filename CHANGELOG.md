@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.5.0-beta.12
+
+- Treats one to four correlated files from one image request as a bounded candidate batch instead of terminal ambiguity.
+- Caps image review at four candidates and publishes the highest-ranked fallback-eligible image when aesthetic quality remains imperfect.
+- Preserves hard stops for unsafe, misleading, branded, text-filled, severely corrupted, missing, or technically invalid assets.
+
 ## v0.5.0-beta.11
 
 - Added provider-neutral reasoning, routine, and deterministic execution classes with a validated safe same-model fallback.

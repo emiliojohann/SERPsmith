@@ -2,6 +2,7 @@
 import { promises as fs, watch } from "node:fs";
 import path from "node:path";
 import { dispatchEvent } from "./openclaw-image-recovery-dispatch.mjs";
+import { candidateKey, correlateGeneratedSources } from "./image-recovery-correlation.mjs";
 
 const runsRoot = path.resolve(process.argv[2] ?? "");
 const mediaRoot = path.resolve(process.argv[3] ?? "");
@@ -37,40 +38,12 @@ async function checkpointFiles(dir, depth = 0) {
   return found;
 }
 
-async function exactGeneratedSource(request, mediaEntries) {
-  if (!request?.output_filename || !request?.request_token || !request?.requested_at) return null;
-  if (path.basename(request.output_filename) !== request.output_filename) return null;
-  const requestedAt = Date.parse(request.requested_at);
-  if (!Number.isFinite(requestedAt)) return null;
-  const parsed = path.parse(request.output_filename);
-  // OpenClaw normalizes generated-media stems to at most 60 characters before
-  // appending its UUID. Exact-one-match and timestamp checks still fail closed
-  // when two long requested names share the same normalized prefix.
-  const generatedStem = parsed.name.slice(0, 60);
-  const names = mediaEntries
-    .filter((entry) => entry.isFile())
-    .map((entry) => entry.name)
-    .filter((name) => name === request.output_filename ||
-      (name.startsWith(`${generatedStem}---`) && name.endsWith(parsed.ext)));
-  const sources = [];
-  for (const name of names) {
-    const source = path.join(mediaRoot, name);
-    const info = await fs.lstat(source);
-    if (!info.isFile() || info.isSymbolicLink() || info.mtimeMs + 1000 < requestedAt) continue;
-    const real = await fs.realpath(source);
-    if (path.dirname(real) === mediaRoot) sources.push(real);
-  }
-  return sources.length === 1 ? sources[0] : null;
-}
-
 function activeImageRequest(checkpoint) {
   if (checkpoint?.schema === "serpsmith.run-checkpoint.v2") {
     const request = checkpoint.pending_operation;
     if (checkpoint.lifecycle?.state !== "waiting_external" ||
         request?.state !== "requested" || request?.capability !== "image_generate") return null;
-    const candidateLabel = typeof request.candidate === "string" ? request.candidate.toUpperCase() : "";
-    const candidateMatch = /^(?:CANDIDATE[-_])?([A-Z])$/.exec(candidateLabel);
-    const candidate = candidateMatch?.[1] ?? null;
+    const candidate = candidateKey(request.candidate);
     if (!candidate) return null;
     return {
       candidate,
@@ -78,7 +51,9 @@ function activeImageRequest(checkpoint) {
         output_filename: request.requested_filename,
         request_token: request.operation_id,
         requested_at: request.requested_at,
-        stage: `image_generation_candidate_${candidate.toLowerCase()}`,
+        stage: candidate.length === 1
+          ? `image_generation_candidate_${candidate.toLowerCase()}`
+          : "image_generation_batch",
       },
     };
   }
@@ -168,9 +143,9 @@ async function scan() {
     const active = activeImageRequest(checkpoint);
     if (!active) continue;
     const { candidate, request } = active;
-    const source = await exactGeneratedSource(request, mediaEntries);
-    if (!source) continue;
-    const eventKey = `${checkpointPath}:${request.request_token}:${source}`;
+    const sources = await correlateGeneratedSources(request, mediaEntries, mediaRoot);
+    if (!sources) continue;
+    const eventKey = `${checkpointPath}:${request.request_token}:${sources.join("\n")}`;
     const previous = emitted.get(checkpointPath);
     if (previous?.eventKey === eventKey && Date.now() - previous.emittedAt < retryAfterMs) continue;
     emitted.set(checkpointPath, { eventKey, emittedAt: Date.now() });
@@ -179,10 +154,11 @@ async function scan() {
       site_key: checkpoint.run?.site_key ?? checkpoint.site_key,
       run_key: checkpoint.run?.run_key ?? checkpoint.run_key,
       candidate,
-      source,
+      sources,
       token: request.request_token,
       revision: Number.isInteger(checkpoint.revision) ? checkpoint.revision : 0,
     };
+    if (sources.length === 1) event.source = sources[0];
     if (dispatch) {
       const dispatched = await dispatchEvent(event,queueRoot);
       if (!quiet) process.stdout.write(`SERPSMITH_DISPATCH ${JSON.stringify(dispatched)}\n`);

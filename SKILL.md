@@ -5,11 +5,11 @@ description: "Publish SEO articles, verify unattended health, and gate source-to
 
 # SERPsmith
 
-Publish evidence-led, AI-search-ready articles to one authorized Git-backed site. SERPsmith core defines capabilities and durable state; each AI agent or workflow engine supplies a reviewed runtime adapter. OpenClaw is the first production-tested adapter, not the product boundary.
+Publish evidence-led, AI-search-ready articles to one authorized Git-backed site through a certified runtime adapter. OpenClaw is the first production-tested adapter, not the product boundary.
 
 ## 1. Load and bind one site
 
-Read `references/core-policy.md`, then the references it routes to for the selected task. Load exactly one external JSON profile and run `node scripts/validate-profile.mjs PROFILE`. Read repository instructions and verify site, branch, upstream, clean tree, content/image/discovery paths, deployment, authorization, external state roots, and secret access without printing values. Stop on mismatch, unknown state, dirty/diverged work, missing ownership, or unresolved configuration.
+Read `references/core-policy.md` and its task-routed references. Load one external JSON profile and run `node scripts/validate-profile.mjs PROFILE`. Verify repository instructions, site/branch/upstream, clean tree, content/image/discovery paths, deployment, authorization, external state roots, and secret access without printing values. Stop on mismatch, unknown state, dirty/diverged work, missing ownership, or unresolved configuration.
 
 Completion: one validated profile, one stable site/slot/run key, one external lock, and no unrelated changes.
 
@@ -19,7 +19,7 @@ Map native tools or wrappers to `references/adapter-contract.md`. Complete an ex
 
     node scripts/validate-runtime-capabilities.mjs MAP unattended
 
-Bind certification to the exact agent, runtime version, host, model policy, plugins/tools, and permissions. Repeat it after any change. For an OpenClaw update or skill relocation, run the post-update health check in `references/openclaw-adapter.md` before trusting enabled jobs or earlier green results. Stored configuration is not proof; unattended certification needs effective passing and safe-failure fixtures. A runtime that cannot restrict unsafe actions remains manual-only.
+Bind certification to the exact agent, runtime, host, model policy, tools, and permissions; repeat it after any change. For an OpenClaw update or skill relocation, run the post-update health check in `references/openclaw-adapter.md`. Unattended certification needs effective passing and safe-failure fixtures; stored configuration is not proof. A runtime that cannot restrict unsafe actions remains manual-only.
 
 Use the provider-neutral classes in `references/execution-policy.md`. Run reconciliation, analytics collection, image correlation, and retention as deterministic processes. Reserve agent turns for reasoning or bounded routine work, and certify every model/context policy. A runtime with one model maps both agent classes to its certified default.
 
@@ -45,7 +45,9 @@ Completion: sourced prose and the site package pass validation without unrelated
 
 Follow `references/image-system.md`. Build two meaningfully different concepts from the article and recent-image conflict list. Prefer literal or functional clarity. Inspect originals and every configured desktop hero, mobile hero, card, and social crop. Produce the exact formats/dimensions, strip metadata, never stretch, and keep candidates internal.
 
-Before an asynchronous provider call, record `external_requested` with operation ID, capability, candidate, bounded filename, request time, and deadline. End the turn in `waiting_external`. Assign exactly one runtime completion owner. After entering `waiting_external`, the original publisher must ignore generic provider-completion callbacks; only the declared completion adapter may correlate the artifact, record `external_completed`, and resume the same run. Provider or scheduler success never means publication success. OpenClaw follows `references/openclaw-adapter.md`.
+Review at most four generated candidates. Treat one provider operation that returns one to four correlated files as a bounded candidate batch, not an ambiguous result. If no candidate passes every quality gate after four reviews, select the highest-ranked fallback-eligible image and continue publication. Stop for an image only when every reviewed candidate fails a hard safety, truthfulness, branding/text, severe-defect, or technical asset gate.
+
+Before an asynchronous provider call, record `external_requested` with operation ID, capability, candidate or bounded batch label, bounded filename, request time, and deadline. End the turn in `waiting_external`. Assign exactly one runtime completion owner. After entering `waiting_external`, the original publisher must ignore generic provider-completion callbacks; only the declared completion adapter may correlate the bounded result, record `external_completed` for the selected artifact, and resume the same run. Provider or scheduler success never means publication success. OpenClaw follows `references/openclaw-adapter.md`.
 
 Completion: one selected, responsive, technically valid image pair is recorded.
 
@@ -71,26 +73,24 @@ Completion: checkpoint is `complete`, delivery is acknowledged exactly once, ret
 
 Create immutable aggregate Search Console snapshots with `scripts/google-search-console-snapshot.mjs` and evaluate published URLs at 7, 14, 28, and 90 days with `scripts/content-milestones.mjs`. Combine these observations with GA4 and require the existing Content Intelligence observation and owner-authorization gates before any existing-page change.
 
-Treat every explicit owner image rejection as structured feedback, including feedback received after publication or outside a scheduled publisher run. Preserve the owner's concrete reason without weakening it, map it to a stable concept family and reusable visual constraint, and record it immediately in the private site-namespaced ledger through `scripts/image-feedback-ledger.mjs`. Before generating a replacement, read back the ledger and add every applicable constraint to both candidate briefs. Before reporting the replacement complete, verify the new rejection is present in the ledger. Exclude concept families rejected twice from future briefs until the owner explicitly clears them, and keep the ledger outside website repositories. Never treat daily memory, chat history, or a replaced asset as a substitute for the structured ledger.
+Record every explicit owner image rejection immediately in the private site-namespaced ledger through `scripts/image-feedback-ledger.mjs`, including post-publication feedback. Preserve the concrete reason, map it to a stable concept family and reusable constraint, read it back before replacement generation, and apply every relevant constraint to both briefs. Verify the entry before reporting completion. Exclude a concept family after two rejections until the owner clears it. Keep the ledger outside website repositories; memory, chat, and replaced assets are not substitutes.
 
 Completion: milestone evidence and owner feedback are durable, private, site-isolated, read-back verified, and advisory.
 
 ## 9. Learn from reliability evidence
 
-Follow `references/reliability-intelligence.md`. Record structured retry, recovery, and terminal outcomes continuously in one private site-namespaced ledger. Evaluate recurring signatures after each event and summarize unresolved patterns weekly. Send no attempt noise; surface only a newly eligible owner recommendation or one exhausted terminal failure.
+Follow `references/reliability-intelligence.md`. Record retry, recovery, and terminal outcomes in one private site ledger. Evaluate recurring signatures after each event, summarize unresolved patterns weekly, and surface only a newly eligible owner recommendation or one exhausted terminal failure.
 
-Reliability intelligence may propose a reviewed change, but it may never modify its own code, configuration, schedules, runtime, websites, or release state. Record the owner's accepted, rejected, or implemented decision so repeated evidence is interpreted consistently.
+Reliability intelligence may propose a reviewed change but never modify code, configuration, schedules, runtime, websites, or release state. Record the owner's decision.
 
 Completion: recurring operational failures produce bounded, evidence-backed, approval-only recommendations.
 
 ## Runtime status
 
-OpenClaw is the production-tested reference adapter. Hermes, Grok Build, Claude-based agents, ChatGPT/Codex agents, Gemini-based agents, CI systems, and other runtimes remain certification-pending until their exact capability maps and end-to-end canaries pass. Never infer certification from documentation.
+OpenClaw is the production-tested reference adapter. Every other runtime remains certification-pending until its exact capability map and end-to-end canary pass; documentation is not certification.
 
 ## Product release authorization
 
-Treat source releases, distributable releases, and installed-runtime activation as separate external mutations. A request to prepare, clean up, commit, tag, push, or release the source authorizes the source destination only unless that same user message explicitly authorizes distribution or runtime activation. A plan that mentions a later destination, completion of a source release, or wording such as "continue the cleanup" does not grant promotion authority.
-
-After a source release, stop and report its validated state. Wait for new explicit user approval naming the distribution or installed-runtime destination before copying files, committing, tagging, pushing, creating a release, or activating it there. If the requested destination is ambiguous, ask before mutation.
+Treat source, distributable, and installed-runtime releases as separate mutations. Source work authorizes only the source destination unless the same user message explicitly names distribution or runtime activation. Plans, earlier source completion, and "continue" language do not grant promotion authority. After a source release, report and wait for new approval naming the next destination before any mutation; ask when ambiguous.
 
 Completion: the recorded user approval names the exact release destination before the first mutation to that destination.

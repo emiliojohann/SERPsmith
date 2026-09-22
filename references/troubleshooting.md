@@ -36,9 +36,9 @@ Action: record the rejection and stop the slot safely. Do not publish filler.
 
 Cause: provider timeout/rate limit, invalid output, artifacts, text, misleading symbolism, or no candidate passing the rubric.
 
-Recovery: review at most six generated candidates. If none passes every quality gate, publish the highest-ranked fallback-eligible candidate and mark the report `best_available_image_fallback` with the exact clarity or non-destructive responsive-composition exception plus an owner-review recommendation. Stop only when every candidate fails a hard safety/usability gate or required derivatives cannot be produced.
+Recovery: review at most four generated candidates. Treat one to four files returned by the same bounded provider operation as reviewable candidates, not ambiguous output. If none passes every quality gate, publish the highest-ranked fallback-eligible candidate and mark the report `best_available_image_fallback` with the exact clarity or non-destructive responsive-composition exception plus an owner-review recommendation. Stop only when every candidate fails a hard safety/usability gate or required derivatives cannot be produced.
 
-Action: use the bounded six-candidate process from `image-system.md`. If no candidate passes every quality gate, publish the best fallback-eligible candidate and disclose the exact exception. Preserve the article package and leave it unpublished only when no candidate passes the hard safety/usability gates or required derivatives cannot be produced.
+Action: use the bounded four-candidate process from `image-system.md`. If no candidate passes every quality gate, publish the best fallback-eligible candidate and disclose the exact exception. Preserve the article package and leave it unpublished only when no candidate passes the hard safety/usability gates or required derivatives cannot be produced.
 
 ## Deployment is delayed after push
 
