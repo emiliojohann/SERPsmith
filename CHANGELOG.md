@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.5.0-beta.13
+
+- Correlates bounded provider PNG images with WebP-named image requests and accepts the older `image_generation` capability alias during recovery.
+- Detects stalled workers, ambiguous receipts, invalid checkpoints, and recovery operations that settled without checkpoint progress as owner-review cases.
+- Provides a site-isolated receipt ledger and an OpenClaw notification adapter that sends review requests, checks acknowledgment, deduplicates retries, and fails the monitor on delivery error. LIVE alerting still requires the monitor job to invoke the adapter and have an owner-visible failure route.
+- Treats impossible tool/object contact as a hard meaning-breaking image defect when the physical action carries the article concept; image fallback still permits coherent, safe, technically valid quality compromises after four reviewed candidates.
+
 ## v0.5.0-beta.12
 
 - Treats one to four correlated files from one image request as a bounded candidate batch instead of terminal ambiguity.

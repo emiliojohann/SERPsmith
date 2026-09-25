@@ -1,6 +1,8 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
+const rasterExtensions=new Set([".png",".webp",".jpg",".jpeg"]);
+
 export async function correlateGeneratedSources(request, mediaEntries, mediaRoot) {
   if (!request?.output_filename || !request?.request_token || !request?.requested_at) return null;
   if (path.basename(request.output_filename) !== request.output_filename) return null;
@@ -12,7 +14,7 @@ export async function correlateGeneratedSources(request, mediaEntries, mediaRoot
     .filter(entry => entry.isFile())
     .map(entry => entry.name)
     .filter(name => name === request.output_filename ||
-      (name.startsWith(`${generatedStem}---`) && name.endsWith(parsed.ext)));
+      (name.startsWith(`${generatedStem}---`) && rasterExtensions.has(path.extname(name).toLowerCase())));
   const sources = [];
   for (const name of names) {
     const source = path.join(mediaRoot, name);

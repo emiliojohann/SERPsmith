@@ -21,7 +21,7 @@ const completedImageDuplicate = (job,checkpoint) => {
   const jobCandidate=candidate(job.payload?.candidate);
   return job.kind==="image_recovery" && checkpoint.revision>job.expected_revision &&
     checkpoint.lifecycle?.state==="running" &&
-    checkpoint.pending_operation?.capability==="image_generate" &&
+    ["image_generate","image_generation"].includes(checkpoint.pending_operation?.capability) &&
     checkpoint.pending_operation?.state==="completed" &&
     checkpoint.pending_operation?.operation_id===job.payload?.token &&
     checkpointCandidate!==null && checkpointCandidate===jobCandidate &&

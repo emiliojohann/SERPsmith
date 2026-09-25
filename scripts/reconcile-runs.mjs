@@ -41,19 +41,20 @@ for (const file of await checkpoints(root)) {
   }
   try {
     validateCheckpoint(checkpoint);
-    runs.push({ checkpoint: file, run_key: checkpoint.run.run_key, revision:checkpoint.revision, ...classifyCheckpoint(checkpoint, now) });
+    runs.push({ checkpoint: file, run_key: checkpoint.run.run_key, slug:checkpoint.run.slug,
+      published:checkpoint.gates.push===true, revision:checkpoint.revision, ...classifyCheckpoint(checkpoint, now) });
   } catch {
     runs.push({ checkpoint: file, run_key: checkpoint.run?.run_key ?? null, classification: "invalid", retryable: false });
   }
 }
 if(queueRoot){
   if(queueRoot===path.parse(queueRoot).root||!queueRoot.split(path.sep).includes(profile.site_key))throw new Error("bounded site-namespaced queue root required");
-  const active=new Set((await activeJobs(queueRoot)).map(job=>`${job.site_key}\n${job.run_key}`));
+  const active=new Map((await activeJobs(queueRoot)).map(job=>[`${job.site_key}\n${job.run_key}`,job]));
   for(const run of runs){
     if(run.classification!=="running")continue;
     const checkpoint=JSON.parse(await fs.readFile(run.checkpoint,"utf8"));
     const completedImage=checkpoint.lifecycle?.state==="running" &&
-      checkpoint.pending_operation?.capability==="image_generate" &&
+      ["image_generate","image_generation"].includes(checkpoint.pending_operation?.capability) &&
       checkpoint.pending_operation?.state==="completed";
     const strandedFor=Date.parse(now)-Date.parse(checkpoint.run.updated_at);
     if(completedImage&&strandedFor>=10*60*1000&&!active.has(`${profile.site_key}\n${run.run_key}`)){
@@ -68,9 +69,37 @@ const actionRequired = runs.filter((run) =>
   actionable.has(run.classification) &&
   (run.classification !== "report_pending" || run.overdue === true));
 const queued=[];
+const ownerReviewRequired=[];
+const requireReview=(run,reason)=>ownerReviewRequired.push({
+  site_key:profile.site_key,
+  run_key:run.run_key,
+  slug:run.slug??null,
+  published:run.published??null,
+  classification:run.classification,
+  reason,
+  review_key:"review:"+crypto.createHash("sha256")
+    .update(`${profile.site_key}:${run.run_key??run.checkpoint}:${run.revision??"invalid"}:${run.classification}:${reason}`)
+    .digest("hex").slice(0,24),
+});
 if(queueRoot){
+  const active=new Map();
+  for(const job of await activeJobs(queueRoot)){
+    const key=`${job.site_key}\n${job.run_key}`;
+    active.set(key,[...(active.get(key)??[]),job]);
+  }
   for(const run of actionRequired){
-    if(["invalid","report_ambiguous"].includes(run.classification))continue;
+    if(["invalid","report_ambiguous"].includes(run.classification)){
+      requireReview(run,run.classification==="invalid"?"invalid_checkpoint":"ambiguous_report_receipt");
+      continue;
+    }
+    const runningJobs=active.get(`${profile.site_key}\n${run.run_key}`)??[];
+    if(runningJobs.length){
+      const live=runningJobs.some(job=>job.queue_state==="pending"
+        ? Date.parse(now)-Date.parse(job.created_at)<=10*60*1000
+        : Date.parse(job.lease?.deadline_at??"")>=Date.parse(now));
+      if(!live)requireReview(run,"recovery_worker_stalled");
+      continue;
+    }
     const checkpoint=JSON.parse(await fs.readFile(run.checkpoint,"utf8"));
     const action=nextAction(checkpoint,now);
     if(action.automatic!==true)continue;
@@ -80,12 +109,17 @@ if(queueRoot){
       queued.push({run_key:run.run_key,operation_id:operationId,action:action.action});
     }catch(error){
       if(error?.code!=="EEXIST")throw error;
+      requireReview(run,"recovery_settled_without_progress");
     }
   }
+}else{
+  for(const run of actionRequired)
+    if(["invalid","report_ambiguous"].includes(run.classification))
+      requireReview(run,run.classification==="invalid"?"invalid_checkpoint":"ambiguous_report_receipt");
 }
 process.stdout.write(JSON.stringify({
   adapter: "run_reconciliation", result: actionRequired.length ? "action_required" : "verified",
   retryable: actionRequired.some((run) => run.retryable), site_key: profile.site_key,
   counts: Object.fromEntries([...new Set(runs.map((run) => run.classification))].sort().map((key) => [key, runs.filter((run) => run.classification === key).length])),
-  actionable: actionRequired, queued,
+  actionable: actionRequired, queued, owner_review_required:ownerReviewRequired,
 }) + "\n");

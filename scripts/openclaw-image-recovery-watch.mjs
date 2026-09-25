@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import { promises as fs, watch } from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { dispatchEvent } from "./openclaw-image-recovery-dispatch.mjs";
+import { enqueue } from "./durable-work-queue.mjs";
 import { candidateKey, correlateGeneratedSources } from "./image-recovery-correlation.mjs";
 
 const runsRoot = path.resolve(process.argv[2] ?? "");
@@ -22,6 +24,7 @@ const emitted = new Map();
 // still closing. Re-emit the same pending event after one minute until its
 // checkpoint advances; the stable token keeps each retry idempotent.
 const retryAfterMs = 60 * 1000;
+const maximumImageWaitMs = 10 * 60 * 1000;
 let timer;
 let scanRunning = false;
 let scanAgain = false;
@@ -42,7 +45,7 @@ function activeImageRequest(checkpoint) {
   if (checkpoint?.schema === "serpsmith.run-checkpoint.v2") {
     const request = checkpoint.pending_operation;
     if (checkpoint.lifecycle?.state !== "waiting_external" ||
-        request?.state !== "requested" || request?.capability !== "image_generate") return null;
+        request?.state !== "requested" || !["image_generate","image_generation"].includes(request?.capability)) return null;
     const candidate = candidateKey(request.candidate);
     if (!candidate) return null;
     return {
@@ -51,6 +54,7 @@ function activeImageRequest(checkpoint) {
         output_filename: request.requested_filename,
         request_token: request.operation_id,
         requested_at: request.requested_at,
+        deadline_at: request.deadline_at,
         stage: candidate.length === 1
           ? `image_generation_candidate_${candidate.toLowerCase()}`
           : "image_generation_batch",
@@ -66,6 +70,7 @@ function activeImageRequest(checkpoint) {
     output_filename: request?.output_filename ?? request?.filename ??
       request?.requested_filename ?? request?.requested_output_filename,
     stage: request?.stage ?? request?.requested_stage ?? fallbackStage,
+    deadline_at: request?.deadline_at ?? request?.deadline ?? request?.expires_at,
   });
   const stageMatch = matchStage(checkpoint.stage);
   if (stageMatch) {
@@ -130,6 +135,50 @@ function activeImageRequest(checkpoint) {
   };
 }
 
+function boundedImageDeadline(request) {
+  const requestedAt = Date.parse(request?.requested_at ?? "");
+  if (!Number.isFinite(requestedAt)) return null;
+  const maximum = requestedAt + maximumImageWaitMs;
+  const recorded = Date.parse(request?.deadline_at ?? "");
+  return Number.isFinite(recorded) ? Math.min(recorded, maximum) : maximum;
+}
+
+async function dispatchExpiredRequest(checkpointPath, checkpoint, active) {
+  if (!dispatch || checkpoint?.schema !== "serpsmith.run-checkpoint.v2") return false;
+  const deadline = boundedImageDeadline(active.request);
+  if (deadline === null || Date.now() < deadline) return false;
+  const revision = Number.isInteger(checkpoint.revision) ? checkpoint.revision : 0;
+  const siteKey = checkpoint.run?.site_key ?? checkpoint.site_key;
+  const runKey = checkpoint.run?.run_key ?? checkpoint.run_key;
+  const token = active.request.request_token;
+  const operationId = "image-timeout:" + createHash("sha256")
+    .update(`${checkpointPath}\n${token}\n${revision}`)
+    .digest("hex").slice(0, 24);
+  try {
+    const result = await enqueue(queueRoot, {
+      operation_id: operationId,
+      site_key: siteKey,
+      run_key: runKey,
+      kind: "stage_resume",
+      checkpoint: checkpointPath,
+      expected_revision: revision,
+      max_attempts: 3,
+      payload: {
+        action: "recover_external",
+        operation_id: token,
+        failure_class: "image_artifact_timeout",
+        requested_filename: active.request.output_filename,
+        effective_deadline_at: new Date(deadline).toISOString(),
+      },
+    });
+    if (!quiet) process.stdout.write(`SERPSMITH_TIMEOUT_DISPATCH ${JSON.stringify(result)}\n`);
+    return result.result === "enqueued";
+  } catch (error) {
+    if (error?.code === "EEXIST") return false;
+    throw error;
+  }
+}
+
 async function scan() {
   const mediaEntries = await fs.readdir(mediaRoot, { withFileTypes: true });
   for (const checkpointPath of await checkpointFiles(runsRoot)) {
@@ -144,7 +193,10 @@ async function scan() {
     if (!active) continue;
     const { candidate, request } = active;
     const sources = await correlateGeneratedSources(request, mediaEntries, mediaRoot);
-    if (!sources) continue;
+    if (!sources) {
+      if (await dispatchExpiredRequest(checkpointPath, checkpoint, active)) return true;
+      continue;
+    }
     const eventKey = `${checkpointPath}:${request.request_token}:${sources.join("\n")}`;
     const previous = emitted.get(checkpointPath);
     if (previous?.eventKey === eventKey && Date.now() - previous.emittedAt < retryAfterMs) continue;

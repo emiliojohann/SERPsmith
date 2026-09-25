@@ -112,6 +112,7 @@ Inspect both candidates at original detail. Reject an image for:
 - text, pseudo-text, logos, or branded elements;
 - malformed anatomy, hands, materials, lighting, scale, depth, or perspective;
 - contradictory action logic: when the concept depends on a person operating, revealing, handing off, or reviewing something, their pose, gaze, and body orientation must visibly attend to that action or its intended recipient;
+- impossible physical contact: if a person or tool is supposed to grip, lift, place, connect, or manipulate an object, inspect the actual contact point at original resolution. A hovering or non-gripping tool is a severe meaning-breaking defect when that action carries the concept; do not waive it as an aesthetic fallback. Prefer a hands-free concept when reliable contact cannot be rendered within the attempt budget;
 - generic staging or unusable social-card composition;
 - accidental clipping of a face or essential gesture/action, or of an object whose completeness is necessary to understand the scene;
 - a final hero, card, or social crop that cuts through the primary subject or removes the visual evidence connecting the image to the title.
@@ -119,6 +120,8 @@ Inspect both candidates at original detail. Reject an image for:
 Rank every reviewed candidate by hard-gate eligibility first, then title relevance, clarity, responsive composition, emotional fit, realism, distinctness, and clean hierarchy. Before four candidates have been reviewed, choose a candidate only when it passes every gate; otherwise generate a more direct concept.
 
 After four reviewed candidates, select the highest-ranked fallback-eligible candidate when none passes every quality gate. Fallback eligibility still requires relevance plus all hard publication gates: no unsafe or misleading claim, unrelated destruction/danger, generated or pseudo-text, logo/brand, severe meaning-breaking generation defect, missing derivative, or invalid file/MIME/dimensions. A fallback may carry documented clarity, composition, anatomy, subject-clipping, gesture, or responsive-crop weaknesses when the image remains coherent, recognizable, and technically usable. Record all four rankings, the exact exception, and why the selected candidate is still usable. If no candidate is eligible, stop safely.
+
+Do not classify a failed physical interaction as a mere gesture weakness. If the action is the image's explanation of the article, the object must visibly be held, moved, or connected as claimed. When all four candidates fail this hard gate, preserve the unpublished package and trigger the owner-review/failure route; never silently abandon the run.
 
 ## Production
 
