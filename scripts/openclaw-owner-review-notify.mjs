@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const helper = fileURLToPath(new URL("./owner-review-receipts.mjs", import.meta.url));
 const safe = value => typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/.test(value);
+const safeLabel = value => typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9 ._-]{0,79}$/.test(value);
 const reasons = {
   invalid_checkpoint: "The saved run state cannot be validated. Review the checkpoint and decide whether to repair or abandon this run.",
   ambiguous_report_receipt: "Publication reporting may already have been delivered. Check the prior message before authorizing a resend.",
@@ -13,14 +14,17 @@ const reasons = {
   recovery_settled_without_progress: "Bounded recovery finished without advancing the run. Review the run and decide whether to resume it manually or stop.",
 };
 
-export function reviewMessage(review) {
+export function reviewMessage(review, projectLabel = review?.site_key) {
   if (!safe(review?.site_key) ||
+      !safeLabel(projectLabel) ||
       !/^review:[a-f0-9]{24}$/.test(review?.review_key ?? "") ||
       !Object.hasOwn(reasons, review?.reason)) throw new Error("invalid owner review request");
-  const article = safe(review.slug) ? review.slug : safe(review.run_key) ? review.run_key : "unreadable run";
+  const article = safe(review.slug) ? review.slug : null;
+  const run = safe(review.run_key) ? review.run_key : "unreadable run";
   const state = review.published === true ? "Published; verification/reporting needs review" :
     review.published === false ? "Not published" : "Publication state uncertain";
-  return `SERPsmith needs your review: ${review.site_key} / ${article}\n` +
+  return `SERPsmith needs your review\nProject/blog: ${projectLabel} (${review.site_key})\n` +
+    `Post: ${article ?? "unknown (checkpoint unreadable)"}\nRun: ${run}\n` +
     `Status: ${state}.\nBlocker: ${reasons[review.reason]}`;
 }
 
@@ -32,14 +36,14 @@ export function receiptFromSend(value) {
   return String(id);
 }
 
-export async function notifyOwnerReviews(result, siteKey, { status, send, record }) {
+export async function notifyOwnerReviews(result, siteKey, { status, send, record }, projectLabel = siteKey) {
   if (result?.adapter !== "run_reconciliation" || result.site_key !== siteKey ||
       !safe(siteKey) || !Array.isArray(result.owner_review_required))
     throw new Error("invalid reconciliation result");
   let sent = 0;
   let previouslyAcknowledged = 0;
   for (const review of result.owner_review_required) {
-    const message = reviewMessage(review);
+    const message = reviewMessage(review, projectLabel);
     if (review.site_key !== siteKey) throw new Error("cross-site owner review request");
     const prior = await status(review.review_key);
     if (prior === "acknowledged") { previouslyAcknowledged++; continue; }
@@ -62,17 +66,17 @@ function command(binary, args) {
 }
 
 async function main() {
-  const [resultFile, siteKey, receiptRoot, telegramTarget] = process.argv.slice(2);
+  const [resultFile, siteKey, receiptRoot, telegramTarget, projectLabel = siteKey] = process.argv.slice(2);
   if (!resultFile || !safe(siteKey) || !path.isAbsolute(receiptRoot ?? "") ||
-      !receiptRoot.split(path.sep).includes(siteKey) || !/^\d{5,20}$/.test(telegramTarget ?? ""))
-    throw new Error("usage: openclaw-owner-review-notify.mjs RESULT_JSON SITE_KEY SITE_RECEIPT_ROOT TELEGRAM_CHAT_ID");
+      !receiptRoot.split(path.sep).includes(siteKey) || !/^\d{5,20}$/.test(telegramTarget ?? "") || !safeLabel(projectLabel))
+    throw new Error("usage: openclaw-owner-review-notify.mjs RESULT_JSON SITE_KEY SITE_RECEIPT_ROOT TELEGRAM_CHAT_ID [PROJECT_LABEL]");
   const result = JSON.parse(await readFile(path.resolve(resultFile), "utf8"));
   return notifyOwnerReviews(result, siteKey, {
     status: key => Promise.resolve(command(process.execPath, [helper, "status", siteKey, receiptRoot, key]).result),
     record: (key, receipt) => Promise.resolve(command(process.execPath, [helper, "record", siteKey, receiptRoot, key, receipt])),
     send: message => Promise.resolve(command("openclaw", ["message", "send", "--channel", "telegram",
       "--account", "default", "--target", telegramTarget, "--message", message, "--json"])),
-  });
+  }, projectLabel);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url)))
