@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.0-beta.14
+
+- Requires each generated article-image file to be one standalone scene; candidate briefs may no longer produce comparison grids or contact sheets.
+- Preserves best-available fallback for coherent, relevant, safe images with aesthetic weaknesses, while excluding collages from that fallback.
+
 ## v0.5.0-beta.13
 
 - Correlates bounded provider PNG images with WebP-named image requests and accepts the older `image_generation` capability alias during recovery.

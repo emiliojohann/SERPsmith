@@ -7,8 +7,8 @@ Starting with `serpsmith-core-v5`, the prose pass uses the portable `blader/huma
 Reviewed baseline:
 
 - Source: `https://github.com/blader/humanizer`
-- Version: `2.9.1`
-- Reviewed commit: `523374dee72d67c7b2b5f858ea0094ffda49c3ac`
+- Version: `3.1.0`
+- Reviewed commit: `225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8`
 - License: MIT
 - Runtime artifact: plain Markdown `SKILL.md`
 - Executable dependency: none
@@ -25,7 +25,7 @@ npx skills add blader/humanizer --global
 
 Use `--agent '*'` only when the operator deliberately wants to install it for every supported local harness. OpenClaw operators use Skill Workshop or another approved skill-management path rather than overwriting live skill files manually.
 
-Reload the agent session after installation when the harness does not hot-reload skills. Verify that the discovered skill is named `humanizer` and its metadata version is at least `2.9.1`.
+Reload the agent session after installation when the harness does not hot-reload skills. Verify that the discovered skill is named `humanizer` and its metadata version is at least `3.1.0`.
 
 Do not auto-update. Review each upstream release, its license, prompt changes, package validation, and SERPsmith regression fixtures before changing the pinned baseline.
 

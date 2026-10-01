@@ -97,7 +97,7 @@ Production: wide 16:9, article-specific, text-free, factually safe
 Clarity test: [literal connection a title-only viewer should recognize within three seconds]
 ```
 
-Candidate A and B must differ meaningfully in scene, subject/action, composition, or metaphor. A cosmetic color change is not a second concept. When a direct concept exists, at least one candidate must use it rather than an abstract metaphor.
+Candidate A and B must differ meaningfully in scene, subject/action, composition, or metaphor. A cosmetic color change is not a second concept. When a direct concept exists, at least one candidate must use it rather than an abstract metaphor. Keep the concepts as separate briefs: do not combine A and B into a single image-generation prompt unless the provider supports an explicit per-output prompt. Every returned file must be one independent, full-frame scene. When requesting several variations in one operation, explicitly say "one scene per output file; no grids, contact sheets, split screens, or side-by-side comparisons." If per-output prompts are unavailable, use one concept for that operation and request the other only through a separately tracked operation supported by the checkpoint.
 
 ## Selection rubric
 
@@ -139,6 +139,8 @@ Focal-crop; never stretch. Preserve the face when present, the essential gesture
 ## Attempts and bounded fallback
 
 Review at most four generated candidates per run, normally two meaningfully different concepts with up to two candidates or refinements each. Treat one provider operation that returns one to four correlated files as a bounded candidate batch, not an ambiguous completion: inspect, rank, and record every returned file. More than four correlated files remains ambiguous and fails closed. A provider retry that returns no usable image does not count as a reviewed candidate. Retry only a definite transient provider failure; keep the prompt unchanged for the first retry and change one execution variable only for the final provider retry. Never duplicate an active request.
+
+Inspect each returned file as its own proposed article image before applying the fallback ranking. A 2×2 contact sheet, split-screen composition, or collage of alternative scenes is not one coherent hero and fails the severe-defect gate even if an individual panel looks promising. Do not select the least-bad collage as `best_available_image_fallback`; correct the request format in a new, checkpoint-tracked attempt when the run still permits one. Preserve a terminal checkpoint rather than silently reopening or bypassing it.
 
 If any candidate passes every gate before the fourth review, select it and stop generating. If none passes every quality gate after four reviews, use the highest-ranked fallback-eligible candidate and continue publication under the existing authorization. Mark the checkpoint and final report `best_available_image_fallback`; state the exact clarity or responsive-composition exception and tell the owner to review the live image when convenient. Do not present the fallback as a failed publication.
 

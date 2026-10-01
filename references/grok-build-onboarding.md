@@ -17,7 +17,7 @@ npx skills add [PUBLIC_SERPSMITH_SOURCE]
 npx skills add blader/humanizer --global
 ```
 
-Reload Grok Build when required, then verify that both `serpsmith` and `humanizer` are discoverable. The Humanizer skill must be reviewed version 2.9.1 or newer.
+Reload Grok Build when required, then verify that both `serpsmith` and `humanizer` are discoverable. The Humanizer skill must be reviewed version 3.1.0 or newer.
 
 The exact public SERPsmith source must replace the placeholder above before release. Do not point public instructions at a private development repository.
 
