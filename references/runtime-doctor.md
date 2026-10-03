@@ -1,0 +1,22 @@
+# Runtime Doctor
+
+Run `node scripts/runtime-doctor.mjs CONFIG.json` before an unattended publishing cycle or after a runtime change. It is deterministic and read-only: exit 0 means every supplied check passed, exit 2 means action is required, and exit 64 means the input is invalid. Output is one JSON line with named checks and repair classes, without file paths, job payloads, or credentials.
+
+The runtime adapter prepares a private `serpsmith.runtime-doctor.v1` JSON snapshot outside the product repository. For OpenClaw, use `node scripts/openclaw-doctor-check.mjs PRIVATE_BINDING.json PRIVATE_SNAPSHOT.json` to capture and check in one read-only command. Its collector reads `openclaw cron list --all --json` afresh (with at most one retry for a transient CLI failure), rejects incomplete inventories and missing pinned jobs, and atomically writes the snapshot with mode 0600. It never edits a job or schedule. The private binding uses schema `serpsmith.openclaw-doctor-binding.v1` and holds the independently reviewed fields below, plus `expected_sites`, publisher `{id,job_id,expected_agent_id,expected_schedule}` pins, and recovery-worker `{id,job_id,expected_agent_id}` pins. Keep that binding and the snapshot outside the product repository.
+
+The snapshot must supply:
+
+- `captured_at`: UTC timestamp from the same scheduler/runtime read used to build the snapshot; Doctor rejects missing, future, or older-than-15-minute snapshots;
+- `release`: reviewed artifact `root`, an external `checksum_manifest` from that release, the independently pinned `checksum_manifest_sha256`, and `expected_version`;
+- `installation`: actual installed runtime `root` and reviewed `exceptions` for release files deliberately retained from an older installation or operated externally. Every non-exception file must match the reviewed release manifest. Each exception must pin its own independent SHA-256; an external file also supplies its absolute `external_path`;
+- `humanizer`: discovered `skill_path` and reviewed `minimum_version`;
+- `capability_map`: path to the exact current unattended capability certification;
+- `profiles`: one `{id,path}` entry per unattended site, with `id` matching the profile's `site_key`;
+- `publishers`: one entry per profile with the same `id`, the actual `payload`, enabled/agent/payload-kind state, actual `{expr,tz}` schedule, and independently pinned `expected_schedule`.
+- `recovery_workers`: one entry per expected site with the actual enabled/agent/payload-kind state and payload from the pinned OpenClaw job. Doctor checks for the new batch adapter, review ledger, and bounded-resume instructions. Payload text checks detect drift; they do not certify that an agent followed the instructions.
+
+Capture the scheduler state and all other actual inputs in one fresh snapshot before invoking Doctor. Do not reuse a saved example or yesterday's successful snapshot as current health evidence. Take actual publisher payloads and schedules from the scheduler read API, not a manually maintained copy. Keep the snapshot private: it may contain private site paths and unpublished job instructions. Pin expected values and exception digests from the reviewed release/deployment record, not the installed tree being checked. A local read-only canary using freshly computed exception digests is useful for development, but is not a trusted production pin.
+
+The Doctor verifies every released artifact file against the pinned checksum manifest, the release VERSION, every non-exception installed file and pinned exception, the release skill's Humanizer requirement against the pinned minimum, installed Humanizer metadata/version, unattended capability map, site profiles, publisher and recovery-worker coverage/enabled state, schedule expressions/timezones, stale Humanizer literals, and publisher-level image candidate limits that compete with the live skill. It never installs a skill, edits a job, restarts a worker, republishes an article, or changes a release. A repair class is a routing recommendation, not authorization. The existing checkpoint reconciler remains responsible for bounded run recovery.
+
+Do not call the system self-healing based on this check alone. Add a separately certified repair controller for explicitly safe, idempotent operational actions, plus end-to-end canaries and owner-gated third-party/version promotion.

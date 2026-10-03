@@ -6,15 +6,18 @@
   "platforms": {
     "google-ai-features": {
       "crawler": "Googlebot",
-      "access": "allowed"
+      "access": "allowed",
+      "access_evidence": "verified_bot_request"
     },
     "chatgpt-search": {
       "crawler": "OAI-SearchBot",
-      "access": "allowed"
+      "access": "allowed",
+      "access_evidence": "verified_bot_request"
     },
     "perplexity-search": {
       "crawler": "PerplexityBot",
-      "access": "allowed"
+      "access": "allowed",
+      "access_evidence": "verified_bot_request"
     }
   },
   "technical": {

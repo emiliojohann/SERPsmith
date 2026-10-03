@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.5.0-beta.16
+
+- Fixes the image-batch command-line entrypoint when its script is invoked through a symbolic-link path, and adds a regression test for silent no-op execution.
+
+## v0.5.0-beta.15
+
+- Adds a read-only runtime Doctor for release integrity, Humanizer compatibility, site coverage, scheduler drift, and image-worker instructions.
+- Records every correlated image candidate's review before choosing a bounded next action, preventing a single rejected image from ending a run as though all four candidates were reviewed.
+- Adds a guarded batch-completion adapter and revision-bound recovery continuation. Real unattended recovery still requires a certified runtime worker and field canary.
+- Tightens PHP and rendered code-block validation and requires verified-bot evidence for crawler-access claims.
+- Keeps concise publication reports while retaining detailed checkpoint evidence.
+
 ## v0.5.0-beta.14
 
 - Requires each generated article-image file to be one standalone scene; candidate briefs may no longer produce comparison grids or contact sheets.

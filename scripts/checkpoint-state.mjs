@@ -12,6 +12,8 @@ export const GATES = Object.freeze([
 ]);
 const STATES = new Set(["running","waiting_external","recovery_required","awaiting_report_ack","failed","complete"]);
 const REPORT_STATES = new Set(["not_prepared","prepared","acknowledged"]);
+const IMAGE_VERDICTS = new Set(["normal_pass","fallback_eligible","hard_rejected"]);
+const IMAGE_HARD_FAILURE = "no_hard_gate_eligible_image";
 const TOP_LEVEL = new Set([
   "schema", "core_policy_version", "revision", "run", "lifecycle", "pending_operation",
   "gates", "report", "failure", "attempts", "data", "history",
@@ -59,11 +61,26 @@ export function validateCheckpoint(value) {
   if (value.report.delivery_state === "started" && !iso(value.report.delivery_started_at)) fail("started report lacks timestamp");
   if (value.report.state === "acknowledged" && value.report.delivery_state !== "acknowledged") fail("acknowledged report delivery mismatch");
   if (!Array.isArray(value.attempts) || !value.data || typeof value.data !== "object" || Array.isArray(value.data)) fail("invalid checkpoint extension data");
+  if (value.data.image_reviews !== undefined) {
+    const reviews = value.data.image_reviews;
+    if (!Array.isArray(reviews) || reviews.length > 4) fail("invalid image reviews");
+    const refs = new Set();
+    for (const review of reviews) {
+      if (!identifier(review?.operation_id) || !identifier(review?.artifact_ref) ||
+          !IMAGE_VERDICTS.has(review?.verdict) || !iso(review?.reviewed_at) || refs.has(review.artifact_ref)) fail("invalid image review");
+      refs.add(review.artifact_ref);
+    }
+  }
   if (value.pending_operation !== null) {
     const op = value.pending_operation;
     if (!identifier(op.operation_id) || !identifier(op.capability) || !iso(op.requested_at) || !iso(op.deadline_at)) fail("invalid pending operation");
     if (!["requested","completed","failed"].includes(op.state)) fail("invalid operation state");
     if (op.requested_filename !== null && (typeof op.requested_filename !== "string" || path.basename(op.requested_filename) !== op.requested_filename)) fail("invalid requested filename");
+    if (op.artifact !== null && op.artifact !== undefined) {
+      const refs = op.artifact.refs ?? [op.artifact.ref];
+      if (!identifier(op.artifact.ref) || !Array.isArray(refs) || refs.length < 1 || refs.length > 4 ||
+          refs.some((ref) => !identifier(ref)) || new Set(refs).size !== refs.length || !refs.includes(op.artifact.ref)) fail("invalid operation artifact refs");
+    }
   }
   if (!Array.isArray(value.history) || value.history.length < 1) fail("invalid history");
   if (value.lifecycle.state === "waiting_external" && value.pending_operation?.state !== "requested") fail("waiting state requires requested operation");
@@ -89,6 +106,14 @@ export function applyTransition(current, event, now = new Date().toISOString()) 
     next.gates[event.gate] = true;
   } else if (type === "external_requested") {
     if (current.lifecycle.state !== "running" || !identifier(event.operation_id) || !identifier(event.capability) || !iso(event.requested_at) || !iso(event.deadline_at) || Date.parse(event.deadline_at) <= Date.parse(event.requested_at)) fail("invalid external request");
+    if (["image_generate","image_generation"].includes(event.capability)) {
+      const reviews = current.data.image_reviews ?? [];
+      if (reviews.length >= 4) fail("image candidate budget exhausted");
+      if (reviews.some((review) => review.verdict === "normal_pass")) fail("passing image already selected");
+      if (["image_generate","image_generation"].includes(current.pending_operation?.capability) &&
+          current.pending_operation.state === "completed" &&
+          !reviews.some((review) => review.operation_id === current.pending_operation.operation_id)) fail("previous image operation lacks review");
+    }
     const requestedFilename = event.requested_filename ?? null;
     if (requestedFilename !== null && (typeof requestedFilename !== "string" || path.basename(requestedFilename) !== requestedFilename)) fail("invalid requested filename");
     next.pending_operation = {operation_id:event.operation_id,capability:event.capability,candidate:event.candidate ?? null,requested_at:event.requested_at,deadline_at:event.deadline_at,requested_filename:requestedFilename,state:"requested",artifact:null};
@@ -96,9 +121,21 @@ export function applyTransition(current, event, now = new Date().toISOString()) 
     next.lifecycle.phase = event.capability;
   } else if (type === "external_completed") {
     if (current.lifecycle.state !== "waiting_external" || current.pending_operation?.operation_id !== event.operation_id || !identifier(event.artifact_ref)) fail("invalid external completion");
+    const refs = event.artifact_refs ?? [event.artifact_ref];
+    if (!Array.isArray(refs) || refs.length < 1 || refs.length > 4 ||
+        refs.some((ref) => !identifier(ref)) || new Set(refs).size !== refs.length || !refs.includes(event.artifact_ref)) fail("invalid correlated image artifacts");
     next.pending_operation.state = "completed";
-    next.pending_operation.artifact = {ref:event.artifact_ref};
+    next.pending_operation.artifact = {ref:event.artifact_ref,refs};
     next.lifecycle.state = "running";
+  } else if (type === "image_reviewed") {
+    if (current.lifecycle.state !== "running" || current.pending_operation?.state !== "completed" ||
+        !["image_generate","image_generation"].includes(current.pending_operation.capability) ||
+        current.pending_operation.operation_id !== event.operation_id || !identifier(event.artifact_ref) ||
+        !(current.pending_operation.artifact?.refs ?? [current.pending_operation.artifact?.ref]).includes(event.artifact_ref) ||
+        !IMAGE_VERDICTS.has(event.verdict)) fail("invalid image review");
+    const reviews = current.data.image_reviews ?? [];
+    if (reviews.length >= 4 || reviews.some((item) => item.artifact_ref === event.artifact_ref)) fail("image review budget or duplicate artifact");
+    next.data.image_reviews = [...reviews, {operation_id:event.operation_id,artifact_ref:event.artifact_ref,verdict:event.verdict,reviewed_at:now}];
   } else if (type === "external_failed") {
     if (!["waiting_external","recovery_required"].includes(current.lifecycle.state) || current.pending_operation?.operation_id !== event.operation_id) fail("invalid external failure");
     next.pending_operation.state = "failed";
@@ -124,6 +161,9 @@ export function applyTransition(current, event, now = new Date().toISOString()) 
     next.lifecycle.phase = "complete";
   } else if (type === "failed") {
     if (!identifier(event.failure_class)) fail("invalid failure");
+    if (event.failure_class === IMAGE_HARD_FAILURE &&
+        (current.data.image_reviews?.length !== 4 ||
+         current.data.image_reviews.some((review) => review.verdict !== "hard_rejected"))) fail("image candidate budget not exhausted by hard rejections");
     next.failure = {class:event.failure_class,retryable:false,at:now};
     next.lifecycle.state = "failed";
   } else fail("unsupported transition");

@@ -20,7 +20,7 @@ An llms.txt file is optional for Google and is not a special Google ranking inpu
 
 Collect evidence after deployment with the exact selected profile and article URL:
 
-- configured search crawler access is allowed;
+- configured search crawler access is supported by a real verified-bot request in trusted access/WAF logs, matched to the article or required asset; a synthetic request with a crawler User-Agent, robots.txt alone, or a successful generic HTTP probe does not establish verified-bot access;
 - article is indexed or technically eligible and snippet-eligible;
 - canonical matches, sitemap contains the URL, and rendered text is available;
 - structured data matches visible content;
@@ -30,6 +30,8 @@ Collect evidence after deployment with the exact selected profile and article UR
 - authorship, published/modified dates, descriptive headings, and a direct answer are visible;
 - each configured measurement is ready or explicitly unavailable, never unchecked;
 - llms.txt status matches the profile policy.
+
+Each platform evidence entry uses `access_evidence: "verified_bot_request"` only after independently verifying the crawler identity (for example, the provider's documented reverse/forward DNS or authenticated WAF bot identity). If only robots policy or a spoofed User-Agent probe is available, record a crawler gap and do not call readiness verified.
 
 Evidence must be no older than seven days, contain no secrets, and match the profile site and `site_key`.
 
