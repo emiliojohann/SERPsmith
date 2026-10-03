@@ -2,11 +2,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
-import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { validateRuntimeCapabilities } from "./validate-runtime-capabilities.mjs";
+import { validateProfile } from "./validate-profile.mjs";
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const configPath = process.argv[2];
+export function runDoctor(configPath) {
 const checks = [];
 const add = (name, ok, repair) => checks.push({ name, result: ok ? "passed" : "failed", ...(!ok ? { repair } : {}) });
 const readJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
@@ -21,16 +21,11 @@ const atLeast = (actual, minimum) => {
   for (let i = 0; i < 3; i++) if (a[i] !== b[i]) return a[i] > b[i];
   return true;
 };
-const validated = (script, args) => {
-  const run = spawnSync(process.execPath, [path.join(scriptDir, script), ...args], {
-    encoding: "utf8", timeout: 30000, maxBuffer: 1024 * 1024
-  });
-  return run.status === 0 && !run.error;
+const validated = (kind, file) => {
+  try { return kind === "capabilities" ? validateRuntimeCapabilities(file,"unattended").result === "verified" : validateProfile(file).result === "verified"; }
+  catch { return false; }
 };
-const failUsage = () => {
-  process.stderr.write(JSON.stringify({ adapter: "runtime_doctor", result: "failed", class: "invalid_input", detail: "provide one readable doctor JSON config" }) + "\n");
-  process.exit(64);
-};
+const failUsage = () => { throw new Error("invalid doctor input"); };
 
 if (!configPath) failUsage();
 let config;
@@ -109,7 +104,7 @@ try {
   add("humanizer_policy_binding", false, "align_humanizer_requirement");
 }
 
-add("runtime_capabilities", validated("validate-runtime-capabilities.mjs", [config.capability_map, "unattended"]), "recertify_runtime");
+add("runtime_capabilities", validated("capabilities",config.capability_map), "recertify_runtime");
 const profileIds = new Set();
 for (const profile of config.profiles) {
   if (!profile || typeof profile.id !== "string" || !/^[a-z0-9-]+$/.test(profile.id) || typeof profile.path !== "string") failUsage();
@@ -117,7 +112,7 @@ for (const profile of config.profiles) {
   profileIds.add(profile.id);
   let matchingKey = false;
   try { matchingKey = readJson(profile.path).site_key === profile.id; } catch { /* validator reports the failure */ }
-  add(`profile:${profile.id}`, matchingKey && validated("validate-profile.mjs", [profile.path]), "review_profile");
+  add(`profile:${profile.id}`, matchingKey && validated("profile",profile.path), "review_profile");
 }
 
 const candidateOverride = /\b(?:review|generate|inspect)\s+(?:at most|up to|no more than)\s+(?:\d+|one|two|three|four|five|six)\s+(?:generated\s+)?candidates\b/i;
@@ -149,5 +144,9 @@ if (config.source?.kind === "openclaw_cli") {
 }
 
 const failed = checks.filter(check => check.result === "failed");
-process.stdout.write(JSON.stringify({ adapter: "runtime_doctor", result: failed.length ? "action_required" : "verified", checks, failed_count: failed.length }) + "\n");
-if (failed.length) process.exitCode = 2;
+return { adapter: "runtime_doctor", result: failed.length ? "action_required" : "verified", checks, failed_count: failed.length };
+}
+if (process.argv[1] && fs.realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  try { const result=runDoctor(process.argv[2]); process.stdout.write(JSON.stringify(result)+"\n"); if(result.failed_count) process.exitCode=2; }
+  catch { process.stderr.write(JSON.stringify({adapter:"runtime_doctor",result:"failed",class:"invalid_input",detail:"provide one readable doctor JSON config"})+"\n"); process.exitCode=64; }
+}

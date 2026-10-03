@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 const CORE_POLICY_VERSION="serpsmith-core-v27";
 const TOP_LEVEL_KEYS=new Set(["core_policy_version","site_key","repository","branch","remote","public_base_url","article_route","content_adapter","image_directory","image_policy","image_direction","sitemap_file","sitemap_url","llms_file","llms_full_file","search_console_property","bing_site_url","indexnow_host","required_notifications","deployment_adapter","checkpoint_root","lock_root","timezone","editorial_guardrails","autopilot_enabled","repository_instruction_files","validation_commands","crawler_user_agents","internal_link_minimum","external_link_limits","prose_adapter","notification_adapter","schedule","authorization","product_source","validation_policy","robots_policy","analytics","ai_search"]);
 const IMAGE_POLICY=new Set(["width","height","hero_format","hero_quality","social_format","social_quality","derive_social_from_hero","strip_metadata","social_crawlers"]);
@@ -14,8 +15,8 @@ const AI_SEARCH_MEASUREMENTS=new Set(["search-console-generative-ai","ga4-ai-ref
 const SECRET_KEY=/(^|_)(api_?key|key_value|token|secret|password|credential|credential_path|credential_file|private_key|oauth_token)$/i;
 const SECRET_VALUE=/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|\bgh[pousr]_[A-Za-z0-9]{20,}\b|\bsk-[A-Za-z0-9_-]{16,}\b|\bAKIA[A-Z0-9]{16}\b|\bAIza[A-Za-z0-9_-]{30,}\b|\bxox[baprs]-[A-Za-z0-9-]{10,}\b|\bglpat-[A-Za-z0-9_-]{16,}\b|\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/;
 const OVERRIDES=[/safe[-_ ]?zone/i,/\bpixel(?:s)?\b/i,/\bcoordinate(?:s)?\b/i,/\bx\s*=\s*\d/i,/\by\s*=\s*\d/i,/\b(?:retry|attempt) budget\b/i,/\bvalidation gate\b/i,/\bevery (?:rendered )?crop\b/i,/\ball (?:rendered )?crops\b/i];
-const profilePath=process.argv[2];
-const fail=(code,cls,detail)=>{process.stderr.write(JSON.stringify({adapter:"profile_validate",result:"failed",retryable:false,class:cls,detail})+"\n");process.exit(code);};
+export function validateProfile(profilePath) {
+const fail=(code,cls,detail)=>{const error=new Error(detail);error.code=code;error.cls=cls;throw error;};
 if(!profilePath)fail(64,"usage","provide a JSON profile path");
 let raw;try{raw=fs.readFileSync(profilePath,"utf8");}catch{fail(64,"profile_unreadable","profile cannot be read");}
 if(/\$\{[A-Z_][A-Z0-9_]*\}/.test(raw)||/\[[A-Z][A-Z _-]+\]/.test(raw))fail(64,"unresolved_placeholder","replace every placeholder");
@@ -90,4 +91,9 @@ if(p.authorization!==undefined){if(!p.authorization||typeof p.authorization!=="o
 if(p.schedule!==undefined){if(!p.schedule||typeof p.schedule!=="object"||Array.isArray(p.schedule))fail(64,"invalid_schedule","object required");for(const k of Object.keys(p.schedule))if(!new Set(["weekdays","local_time","timezone","slot_key"]).has(k))fail(64,"unknown_field","schedule."+k);const days=new Set(["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]);if(!Array.isArray(p.schedule.weekdays)||!p.schedule.weekdays.length||p.schedule.weekdays.some(x=>!days.has(x))||new Set(p.schedule.weekdays).size!==p.schedule.weekdays.length)fail(64,"invalid_schedule","unique lowercase weekdays required");}
 if(typeof p.autopilot_enabled!=="boolean")fail(64,"invalid_autopilot","boolean required");
 if(p.autopilot_enabled){if(!p.authorization||p.authorization.owner_approved_unattended!==true||typeof p.authorization.scope!=="string"||!p.authorization.scope.trim())fail(64,"missing_unattended_authorization","owner approval and scope required");if(!p.schedule||!Array.isArray(p.schedule.weekdays)||!p.schedule.weekdays.length||!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(p.schedule.local_time||"")||typeof p.schedule.slot_key!=="string"||!p.schedule.slot_key.trim())fail(64,"invalid_schedule","weekdays, time, slot required");try{new Intl.DateTimeFormat("en-US",{timeZone:p.schedule.timezone}).format();}catch{fail(64,"invalid_schedule_timezone","valid IANA timezone required");}if(p.schedule.timezone!==p.timezone)fail(64,"schedule_timezone_mismatch","schedule/profile timezone mismatch");if(typeof p.notification_adapter!=="string"||!p.notification_adapter.trim())fail(64,"missing_notification_adapter","final reporting required");if(!Array.isArray(p.required_notifications)||!p.required_notifications.length)fail(64,"missing_required_notifications","explicit policy required");if(!p.validation_policy||p.validation_policy.secret_scan_required!==true)fail(64,"missing_secret_scan_gate","secret scan required");}
-process.stdout.write(JSON.stringify({adapter:"profile_validate",result:"verified",retryable:false,site_key:p.site_key,mode:"structural",core_policy_version:CORE_POLICY_VERSION})+"\n");
+return {adapter:"profile_validate",result:"verified",retryable:false,site_key:p.site_key,mode:"structural",core_policy_version:CORE_POLICY_VERSION};
+}
+if (process.argv[1] && fs.realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  try { process.stdout.write(JSON.stringify(validateProfile(process.argv[2]))+"\n"); }
+  catch (error) { process.stderr.write(JSON.stringify({adapter:"profile_validate",result:"failed",retryable:false,class:error.cls||"invalid_profile",detail:error.message})+"\n"); process.exitCode=error.code||64; }
+}

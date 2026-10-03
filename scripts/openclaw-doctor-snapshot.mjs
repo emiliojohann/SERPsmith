@@ -2,15 +2,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
-import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const sourceRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const [bindingPath, outputPath] = process.argv.slice(2);
-const fail = (code, cls) => {
-  process.stderr.write(JSON.stringify({ adapter: "openclaw_doctor_snapshot", result: "failed", class: cls }) + "\n");
-  process.exit(code);
-};
+export function captureSchedulerSnapshot(bindingPath, outputPath, scheduler) {
+const fail = (code, cls) => { const error=new Error(cls); error.code=code; error.cls=cls; throw error; };
 if (!bindingPath || !outputPath || !path.isAbsolute(bindingPath) || !path.isAbsolute(outputPath)) fail(64, "usage");
 
 let binding;
@@ -22,15 +18,7 @@ let parent;
 try { parent = fs.realpathSync(path.dirname(output)); } catch { fail(64, "output_parent_unavailable"); }
 if (parent === sourceRoot || parent.startsWith(sourceRoot + path.sep)) fail(64, "output_inside_source");
 
-const readScheduler = () => spawnSync("openclaw", ["cron", "list", "--all", "--json"], {
-  encoding: "utf8", timeout: 30000, maxBuffer: 16 * 1024 * 1024
-});
-let read = readScheduler();
-if (read.error || read.status !== 0) read = readScheduler(); // one read-only retry for a transient CLI failure
-if (read.error || read.status !== 0) fail(2, "scheduler_unavailable");
-let scheduler;
-try { scheduler = JSON.parse(read.stdout); } catch { fail(2, "scheduler_response_invalid"); }
-if (!Array.isArray(scheduler.jobs) || scheduler.hasMore !== false || scheduler.offset !== 0 || scheduler.total !== scheduler.jobs.length || typeof scheduler.snapshotRevision !== "string" || !scheduler.snapshotRevision) fail(2, "scheduler_incomplete");
+if (!scheduler || !Array.isArray(scheduler.jobs) || scheduler.hasMore !== false || scheduler.offset !== 0 || scheduler.total !== scheduler.jobs.length || typeof scheduler.snapshotRevision !== "string" || !scheduler.snapshotRevision) fail(2, "scheduler_incomplete");
 
 const jobs = new Map();
 for (const job of scheduler.jobs) {
@@ -90,4 +78,18 @@ try {
   if (tmp && fs.existsSync(tmp)) fs.unlinkSync(tmp);
   fail(2, "snapshot_write_failed");
 }
-process.stdout.write(JSON.stringify({ adapter: "openclaw_doctor_snapshot", result: "captured", publisher_count: selected.length, recovery_worker_count:selectedWorkers.length, scheduler_revision: scheduler.snapshotRevision }) + "\n");
+return { adapter: "openclaw_doctor_snapshot", result: "captured", publisher_count: selected.length, recovery_worker_count:selectedWorkers.length, scheduler_revision: scheduler.snapshotRevision };
+}
+if (process.argv[1] && fs.realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  try {
+    const [bindingPath,outputPath,schedulerPath]=process.argv.slice(2);
+    if (!schedulerPath || !path.isAbsolute(schedulerPath)) throw Object.assign(new Error("usage"),{code:64,cls:"usage"});
+    const schedulerAge=Date.now()-fs.statSync(schedulerPath).mtimeMs;
+    if (!Number.isFinite(schedulerAge) || schedulerAge<0 || schedulerAge>2*60*1000) throw Object.assign(new Error("scheduler_stale"),{code:2,cls:"scheduler_stale"});
+    const scheduler=JSON.parse(fs.readFileSync(schedulerPath,"utf8"));
+    process.stdout.write(JSON.stringify(captureSchedulerSnapshot(bindingPath,outputPath,scheduler))+"\n");
+  } catch(error) {
+    process.stderr.write(JSON.stringify({adapter:"openclaw_doctor_snapshot",result:"failed",class:error.cls||"scheduler_response_invalid"})+"\n");
+    process.exitCode=error.code||2;
+  }
+}

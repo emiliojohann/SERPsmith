@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.0-beta.17
+
+- Makes the read-only runtime Doctor installable under stricter skill scanners by removing child-process launches from its executables.
+- Requires a fresh, complete scheduler inventory supplied by a certified runtime adapter; the Doctor still checks release integrity, installed files, capabilities, profiles, publisher and worker drift, and snapshot freshness.
+
 ## v0.5.0-beta.16
 
 - Fixes the image-batch command-line entrypoint when its script is invoked through a symbolic-link path, and adds a regression test for silent no-op execution.
