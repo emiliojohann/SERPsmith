@@ -11,7 +11,7 @@ if (!bindingPath || !outputPath || !path.isAbsolute(bindingPath) || !path.isAbso
 
 let binding;
 try { binding = JSON.parse(fs.readFileSync(bindingPath, "utf8")); } catch { fail(64, "binding_unreadable"); }
-if (binding?.schema !== "serpsmith.openclaw-doctor-binding.v1" || !binding.release || !binding.installation || !binding.humanizer || !binding.capability_map || !Array.isArray(binding.expected_sites) || !binding.expected_sites.length || !Array.isArray(binding.profiles) || !binding.profiles.length || !Array.isArray(binding.publishers) || !binding.publishers.length || !Array.isArray(binding.recovery_workers) || !binding.recovery_workers.length) fail(64, "binding_invalid");
+if (binding?.schema !== "serpsmith.openclaw-doctor-binding.v1" || !binding.release || !binding.installation || !binding.humanizer || !binding.capability_map || !Array.isArray(binding.expected_sites) || !binding.expected_sites.length || !Array.isArray(binding.profiles) || !binding.profiles.length || !Array.isArray(binding.publishers) || !binding.publishers.length || !Array.isArray(binding.recovery_workers) || !binding.recovery_workers.length || !Array.isArray(binding.lease_watchers) || !binding.lease_watchers.length) fail(64, "binding_invalid");
 
 const output = path.resolve(outputPath);
 let parent;
@@ -27,6 +27,7 @@ for (const job of scheduler.jobs) {
 }
 const selected = [];
 const selectedWorkers = [];
+const selectedLeaseWatchers = [];
 const seenSites = new Set();
 const seenJobs = new Set();
 for (const pin of binding.publishers) {
@@ -53,7 +54,17 @@ for (const pin of binding.recovery_workers) {
   seenJobs.add(pin.job_id);
   const job = jobs.get(pin.job_id);
   if (!job) fail(2, "recovery_worker_missing");
-  selectedWorkers.push({id:pin.id,enabled:job.enabled,agent_id:job.agentId,expected_agent_id:pin.expected_agent_id,payload_kind:job.payload?.kind,payload:typeof job.payload?.message === "string" ? job.payload.message : ""});
+  selectedWorkers.push({id:pin.id,enabled:job.enabled,agent_id:job.agentId,expected_agent_id:pin.expected_agent_id,payload_kind:job.payload?.kind,timeout_seconds:job.payload?.timeoutSeconds,payload:typeof job.payload?.message === "string" ? job.payload.message : ""});
+}
+const seenLeaseWatchers = new Set();
+for (const pin of binding.lease_watchers) {
+  if (typeof pin?.id !== "string" || typeof pin.job_id !== "string" || seenLeaseWatchers.has(pin.id) || seenJobs.has(pin.job_id)) fail(64, "binding_lease_watcher_invalid");
+  seenLeaseWatchers.add(pin.id);
+  seenJobs.add(pin.job_id);
+  const job = jobs.get(pin.job_id);
+  if (!job) fail(2, "lease_watcher_missing");
+  selectedLeaseWatchers.push({ id: pin.id, enabled: job.enabled, schedule_kind: job.schedule?.kind,
+    command: job.schedule?.command, stream_status: job.state?.streamStatus });
 }
 
 const snapshot = {
@@ -67,7 +78,8 @@ const snapshot = {
   expected_sites: binding.expected_sites,
   profiles: binding.profiles,
   publishers: selected,
-  recovery_workers: selectedWorkers
+  recovery_workers: selectedWorkers,
+  lease_watchers: selectedLeaseWatchers
 };
 let tmp;
 try {

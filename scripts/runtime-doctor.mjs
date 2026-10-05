@@ -63,7 +63,7 @@ try {
   add("release_version", false, "align_version_metadata");
 }
 
-if (config.source?.kind === "openclaw_cli" && (!config.source.revision || !config.installation || !Array.isArray(config.expected_sites) || !config.expected_sites.length || !Array.isArray(config.recovery_workers) || !config.recovery_workers.length)) failUsage();
+if (config.source?.kind === "openclaw_cli" && (!config.source.revision || !config.installation || !Array.isArray(config.expected_sites) || !config.expected_sites.length || !Array.isArray(config.recovery_workers) || !config.recovery_workers.length || !Array.isArray(config.lease_watchers) || !config.lease_watchers.length)) failUsage();
 if (config.installation) {
   let installed = Boolean(trustedReleaseFiles);
   try {
@@ -137,10 +137,21 @@ if (config.source?.kind === "openclaw_cli") {
     workers.add(worker.id);
     const payload = worker.payload ?? "";
     const bound = worker.enabled === true && worker.agent_id === worker.expected_agent_id && worker.payload_kind === "agentTurn";
-    const contract = ["complete-image-batch.mjs","review_completed_image","request_distinct_image","image_reviewed"].every(marker => payload.includes(marker));
-    add(`recovery_worker:${worker.id}`,bound && contract,"review_recovery_worker_payload");
+    const contract = ["complete-image-batch.mjs","complete-stage-slice.mjs","660 seconds","review_completed_image","request_distinct_image","image_reviewed"].every(marker => payload.includes(marker));
+    const boundedTurn = Number.isInteger(worker.timeout_seconds) && worker.timeout_seconds >= 60 && worker.timeout_seconds <= 600;
+    add(`recovery_worker:${worker.id}`,bound && contract && boundedTurn,"review_recovery_worker_payload");
   }
   add("recovery_worker_coverage",workers.size === expected.size && [...expected].every(id => workers.has(id)),"review_recovery_worker_inventory");
+  const watchers = new Set();
+  for (const watcher of config.lease_watchers) {
+    if (!watcher || typeof watcher.id !== "string" || !/^[a-z0-9-]+$/.test(watcher.id) || watchers.has(watcher.id)) failUsage();
+    watchers.add(watcher.id);
+    const command = watcher.command;
+    const bound = watcher.enabled === true && watcher.schedule_kind === "stream" && watcher.stream_status === "running" &&
+      Array.isArray(command) && command.includes(watcher.id) && command.some(item => typeof item === "string" && item.endsWith("queue-lease-watch.mjs"));
+    add(`lease_watcher:${watcher.id}`, bound, "review_lease_watcher");
+  }
+  add("lease_watcher_coverage",watchers.size === expected.size && [...expected].every(id => watchers.has(id)),"review_lease_watcher_inventory");
 }
 
 const failed = checks.filter(check => check.result === "failed");

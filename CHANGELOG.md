@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.5.0-beta.18
+
+- Splits recovery into bounded publication steps so a stalled step does not hold the whole run until its long timeout.
+- Requeues expired work with lease and checkpoint guards, preserving one final report-delivery handoff.
+- Extends the runtime Doctor to detect outdated recovery-worker settings and missing lease monitoring.
+
 ## v0.5.0-beta.17
 
 - Makes the read-only runtime Doctor installable under stricter skill scanners by removing child-process launches from its executables.
