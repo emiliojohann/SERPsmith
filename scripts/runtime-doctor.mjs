@@ -165,7 +165,8 @@ if (config.source?.kind === "openclaw_cli") {
         watcher.schedule?.expr===watcher.expected_schedule?.expr &&
         watcher.schedule?.tz===watcher.expected_schedule?.tz &&
         typeof watcher.expected_script==="string" && script===watcher.expected_script &&
-        script.includes("startup-slot-watch.mjs") && script.includes("--execute") &&
+        script.includes("startup-slot-watch.mjs") && script.includes("--evidence-hex") &&
+        script.includes("--reserve") && script.includes("openclaw cron run") &&
         /\.exitCode\s*!==\s*0/.test(script) && script.includes("throw new Error") && script.includes("json({})") &&
         script.includes(watcher.publisher_job_id) && script.includes(watcher.profile_path) &&
         watcher.failure_alert?.after===1 && watcher.failure_alert?.mode==="announce" &&

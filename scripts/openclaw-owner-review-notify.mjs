@@ -1,10 +1,4 @@
 #!/usr/bin/env node
-import { readFile } from "node:fs/promises";
-import { spawnSync } from "node:child_process";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
-const helper = fileURLToPath(new URL("./owner-review-receipts.mjs", import.meta.url));
 const safe = value => typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/.test(value);
 const safeLabel = value => typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9 ._-]{0,79}$/.test(value);
 const reasons = {
@@ -57,28 +51,3 @@ export async function notifyOwnerReviews(result, siteKey, { status, send, record
   return { adapter: "owner_review_notification", result: "verified", site_key: siteKey,
     required: result.owner_review_required.length, sent, previously_acknowledged: previouslyAcknowledged };
 }
-
-function command(binary, args) {
-  const child = spawnSync(binary, args, { encoding: "utf8", timeout: 30000, maxBuffer: 1024 * 1024 });
-  if (child.error || child.status !== 0) throw new Error("owner review delivery command failed");
-  try { return JSON.parse(child.stdout); }
-  catch { throw new Error("owner review delivery returned invalid JSON"); }
-}
-
-async function main() {
-  const [resultFile, siteKey, receiptRoot, telegramTarget, projectLabel = siteKey] = process.argv.slice(2);
-  if (!resultFile || !safe(siteKey) || !path.isAbsolute(receiptRoot ?? "") ||
-      !receiptRoot.split(path.sep).includes(siteKey) || !/^\d{5,20}$/.test(telegramTarget ?? "") || !safeLabel(projectLabel))
-    throw new Error("usage: openclaw-owner-review-notify.mjs RESULT_JSON SITE_KEY SITE_RECEIPT_ROOT TELEGRAM_CHAT_ID [PROJECT_LABEL]");
-  const result = JSON.parse(await readFile(path.resolve(resultFile), "utf8"));
-  return notifyOwnerReviews(result, siteKey, {
-    status: key => Promise.resolve(command(process.execPath, [helper, "status", siteKey, receiptRoot, key]).result),
-    record: (key, receipt) => Promise.resolve(command(process.execPath, [helper, "record", siteKey, receiptRoot, key, receipt])),
-    send: message => Promise.resolve(command("openclaw", ["message", "send", "--channel", "telegram",
-      "--account", "default", "--target", telegramTarget, "--message", message, "--json"])),
-  }, projectLabel);
-}
-
-if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url)))
-  main().then(value => process.stdout.write(JSON.stringify(value) + "\n"))
-    .catch(() => { process.stderr.write("owner review delivery failed; owner alert is still unacknowledged\n"); process.exit(1); });

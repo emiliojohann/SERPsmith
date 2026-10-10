@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { promisify } from "node:util";
-import { execFile as execFileCallback } from "node:child_process";
 import { planStartupSlot } from "./startup-slot-plan.mjs";
 
-const execFile=promisify(execFileCallback);
 const fail=message=>{throw new Error(message);};
 const slotStamp=(value,timeZone)=>{
   const parts=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"})
@@ -45,52 +42,57 @@ async function findSlotCheckpoints(root,date,slot){
   await visit(root,0);
   return found;
 }
-async function repositorySafe(repository,branch){
-  const run=async(...args)=>(await execFile("git",args,{cwd:repository,timeout:10000,maxBuffer:20000})).stdout.trim();
-  try{
-    const [status,current,head,upstream]=await Promise.all([
-      run("status","--porcelain"),run("branch","--show-current"),run("rev-parse","HEAD"),run("rev-parse","@{u}")]);
-    return status===""&&current===branch&&head===upstream;
-  }catch{return false;}
-}
-
-export async function watchStartupSlot({profilePath,jobId,date,slot,execute=false,now=new Date().toISOString()}){
+export async function watchStartupSlot({profilePath,jobId,evidence,date,slot,reserve=false,now=new Date().toISOString()}){
   if(!/^[-\w]+$/.test(jobId)||Boolean(date)!==Boolean(slot))fail("invalid slot identity");
   const profile=JSON.parse(await fs.readFile(path.resolve(profilePath),"utf8"));
   const root=path.resolve(profile.checkpoint_root??"");
   if(root===path.parse(root).root||!root.split(path.sep).includes(profile.site_key))fail("bounded site root required");
-  const {stdout}=await execFile("openclaw",["cron","runs",jobId,"--limit","20","--json"],{timeout:30000,maxBuffer:200000});
-  const history=JSON.parse(stdout);
-  const listed=JSON.parse((await execFile("openclaw",["cron","list","--json"],{timeout:30000,maxBuffer:500000})).stdout);
-  const publisher=(listed.jobs??[]).find(job=>job.id===jobId);
-  if(!publisher || publisher.enabled!==true)return{adapter:"startup_slot_watch",action:"owner_review",reason:"publisher_not_enabled",execute:false};
+  if(evidence?.schema!=="serpsmith.startup-slot-evidence.v1" ||
+      !Array.isArray(evidence.history?.entries) ||
+      !evidence.repository || typeof evidence.repository!=="object" ||
+      !Number.isFinite(Date.parse(evidence.captured_at)) ||
+      Math.abs(Date.parse(now)-Date.parse(evidence.captured_at))>60000)fail("fresh startup slot evidence required");
+  const publisher=evidence.publisher;
+  if(publisher?.id!==jobId || publisher.enabled!==true ||
+      publisher.schedule?.kind!=="cron" ||
+      publisher.schedule?.tz!==(profile.timezone??"America/Los_Angeles"))
+    return{adapter:"startup_slot_watch",action:"owner_review",reason:"publisher_not_enabled",reserve:false};
   if(!date){
     date=slotStamp(now,profile.timezone??"America/Los_Angeles").date;
     slot=fixedSlot(publisher.schedule?.expr);
   }
   if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!/^\d{4}$/.test(slot))fail("invalid slot identity");
-  if(publisher.state?.runningAtMs)return{adapter:"startup_slot_watch",action:"none",reason:"publisher_still_running",execute:false};
-  const matches=(history.entries??[]).filter(entry=>
+  if(publisher.state?.runningAtMs)return{adapter:"startup_slot_watch",action:"none",reason:"publisher_still_running",reserve:false};
+  const matches=evidence.history.entries.filter(entry=>
     entry.action==="finished"&& !String(entry.runId??"").startsWith("manual:") &&
     Number.isFinite(entry.runAtMs)&&
     Object.values(slotStamp(entry.runAtMs,profile.timezone??"America/Los_Angeles")).join(":")===`${date}:${slot}`);
   const markerDir=path.join(root,"startup-retries"),marker=path.join(markerDir,`${date}-${slot}.json`);
   const retryCount=await fs.lstat(marker).then(()=>1).catch(()=>0);
   const checkpoints=await findSlotCheckpoints(root,date,slot);
-  const safe=await repositorySafe(profile.repository,profile.branch);
+  const repository=evidence.repository;
+  const repositorySafe=repository.path===profile.repository && repository.branch===profile.branch &&
+    repository.status==="" && /^[a-f0-9]{40}$/.test(repository.head??"") &&
+    repository.head===repository.upstream;
   const decision=planStartupSlot({now,slot_started_at:matches[0]?new Date(matches[0].runAtMs).toISOString():now,
-    scheduler_runs:matches.map(classifySchedulerReceipt),checkpoints,retry_count:retryCount,repository_safe:safe});
-  if(decision.action!=="retry_publisher_once"||!execute)return{adapter:"startup_slot_watch",...decision,execute:false};
+    scheduler_runs:matches.map(classifySchedulerReceipt),checkpoints,retry_count:retryCount,repository_safe:repositorySafe});
+  if(decision.action!=="retry_publisher_once"||!reserve)return{adapter:"startup_slot_watch",...decision,reserve:false};
   await fs.mkdir(markerDir,{recursive:true,mode:0o700});
   await fs.writeFile(marker,JSON.stringify({schema:"serpsmith.startup-retry.v1",job_id:jobId,date,slot,at:now})+"\n",{flag:"wx",mode:0o600});
-  const triggered=await execFile("openclaw",["cron","run",jobId,"--json"],{timeout:30000,maxBuffer:20000});
-  return{adapter:"startup_slot_watch",action:"publisher_retry_requested",receipt:JSON.parse(triggered.stdout)};
+  return{adapter:"startup_slot_watch",action:"publisher_retry_reserved",job_id:jobId,date,slot};
 }
 
 if(process.argv[1]&&path.resolve(process.argv[1])===path.resolve(new URL(import.meta.url).pathname)){
   const [profilePath,jobId,...flags]=process.argv.slice(2);
-  const positionals=flags.filter(value=>value!=="--execute");
-  watchStartupSlot({profilePath,jobId,date:positionals[0],slot:positionals[1],execute:flags.includes("--execute")})
+  const evidenceIndex=flags.indexOf("--evidence-hex");
+  const encoded=evidenceIndex>=0?flags[evidenceIndex+1]:null;
+  const positionals=flags.filter((value,index)=>value!=="--reserve"&&value!=="--evidence-hex"&&index!==evidenceIndex+1);
+  let evidence;
+  try{
+    if(!encoded || !/^[0-9a-f]{2,500000}$/i.test(encoded))fail("encoded startup evidence required");
+    evidence=JSON.parse(Buffer.from(encoded,"hex").toString("utf8"));
+  }catch{fail("invalid encoded startup evidence");}
+  watchStartupSlot({profilePath,jobId,evidence,date:positionals[0],slot:positionals[1],reserve:flags.includes("--reserve")})
     .then(value=>{process.stdout.write(JSON.stringify(value)+"\n");if(value.action==="owner_review")process.exitCode=2;})
     .catch(error=>{process.stderr.write(JSON.stringify({adapter:"startup_slot_watch",result:"failed",detail:error.message})+"\n");process.exitCode=2;});
 }

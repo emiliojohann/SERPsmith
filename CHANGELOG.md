@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.6.0-beta.3
+
+- Moves startup scheduler and Git command execution to the audited runtime adapter; the bundled watchdog accepts fresh evidence and atomically reserves at most one retry.
+- Removes subprocess execution from the bundled owner-review notifier while preserving receipt-aware notification through injected runtime adapters.
+- Updates the Runtime Doctor to require the evidence and reservation handoff before a publisher retry.
+
 ## v0.6.0-beta.2
 
 - Distinguishes overproduced image batches from missing artifacts and reissues a bounded, early-distinct image request in the same run.
