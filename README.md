@@ -133,10 +133,6 @@ For OpenClaw unattended mode, `plugins/openclaw-serpsmith-guard/` provides guard
 
 A normal chat without repository and execution tools cannot automate the workflow. See `references/compatibility.md` for the exact test-status meaning.
 
-## Security
-
-Never commit credentials, real profiles, local paths, private identifiers, state, drafts, reports, or publishing history.
-
 ## License
 
 SERPsmith is available under AGPL-3.0-only or a separate commercial license.
