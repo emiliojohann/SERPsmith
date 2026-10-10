@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.6.0-beta.2
+
+- Distinguishes overproduced image batches from missing artifacts and reissues a bounded, early-distinct image request in the same run.
+- Prevents an unchanged recovery checkpoint from counting as successful progress.
+- Adds a guarded once-only startup retry for confirmed provider failures before a checkpoint exists.
+- Extends the OpenClaw Runtime Doctor to require the recovery worker, startup watcher, and owner failure-alert wiring for unattended v0.6 installations.
+
+## v0.6.0-beta.1
+
+- Verifies and selects the latest same-site Search Console and GA4 windows for all four site profiles, preventing a stale file reference from driving an existing-page recommendation.
+- Captures query-to-page Search Console rows in new snapshots for evidence-backed cannibalization checks.
+- Adds bounded sitewide technical/content audits, internal-link graphs, directional page opportunities, optional supplied-data competitor gaps, and observed SERP comparisons.
+- Adds a concise multi-site advisory digest without changing scheduling or delivery settings.
+- Checks proposed GA4 outcome events read-only before configuration, and distinguishes missing event setup from a configured event with no observations.
+- Marks Search Console query/page overlap as partial evidence, including when privacy-filtered queries leave a site with no paired rows.
+- Does not claim conversions without verified outcome events, or competitor gaps without actual competitor data.
+
 ## v0.5.0-beta.18
 
 - Splits recovery into bounded publication steps so a stalled step does not hold the whole run until its long timeout.

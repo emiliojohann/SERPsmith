@@ -3,11 +3,11 @@ import path from "node:path";
 
 const rasterExtensions=new Set([".png",".webp",".jpg",".jpeg"]);
 
-export async function correlateGeneratedSources(request, mediaEntries, mediaRoot) {
-  if (!request?.output_filename || !request?.request_token || !request?.requested_at) return null;
-  if (path.basename(request.output_filename) !== request.output_filename) return null;
+export async function inspectGeneratedSources(request, mediaEntries, mediaRoot) {
+  if (!request?.output_filename || !request?.request_token || !request?.requested_at) return {status:"invalid",sources:[]};
+  if (path.basename(request.output_filename) !== request.output_filename) return {status:"invalid",sources:[]};
   const requestedAt = Date.parse(request.requested_at);
-  if (!Number.isFinite(requestedAt)) return null;
+  if (!Number.isFinite(requestedAt)) return {status:"invalid",sources:[]};
   const parsed = path.parse(request.output_filename);
   const generatedStem = parsed.name.slice(0, 60);
   const names = mediaEntries
@@ -24,7 +24,13 @@ export async function correlateGeneratedSources(request, mediaEntries, mediaRoot
     if (path.dirname(real) === mediaRoot) sources.push(real);
   }
   const unique = [...new Set(sources)].sort();
-  return unique.length >= 1 && unique.length <= 4 ? unique : null;
+  if (unique.length > 4) return {status:"overproduced",sources:[],count:unique.length};
+  return unique.length ? {status:"ready",sources:unique,count:unique.length} : {status:"missing",sources:[],count:0};
+}
+
+export async function correlateGeneratedSources(request, mediaEntries, mediaRoot) {
+  const result = await inspectGeneratedSources(request,mediaEntries,mediaRoot);
+  return result.status==="ready" ? result.sources : null;
 }
 
 export function candidateKey(value) {

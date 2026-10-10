@@ -74,6 +74,13 @@ export async function runOne(queueRoot,owner,handlers,{now=new Date().toISOStrin
       return observe(onReliabilityEvent,{site_key:job.site_key,run_key:job.run_key,stage:"image_recovery",failure_class:reviewComplete?"duplicate_image_completion":"image_review_incomplete",outcome:reviewComplete?"recovered":"retrying",occurred_at:new Date().toISOString()},{...result,idempotent_duplicate:true,review_pending:!reviewComplete,...resume});
     }
     await handler(Object.freeze(structuredClone(job)),Object.freeze(structuredClone(checkpoint)));
+    if(job.kind==="stage_resume" && job.payload?.action==="recover_external"){
+      const updated=validateCheckpoint(JSON.parse(await fs.readFile(job.checkpoint,"utf8")));
+      if(updated.run.site_key!==job.site_key||updated.run.run_key!==job.run_key)
+        throw Object.assign(new Error("stage resume changed checkpoint binding"),{retryable:false,failureClass:"checkpoint_binding_mismatch"});
+      if(updated.revision===job.expected_revision)
+        throw Object.assign(new Error("stage resume made no checkpoint progress"),{retryable:true,failureClass:"stage_resume_no_progress"});
+    }
     if(job.kind==="image_recovery"){
       const updated=JSON.parse(await fs.readFile(job.checkpoint,"utf8"));
       validateCheckpoint(updated);

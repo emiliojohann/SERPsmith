@@ -4,7 +4,7 @@ SERPsmith provides multi-platform AI agent support for evidence-led SEO and AI-s
 
 ## Beta status
 
-Version: `v0.5.0-beta.18`
+Version: `v0.6.0-beta.2`
 
 SERPsmith is beta software. The bundled publishing path targets Git-backed Markdown sites with deterministic sitemap updates. Runtime portability is capability-based; each runtime/version must be certified independently.
 
@@ -27,6 +27,8 @@ SERPsmith is beta software. The bundled publishing path targets Git-backed Markd
 - optionally verifies exact GA4 property/hostname access and creates immutable aggregate Organic Search snapshots;
 - records immutable Search Console evidence and approval-gated 7/14/28/90-day article milestones;
 - maintains a private owner image-feedback ledger that excludes repeatedly rejected concept families.
+- selects the newest verified, same-site GSC/GA4 evidence for existing-page reviews;
+- provides advisory site audits, internal-link maps, page-opportunity scoring, and supplied-data competitor/SERP comparisons without automatically editing pages.
 
 ## SEO principles and expectations
 

@@ -28,6 +28,7 @@ for (const job of scheduler.jobs) {
 const selected = [];
 const selectedWorkers = [];
 const selectedLeaseWatchers = [];
+const selectedStartupWatchers = [];
 const seenSites = new Set();
 const seenJobs = new Set();
 for (const pin of binding.publishers) {
@@ -66,6 +67,25 @@ for (const pin of binding.lease_watchers) {
   selectedLeaseWatchers.push({ id: pin.id, enabled: job.enabled, schedule_kind: job.schedule?.kind,
     command: job.schedule?.command, stream_status: job.state?.streamStatus });
 }
+const seenStartupWatchers = new Set();
+for (const pin of binding.startup_watchers ?? []) {
+  if (typeof pin?.id !== "string" || typeof pin.job_id !== "string" ||
+      typeof pin.publisher_job_id !== "string" || typeof pin.profile_path !== "string" ||
+      typeof pin.expected_script !== "string" ||
+      typeof pin.expected_failure_to !== "string" ||
+      typeof pin.expected_schedule?.expr !== "string" || typeof pin.expected_schedule?.tz !== "string" ||
+      seenStartupWatchers.has(pin.id) || seenJobs.has(pin.job_id)) fail(64, "binding_startup_watcher_invalid");
+  seenStartupWatchers.add(pin.id);
+  seenJobs.add(pin.job_id);
+  const job=jobs.get(pin.job_id);
+  if (!job) fail(2,"startup_watcher_missing");
+  selectedStartupWatchers.push({id:pin.id,enabled:job.enabled,payload_kind:job.payload?.kind,
+    script:typeof job.payload?.script==="string"?job.payload.script:"",
+    schedule:{expr:job.schedule?.expr??"",tz:job.schedule?.tz??""},
+    expected_schedule:pin.expected_schedule,publisher_job_id:pin.publisher_job_id,profile_path:pin.profile_path,
+    expected_script:pin.expected_script,
+    failure_alert:job.failureAlert??null,expected_failure_to:pin.expected_failure_to});
+}
 
 const snapshot = {
   schema: "serpsmith.runtime-doctor.v1",
@@ -79,7 +99,8 @@ const snapshot = {
   profiles: binding.profiles,
   publishers: selected,
   recovery_workers: selectedWorkers,
-  lease_watchers: selectedLeaseWatchers
+  lease_watchers: selectedLeaseWatchers,
+  startup_watchers: selectedStartupWatchers
 };
 let tmp;
 try {

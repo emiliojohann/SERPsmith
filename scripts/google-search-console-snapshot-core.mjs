@@ -11,11 +11,12 @@ export async function collectSearchConsoleSnapshot(config,query,generatedAt=new 
   for(const days of WINDOWS){
     const current=range(end,days),preceding=range(end,days,days);
     const request=async(dateRange,dimensions=[])=>query({...dateRange,type:"web",dataState:"final",dimensions,rowLimit:25_000});
-    const [ct,pt,cp,pp,cq,pq]=await Promise.all([request(current),request(preceding),request(current,["page"]),request(preceding,["page"]),request(current,["query"]),request(preceding,["query"])]);
+    const [ct,pt,cp,pp,cq,pq,cqp,pqp]=await Promise.all([request(current),request(preceding),request(current,["page"]),request(preceding,["page"]),request(current,["query"]),request(preceding,["query"]),request(current,["query","page"]),request(preceding,["query","page"])]);
     const pages=(payload)=>new Map((payload.rows||[]).map(x=>[sameSite(x.keys?.[0],config.origin),row(x)]).filter(x=>x[0]));
     const queries=(payload)=>(payload.rows||[]).filter(x=>typeof x.keys?.[0]==="string").map(x=>({query:x.keys[0],...row(x)}));
+    const queryPages=(payload)=>(payload.rows||[]).map(x=>({query:x.keys?.[0],canonical_url:sameSite(x.keys?.[1],config.origin),...row(x)})).filter(x=>typeof x.query==="string"&&x.canonical_url);
     const a=pages(cp),b=pages(pp),urls=[...new Set([...a.keys(),...b.keys()])].sort();
-    windows.push({days,current_range:current,preceding_range:preceding,current_total:row(ct.rows?.[0]),preceding_total:row(pt.rows?.[0]),pages:urls.map(canonical_url=>({canonical_url,current:a.get(canonical_url)||null,preceding:b.get(canonical_url)||null})),queries:{current:queries(cq),preceding:queries(pq)}});
+    windows.push({days,current_range:current,preceding_range:preceding,current_total:row(ct.rows?.[0]),preceding_total:row(pt.rows?.[0]),pages:urls.map(canonical_url=>({canonical_url,current:a.get(canonical_url)||null,preceding:b.get(canonical_url)||null})),queries:{current:queries(cq),preceding:queries(pq)},query_pages:{current:queryPages(cqp),preceding:queryPages(pqp),truncated:(cqp.rows?.length||0)>=25_000||(pqp.rows?.length||0)>=25_000}});
   }
   return{schema:"serpsmith.search-console-snapshot.v1",site_key:config.site_key,public_origin:config.origin,generated_at:generatedAt,aggregate_only:true,windows};
 }

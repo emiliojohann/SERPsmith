@@ -209,13 +209,11 @@ Onboard manually: follow `references/repository-onboarding.md`, `references/agen
 
 SERPsmith provides multi-platform AI agent support through the adapter contract. The agent environment must provide the required tools; chat-only agents or environments missing required capabilities cannot automate the workflow. Keep every platform's test status accurate: OpenClaw is the production-tested reference integration, while Hermes, Grok Build, Claude-based agent environments, ChatGPT agent environments, and others remain certification-pending until their exact setup passes the documented tests. Record title/URL, time/timezone, keyword evidence, metrics when available, configured AI-search readiness without a fabricated score, portable Humanizer version/result without a fabricated score, old-page changes, images/crawlers, notifications, commit/deployment, and failures/recovery in the checkpoint. Give the owner the compact result and any material exception or action. Never expose secrets, credential paths, private identifiers, or secret-bearing URLs.
 
-Keep Telegram publication reports to three plain-text lines with no blank lines on success; add one short Note line only when a material exception, recovery, old-page change, or owner action must be surfaced:
+Keep Telegram publication reports brief and skimmable, whether the publisher or a recovery worker sends them. Do not impose an exact line count. Lead with the article title and canonical link, then summarize the meaningful result in a short sentence. Mention a material exception, recovery, old-page change, or owner action only when it matters. A normal success can look like:
 
-Published: <article title>
-<link>
-Checks: Humanizer <version>; image/live/AI search passed; Google/Bing/IndexNow accepted
-Note: <material exception or action, one short clause; omit otherwise>
+Published: <article title> <link>
+Live page and image checked; search submissions accepted.
 
-Do not list timestamps, commit IDs, keyword evidence, image filenames, dimensions, routine crawler details, or boilerplate limitations in Telegram when checks passed. Keep final failure reports to at most three nonblank lines: Failed with title/stage, Safe state, and Next action. Never send an attempt-level failure while bounded retry or recovery remains available or active. Preserve every required checkpoint and verification detail in durable state even when omitted from Telegram.
+Do not list timestamps, commit IDs, keyword evidence, image filenames, dimensions, routine crawler details, or boilerplate limitations in Telegram when checks passed. A final failure should state the failed stage, safe state, and next action concisely, without a fixed template. Never send an attempt-level failure while bounded retry or recovery remains available or active. Preserve every required checkpoint and verification detail in durable state even when omitted from Telegram.
 
 For unattended OpenClaw delivery, prepare the final report, record `report_prepared`, and call `serpsmith_finalize` in pre-delivery mode. Record `report_delivery_started`, then make one explicit `message` call to the configured owner destination with plain text only: no attachments, media, generated-image references, or file paths. Record `report_acknowledged` with the non-secret message receipt and call `serpsmith_finalize` in complete mode. Only then run retention and return `NO_REPLY`; fallback announcement remains disabled. Do not delete generated sources before acknowledgment.

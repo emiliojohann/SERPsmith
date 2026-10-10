@@ -71,6 +71,11 @@ export function validateCheckpoint(value) {
       refs.add(review.artifact_ref);
     }
   }
+  if (value.data.image_reissues !== undefined) {
+    if (!Array.isArray(value.data.image_reissues) || value.data.image_reissues.length > 2 ||
+        value.data.image_reissues.some(item => !identifier(item?.old_operation_id) ||
+          !identifier(item?.new_operation_id) || !identifier(item?.reason) || !iso(item?.at))) fail("invalid image reissues");
+  }
   if (value.pending_operation !== null) {
     const op = value.pending_operation;
     if (!identifier(op.operation_id) || !identifier(op.capability) || !iso(op.requested_at) || !iso(op.deadline_at)) fail("invalid pending operation");
@@ -127,6 +132,24 @@ export function applyTransition(current, event, now = new Date().toISOString()) 
     next.pending_operation.state = "completed";
     next.pending_operation.artifact = {ref:event.artifact_ref,refs};
     next.lifecycle.state = "running";
+  } else if (type === "image_request_reissued") {
+    const old=current.pending_operation;
+    if (current.lifecycle.state!=="waiting_external" || old?.state!=="requested" ||
+        !["image_generate","image_generation"].includes(old.capability) ||
+        old.operation_id!==event.old_operation_id ||
+        !["image_artifact_timeout","image_batch_overproduced"].includes(event.reason) ||
+        !identifier(event.operation_id) || event.operation_id===old.operation_id ||
+        !iso(event.deadline_at) || Date.parse(event.deadline_at)<=Date.parse(now) ||
+        typeof event.requested_filename!=="string" ||
+        path.basename(event.requested_filename)!==event.requested_filename ||
+        event.requested_filename===old.requested_filename ||
+        (current.data.image_reissues?.length??0)>=2) fail("invalid image reissue");
+    next.data.image_reissues=[...(current.data.image_reissues??[]),{
+      old_operation_id:old.operation_id,new_operation_id:event.operation_id,
+      reason:event.reason,at:now,
+    }];
+    next.pending_operation={...old,operation_id:event.operation_id,requested_at:now,
+      deadline_at:event.deadline_at,requested_filename:event.requested_filename,artifact:null};
   } else if (type === "image_reviewed") {
     if (current.lifecycle.state !== "running" || current.pending_operation?.state !== "completed" ||
         !["image_generate","image_generation"].includes(current.pending_operation.capability) ||

@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import { dispatchEvent } from "./openclaw-image-recovery-dispatch.mjs";
 import { enqueue } from "./durable-work-queue.mjs";
-import { candidateKey, correlateGeneratedSources } from "./image-recovery-correlation.mjs";
+import { candidateKey, inspectGeneratedSources } from "./image-recovery-correlation.mjs";
 
 const runsRoot = path.resolve(process.argv[2] ?? "");
 const mediaRoot = path.resolve(process.argv[3] ?? "");
@@ -143,10 +143,10 @@ function boundedImageDeadline(request) {
   return Number.isFinite(recorded) ? Math.min(recorded, maximum) : maximum;
 }
 
-async function dispatchExpiredRequest(checkpointPath, checkpoint, active) {
+async function dispatchExpiredRequest(checkpointPath, checkpoint, active, failureClass="image_artifact_timeout") {
   if (!dispatch || checkpoint?.schema !== "serpsmith.run-checkpoint.v2") return false;
   const deadline = boundedImageDeadline(active.request);
-  if (deadline === null || Date.now() < deadline) return false;
+  if (deadline === null || (failureClass!=="image_batch_overproduced" && Date.now() < deadline)) return false;
   const revision = Number.isInteger(checkpoint.revision) ? checkpoint.revision : 0;
   const siteKey = checkpoint.run?.site_key ?? checkpoint.site_key;
   const runKey = checkpoint.run?.run_key ?? checkpoint.run_key;
@@ -166,7 +166,7 @@ async function dispatchExpiredRequest(checkpointPath, checkpoint, active) {
       payload: {
         action: "recover_external",
         operation_id: token,
-        failure_class: "image_artifact_timeout",
+        failure_class: failureClass,
         requested_filename: active.request.output_filename,
         effective_deadline_at: new Date(deadline).toISOString(),
       },
@@ -192,11 +192,14 @@ async function scan() {
     const active = activeImageRequest(checkpoint);
     if (!active) continue;
     const { candidate, request } = active;
-    const sources = await correlateGeneratedSources(request, mediaEntries, mediaRoot);
-    if (!sources) {
-      if (await dispatchExpiredRequest(checkpointPath, checkpoint, active)) return true;
+    const inspected = await inspectGeneratedSources(request, mediaEntries, mediaRoot);
+    if (inspected.status !== "ready") {
+      if (inspected.status==="invalid") continue;
+      const failureClass=inspected.status==="overproduced"?"image_batch_overproduced":"image_artifact_timeout";
+      if (await dispatchExpiredRequest(checkpointPath, checkpoint, active, failureClass)) return true;
       continue;
     }
+    const sources = inspected.sources;
     const eventKey = `${checkpointPath}:${request.request_token}:${sources.join("\n")}`;
     const previous = emitted.get(checkpointPath);
     if (previous?.eventKey === eventKey && Date.now() - previous.emittedAt < retryAfterMs) continue;

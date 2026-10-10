@@ -31,6 +31,7 @@ if (!configPath) failUsage();
 let config;
 try { config = readJson(configPath); } catch { failUsage(); }
 if (!config || config.schema !== "serpsmith.runtime-doctor.v1" || !config.release || !config.humanizer || !Array.isArray(config.profiles) || !config.profiles.length || !Array.isArray(config.publishers) || !config.publishers.length || !config.capability_map) failUsage();
+const recoveryV06 = /^v?(?:[1-9]\d*|0\.(?:[6-9]|[1-9]\d+))\./.test(config.release.expected_version??"");
 
 const snapshotAge = Date.now() - Date.parse(config.captured_at);
 add("snapshot_freshness", Number.isFinite(snapshotAge) && snapshotAge >= 0 && snapshotAge <= 15 * 60 * 1000, "refresh_runtime_snapshot");
@@ -137,7 +138,9 @@ if (config.source?.kind === "openclaw_cli") {
     workers.add(worker.id);
     const payload = worker.payload ?? "";
     const bound = worker.enabled === true && worker.agent_id === worker.expected_agent_id && worker.payload_kind === "agentTurn";
-    const contract = ["complete-image-batch.mjs","complete-stage-slice.mjs","660 seconds","review_completed_image","request_distinct_image","image_reviewed"].every(marker => payload.includes(marker));
+    const markers=["complete-image-batch.mjs","complete-stage-slice.mjs","660 seconds","review_completed_image","request_distinct_image","image_reviewed"];
+    if(recoveryV06)markers.push("reissue-image-request.mjs","recover_external");
+    const contract = markers.every(marker => payload.includes(marker));
     const boundedTurn = Number.isInteger(worker.timeout_seconds) && worker.timeout_seconds >= 60 && worker.timeout_seconds <= 600;
     add(`recovery_worker:${worker.id}`,bound && contract && boundedTurn,"review_recovery_worker_payload");
   }
@@ -152,6 +155,26 @@ if (config.source?.kind === "openclaw_cli") {
     add(`lease_watcher:${watcher.id}`, bound, "review_lease_watcher");
   }
   add("lease_watcher_coverage",watchers.size === expected.size && [...expected].every(id => watchers.has(id)),"review_lease_watcher_inventory");
+  if(recoveryV06){
+    const startup=new Set();
+    for(const watcher of config.startup_watchers??[]){
+      if(!watcher || typeof watcher.id!=="string" || !/^[a-z0-9-]+$/.test(watcher.id) || startup.has(watcher.id))failUsage();
+      startup.add(watcher.id);
+      const script=watcher.script??"";
+      const bound=watcher.enabled===true && watcher.payload_kind==="script" &&
+        watcher.schedule?.expr===watcher.expected_schedule?.expr &&
+        watcher.schedule?.tz===watcher.expected_schedule?.tz &&
+        typeof watcher.expected_script==="string" && script===watcher.expected_script &&
+        script.includes("startup-slot-watch.mjs") && script.includes("--execute") &&
+        /\.exitCode\s*!==\s*0/.test(script) && script.includes("throw new Error") && script.includes("json({})") &&
+        script.includes(watcher.publisher_job_id) && script.includes(watcher.profile_path) &&
+        watcher.failure_alert?.after===1 && watcher.failure_alert?.mode==="announce" &&
+        watcher.failure_alert?.channel==="telegram" &&
+        watcher.failure_alert?.to===watcher.expected_failure_to;
+      add(`startup_watcher:${watcher.id}`,bound,"review_startup_watcher");
+    }
+    add("startup_watcher_coverage",startup.size===expected.size && [...expected].every(id=>startup.has(id)),"review_startup_watcher_inventory");
+  }
 }
 
 const failed = checks.filter(check => check.result === "failed");

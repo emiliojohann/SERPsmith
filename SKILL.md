@@ -77,6 +77,8 @@ Record every explicit owner image rejection immediately in the private site-name
 
 Completion: milestone evidence and owner feedback are durable, private, site-isolated, read-back verified, and advisory.
 
+For a sitewide SEO/GEO review, use the optional `references/seo-intelligence.md` workflow. Run its evidence gate, crawl, graph, opportunity, and competitor/SERP comparisons for every authorized site without changing the publication workflow or treating a missing data source as a zero-result finding.
+
 ## 9. Learn from reliability evidence
 
 Follow `references/reliability-intelligence.md`. Record retry, recovery, and terminal outcomes in one private site ledger. Evaluate recurring signatures after each event, summarize unresolved patterns weekly, and surface only a newly eligible owner recommendation or one exhausted terminal failure.
