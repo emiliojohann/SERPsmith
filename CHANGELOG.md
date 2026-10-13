@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.6.0-beta.4
+
+- Resolves hash-backed selected image references through a verified source or image-review sidecar before completed-run retention, preventing cleanup from failing after publication.
+- Adds a version-only runtime compatibility proof when a patch release preserves the installed execution contract.
+
 ## v0.6.0-beta.3
 
 - Moves startup scheduler and Git command execution to the audited runtime adapter; the bundled watchdog accepts fresh evidence and atomically reserves at most one retry.

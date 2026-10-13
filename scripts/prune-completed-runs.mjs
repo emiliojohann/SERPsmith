@@ -66,6 +66,34 @@ const selectedRefs=(images)=>{
   });
   return [...explicit,...selectedStatus.flatMap(sourceRefs),...matching.flatMap(sourceRefs)];
 };
+const selectedEvidence=(runDir,checkpoint,sourceRoots)=>{
+  if(checkpoint?.schema!=="serpsmith.run-checkpoint.v2"||checkpoint?.pending_operation?.state!=="completed")return null;
+  const hashes=[checkpoint.pending_operation.artifact?.ref,...(checkpoint.pending_operation.artifact?.refs??[])].filter((value)=>typeof value==="string"&&/^[a-f0-9]{64}$/.test(value));
+  if(!hashes.length)return null;
+  const evidenceFiles=fs.readdirSync(runDir).filter((name)=>/^image-review[^/]*\.json$/.test(name)||name==="image-production-evidence.json");
+  const selected=[];
+  const reviewed=[];
+  for(const name of evidenceFiles){
+    let evidence;
+    try{evidence=JSON.parse(fs.readFileSync(path.join(runDir,name),"utf8"));}catch{throw failure("image selection evidence unreadable for "+path.basename(runDir));}
+    if(typeof evidence.selected_source==="string"&&evidence.selected_source)selected.push(evidence.selected_source);
+    if(Array.isArray(evidence.reviews))reviewed.push(...evidence.reviews.map((item)=>item?.source).filter((value)=>typeof value==="string"));
+  }
+  if(!selected.length)return null;
+  if(new Set(selected).size!==1)throw failure("image selection evidence conflicts for "+path.basename(runDir));
+  const externalSource=path.resolve(selected[0]);
+  if(!path.isAbsolute(selected[0])||!sourceRoots.some((root)=>inside(externalSource,root)))throw failure("selected source outside allowed roots for "+path.basename(runDir));
+  const stable=walkImages(path.join(runDir,"selected-image")).filter((file)=>path.basename(file).toLowerCase().startsWith("source."));
+  if(stable.length>1)throw failure("multiple retained selected sources for "+path.basename(runDir));
+  const source=fs.existsSync(externalSource)?externalSource:stable[0];
+  if(!source)throw failure("selected source missing for "+path.basename(runDir));
+  const stat=fs.lstatSync(source);
+  if(!stat.isFile()||stat.isSymbolicLink()||!isImage(source))throw failure("selected source is not a regular image for "+path.basename(runDir));
+  const hash=crypto.createHash("sha256").update(fs.readFileSync(source)).digest("hex");
+  if(!hashes.includes(hash))throw failure("selected source hash differs from checkpoint for "+path.basename(runDir));
+  const externalFiles=[...new Set([...reviewed,externalSource])].filter((value)=>path.isAbsolute(value)).map((value)=>path.resolve(value)).filter((file)=>sourceRoots.some((root)=>inside(file,root))&&fs.existsSync(file)&&fs.lstatSync(file).isFile()&&!fs.lstatSync(file).isSymbolicLink()&&isImage(file)&&hashes.includes(crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex")));
+  return {source,externalFiles};
+};
 const exactSource=(runDir,images,retention,sourceRoots,transientRun)=>{
   const retained=typeof retention?.selected_image==="string"?path.resolve(runDir,retention.selected_image):null;
   if(retained&&inside(retained,runDir)&&fs.existsSync(retained)){
@@ -217,7 +245,8 @@ export function pruneCompletedRuns(profilePath,{keep=3,apply=false,sourceRoots=[
     const images=checkpointImages(record.value);
     const present=walkImages(runDir);
     if(!present.length&&!transientRun)continue;
-    const selected=exactSource(runDir,images,record.value?.retention,resolvedSources,transientRun);
+    const evidence=selectedEvidence(runDir,record.value,resolvedSources);
+    const selected=evidence?.source??exactSource(runDir,images,record.value?.retention,resolvedSources,transientRun);
     if(!selected)throw failure("selected source image unresolved for retained run "+record.key);
     const selectedHash=crypto.createHash("sha256").update(fs.readFileSync(selected)).digest("hex");
     const extension=path.extname(selected).toLowerCase();
@@ -225,10 +254,10 @@ export function pruneCompletedRuns(profilePath,{keep=3,apply=false,sourceRoots=[
     const stable=path.join(runDir,stableRelative);
     const removable=present.filter((file)=>path.resolve(file)!==path.resolve(stable));
     const transientExists=Boolean(transientRun&&fs.existsSync(transientRun));
-    const externalFiles=[...new Set(imageRecords(images).flatMap(sourceRefs).flatMap((ref)=>{
+    const externalFiles=[...new Set([...(evidence?.externalFiles??[]),...imageRecords(images).flatMap(sourceRefs).flatMap((ref)=>{
       const candidates=path.isAbsolute(ref)?[path.resolve(ref)]:resolvedSources.map((root)=>path.resolve(root,ref));
       return candidates.filter((candidate)=>resolvedSources.some((root)=>inside(candidate,root))&&!inside(candidate,runDir)&&!(resolvedTransient&&inside(candidate,resolvedTransient))&&fs.existsSync(candidate)&&fs.lstatSync(candidate).isFile()&&!fs.lstatSync(candidate).isSymbolicLink()&&isImage(candidate));
-    }))];
+    })])];
     imagePlans.push({record,runDir,selected,selectedHash,stable,stableRelative,removable,externalFiles,transientRun,transientExists});
   }
 

@@ -59,9 +59,10 @@ After an OpenClaw update, agent/plugin change, or skill relocation:
 2. Inspect every production, monitor, recovery, and stream job. Verify each skill/script path in its payload or stream command exists. Preserve schedule expressions, timezones, enabled states, and delivery settings during diagnosis.
 3. Inspect stream health separately from task-run history. Treat `streamStatus: restarting`, a growing `streamConsecutiveFailures`, or `streamError` as a live failure even when `lastRunStatus` is `ok` from an earlier event.
 4. Check publisher and reconciliation state separately, then classify every site's canonical checkpoints. A green monitor does not prove a broken dispatcher can resume future external operations; confirm no run is stranded.
-5. Invalidate the previous capability certification when the runtime version or resolved skill path changed. Re-run validation and the disposable canary before restoring `unattended-ready` status.
+5. On a runtime-version-only update, run a bounded compatibility gate before changing the capability map. Verify the released installation checksum, managed skill path, Guard version/health, unchanged agent tool and model-policy hashes, actual job paths/schedules/allowlists, stream health, and canonical checkpoint status. Run an isolated no-delivery Guard canary (contained failure, passing command, completion finalizer) and a headless scheduler/script API canary under their actual owner scopes. Record immutable proof with the observed version and pass the fresh live Doctor. Only then atomically extend the map's runtime version; do not edit the number by hand or claim a fresh end-to-end provider test. If any pin changed, any canary failed, or Doctor is not green, leave the old map untouched and route to full review.
+6. A skill relocation or agent, model, host, plugin, tool, permission, or adapter change is material: perform full capability recertification rather than using the version-only extension. Do not change publisher schedules during the check.
 
-Completion: all referenced paths resolve, stream sources remain running, checkpoints have no actionable stranded work, the exact current runtime certification passes, and the canary proves the guarded lifecycle without external delivery.
+Completion: all referenced paths resolve, stream sources remain running, checkpoints have no actionable stranded work, the exact observed runtime has passing baseline-plus-compatibility evidence (or a new full certification), and the canary proves the guarded lifecycle without external delivery.
 
 ## Canary
 

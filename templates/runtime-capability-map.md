@@ -1,6 +1,6 @@
 # SERPsmith runtime capability certification
 
-Use JSON schema `serpsmith.runtime-capabilities.v1`. Certification is bound to the exact agent, runtime version, host, plugin/tool set, model policy, and permissions; repeat it whenever any changes.
+Use JSON schema `serpsmith.runtime-capabilities.v1`. Full certification is bound to the agent, runtime, host, plugin/tool set, model policy, and permissions. A runtime-version-only update may retain baseline fixtures only after an effective post-update compatibility gate proves the pinned contract and stores a version-specific immutable proof. Never relabel old fixture strings as new tests. Material contract drift or a failed gate requires full recertification.
 
 Required runtime identity:
 
@@ -10,6 +10,7 @@ Required runtime identity:
 - `host_id`
 - `certified_at`
 - optional `expires_at`
+- optional `tool_policy_sha256`, `model_policy_sha256`, and `compatibility_proof` for a version-only extension; the proof must name the observed runtime version and successful no-delivery canaries and live Doctor result
 
 Each capability entry contains `status: "passed"`, `effective: true`, and a non-secret `fixture` reference. Unattended certification requires:
 

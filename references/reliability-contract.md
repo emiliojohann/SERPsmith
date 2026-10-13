@@ -67,7 +67,7 @@ A monitor dispatches recovery for `stale_external`, `recovery_required`, overdue
 
 ## Capability admission
 
-Validate the exact agent/runtime/host/tool configuration with `scripts/validate-runtime-capabilities.mjs`. Certification expires after any agent, model, host, plugin, permission, or adapter change. Unattended mode requires effective evidence for filesystem, Git, research, images, HTTP, secrets, content, deploy, notifications, checkpoints, scheduler, tool restriction, and reporting.
+Validate the exact agent/runtime/host/tool configuration with `scripts/validate-runtime-capabilities.mjs`. Certification expires after any agent, model, host, plugin, permission, or adapter change. A runtime-version-only update may carry forward unchanged capability fixtures only with the effective version-specific compatibility proof in `references/openclaw-adapter.md`; it never turns old provider evidence into a new provider test. Unattended mode requires effective evidence for filesystem, Git, research, images, HTTP, secrets, content, deploy, notifications, checkpoints, scheduler, tool restriction, and reporting.
 
 Stored configuration is not effective proof. The reference adapter must run a harmless isolated canary that exercises its real guarded execution and both checkpoint finalization modes. Other runtimes provide equivalent fixtures.
 
