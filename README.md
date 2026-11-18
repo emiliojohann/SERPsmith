@@ -1,139 +1,133 @@
 # SERPsmith
 
-SERPsmith provides multi-platform AI agent support for evidence-led SEO and AI-search publishing on Git-backed websites. An agent can use it when its environment provides the required repository, research, image, network, secret, state, and approval tools.
+SERPsmith is a Hermes-first application for researched blog publishing. It combines source-backed research, drafting and fact-checking, editorial artwork, Git-based publication, public-page verification, search submissions and completion messages in one durable workflow. Manual requests and scheduled articles share the same job store and spending controls.
 
-## Beta status
-
-Version: `v0.6.0-beta.4`
-
-SERPsmith is beta software. The bundled publishing path targets Git-backed Markdown sites with deterministic sitemap updates. Runtime portability is capability-based; each runtime/version must be certified independently.
-
-## What it does
-
-- isolates every site through an external profile;
-- rejects duplicate or cannibalizing topics;
-- creates people-first articles with site-specific guardrails and at most two categories and three tags;
-- adds useful internal links and small reciprocal links with descriptive anchor text when natural;
-- starts with two distinct image concepts, reviews at most four generated candidates, and selects one using a documented rubric;
-- treats one to four correlated files from one image request as reviewable candidates instead of an ambiguous completion;
-- after four candidates, publishes the highest-ranked relevant, safe, technically valid fallback when no candidate clears every aesthetic gate, then discloses the exact exception for owner review;
-- produces an exact 1280 x 720 WebP hero and a locally derived matching JPEG social image;
-- uses a deterministic stage controller, external checkpoints, and a durable leased queue to resume safely;
-- records report-delivery intent before sending so an interruption cannot trigger an automatic duplicate;
-- validates the expected diff before commit;
-- stops on secrets, unsafe claims, dirty/diverged repositories, auth failures, or conflicts;
-- verifies live content, metadata, assets, crawlers, and configured search notifications;
-- validates Google AI features, ChatGPT Search, and Perplexity search readiness from fresh same-site evidence without inventing an LLM score;
-- optionally verifies exact GA4 property/hostname access and creates immutable aggregate Organic Search snapshots;
-- records immutable Search Console evidence and approval-gated 7/14/28/90-day article milestones;
-- maintains a private owner image-feedback ledger that excludes repeatedly rejected concept families.
-- selects the newest verified, same-site GSC/GA4 evidence for existing-page reviews;
-- provides advisory site audits, internal-link maps, page-opportunity scoring, and supplied-data competitor/SERP comparisons without automatically editing pages.
-
-## SEO principles and expectations
-
-SERPsmith applies SEO best practices; it does not promise outcomes. No SEO workflow can guarantee indexing, rankings, traffic, leads, or revenue, and results will vary by site, market, competition, authority, technical health, content quality, and time.
-
-- **Publishing frequency:** There is no universal posting frequency that makes a site rank. For many new or small sites, one thoroughly researched article per week is a sensible operating baseline, not a ranking factor. Configure a sustainable site-specific cadence and increase it only when research quality, originality, review, internal linking, and technical validation remain strong. SERPsmith rejects filler rather than publishing to satisfy a quota.
-- **Internal cross-linking:** New articles should link to genuinely useful existing pages, with small reciprocal links added from older pages when natural. Crawlable links help search engines discover pages and understand their relationship; descriptive anchor text helps readers and search engines understand the destination. SERPsmith avoids forced, repetitive, or irrelevant links.
-- **Best-practice core:** The workflow prioritizes search intent, original value, authoritative evidence, accurate claims, clear structure, useful links, descriptive metadata, canonical and sitemap hygiene, accessible images, technical validation, and live verification. These practices improve eligibility, discoverability, and usefulness; they do not guarantee a particular search result.
-
-See Google's guidance on [helpful, reliable, people-first content](https://developers.google.com/search/docs/fundamentals/creating-helpful-content), [crawlable links and internal linking](https://developers.google.com/search/docs/crawling-indexing/links-crawlable), and the [SEO Starter Guide](https://developers.google.com/search/docs/fundamentals/seo-starter-guide).
-
-## Requirements
-
-- Node.js 20 or later for the publishing runtime;
-- Node.js 22.12 or later when building the bundled OpenClaw Guard plugin;
-- a Git-backed website with a configured branch/upstream;
-- a tool-capable agent with filesystem/Git, web research, image generation, local conversion, HTTP verification, and secret access;
-- the external `blader/humanizer` Agent Skill at reviewed version 2.9.1 or newer;
-- external directories for profiles, state, locks, drafts, and reports;
-- a verifiable deployment path.
-
-Scheduling and final-message delivery are required only for unattended mode.
+**v0.8.0-beta.1** is a beta: website integration and configured external accounts are required. Installation does not start publishing, register a background service or modify a website. See [agent operating instructions](SKILL.md) and the [license](LICENSE).
 
 ## Install
 
-Clone or copy this repository into the skill directory used by your agent runtime. Keep real profiles, credentials, state, and generated operational data outside this repository.
+Use Python 3.11+ in a dedicated virtual environment. From the source repository root, with that environment activated:
 
-Read:
+```sh
+python -m pip install .
+# Alternative: install into an existing environment with uv.
+uv pip install --python /path/to/venv/bin/python .
 
-1. `references/quickstart.md`
-2. `references/humanizer-integration.md`
-3. `references/repository-onboarding.md`
-4. `references/search-engine-onboarding.md`
-5. `references/ai-search-discoverability.md`
-6. `references/google-analytics-onboarding.md`
-7. `references/content-intelligence.md`
-8. `references/site-profile-schema.md`
-9. `references/agent-runtime-onboarding.md`
-10. `references/execution-policy.md`
-11. `references/grok-build-onboarding.md` when using Grok Build
-12. `references/runtime-setup.md`
-13. `references/image-system.md`
-14. `references/troubleshooting.md`
-
-## Safe first run
-
-1. Follow `references/repository-onboarding.md` and add reviewed site repository instructions from `templates/site-repository-instructions.md`.
-2. Follow `references/search-engine-onboarding.md` for Google Cloud/Search Console API, Bing, and IndexNow.
-3. Copy the Git example profile outside the repository.
-4. Replace every placeholder and keep `autopilot_enabled` set to `false`.
-5. Validate the profile:
-
-```bash
-node scripts/validate-profile.mjs /absolute/private/path/site-profile.json
+serpsmith --help
+serpsmith init
+serpsmith blogs add
+serpsmith doctor
+serpsmith status
 ```
 
-6. Ask the agent to run read-only preflight only—no article, repository mutation, push, deployment, search notification, or schedule change.
-7. After preflight passes, prepare one manual article and review the topic, sources, both image concepts, reciprocal links, and complete diff.
-8. Publish only after explicit approval.
+Git and a compatible, authenticated [Hermes Agent](https://hermes-agent.nousresearch.com/docs/) CLI must be available. Hermes is an external application, not an embedded or pinned SDK. Research uses its configured account/model and web search/extraction tools; messaging and subscription artwork need their own configured Hermes capabilities. Installing SERPsmith does not configure those accounts.
 
-The disposable fixture in `examples/demo-site/` can be copied to a temporary local Git directory for practice without a public remote.
+The runtime root defaults to `~/SERPsmith`. Set `SERPSMITH_HOME` or put `--home /path/to/runtime` **before** the command to select another root. Use the same root for every client and service. Keep it outside the source repository. Initialization preserves existing settings; global automation and new blogs' schedules start disabled.
 
-## Bundled adapters
+## Configure a blog
 
-- `scripts/validate-profile.mjs`: structural JSON profile validation; no shell, Git, credential, or network execution.
-- `scripts/markdown-content-adapter.mjs`: creates a Markdown article and updates a simple XML sitemap.
-- `scripts/ai-search-readiness.mjs`: deterministic AI-search evidence validation.
-- `scripts/google-search-console-check.mjs`: read-only Google property/sitemap test.
-- `scripts/google-search-console-snapshot.mjs`: immutable aggregate Search Console 7/14/28/90-day snapshots.
-- `scripts/content-milestones.mjs`: approval-gated article milestone observations.
-- `scripts/google-analytics-check.mjs`: read-only GA4 property/hostname/Data API verification.
-- `scripts/google-analytics-snapshot.mjs`: immutable aggregate Organic Search 7/28/90-day snapshots.
-- `scripts/google-search-console-submit.mjs`: Google sitemap submission adapter.
-- `scripts/bing-webmaster-submit.sh`: portable Bing check/submission adapter.
-- `scripts/indexnow-submit.sh`: explicit-key-file IndexNow check/submission adapter.
-- `scripts/search-onboarding-report.mjs`: sanitized Google, Bing, and IndexNow readiness report.
-- `scripts/run-controller.mjs`: deterministic checkpoint-to-next-action planner.
-- `scripts/durable-work-queue.mjs`: atomic leased work queue with bounded retries.
-- `scripts/durable-worker.mjs`: site/run/revision-bound queue worker harness.
-- `scripts/image-feedback-ledger.mjs`: private owner rejection memory.
-- `scripts/reliability-intelligence.mjs`: bounded, approval-only operational learning.
-- `scripts/validate-execution-policy.mjs`: provider-neutral reasoning, routine, and deterministic task routing validation.
+`serpsmith blogs add` guides terminal onboarding. Agents and noninteractive callers use `serpsmith blogs add --file /path/to/blog.json`; existing blog IDs are not overwritten. `serpsmith blogs list` shows configured blogs, including private configuration, so do not paste its output into public reports.
 
-Git preflight, image generation/conversion, deployment, scheduling, and reporting may be supplied by the agent runtime or separately reviewed adapters.
+Runtime configuration lives in `settings.json` and `blogs/<id>.json`. Each blog requires:
 
-## Content Intelligence
+- An ID, public HTTPS URL, local Git repository, deployment branch and remote.
+- A publisher: `php-posts-data` or `nextjs-tsx-blog-registry`, with a repository-relative `posts_file`.
+- A timezone and `schedule` with `weekdays` (Monday=0 through Sunday=6) and local `time` such as `08:00`.
+- Factual `product` fields: `name`, `description`, HTTPS `url` and a nonempty `verified_capabilities` list. These bound product claims before paid work.
 
-SERPsmith joins Search Console visibility with aggregate GA4 landing-page behavior, then observes a recommendation for at least 7 days and normally 14 before it may become eligible for owner authorization. Stable evidence requires at least two comparable snapshots. Low traffic, volatility, recent deployments, or conflicting signals use the longer window.
+Optional editorial configuration includes audience, topics, guardrails and internal-link requirements. The blog's `image` object supplies dimensions, theme, palette, requirements and `feedback`. `notifications` accepts a Hermes `target` and optional `profile`/`hermes_command`; this messaging profile does not select the research profile.
 
-Eligibility never equals permission. Internal-link additions, small content refreshes, metadata edits, and CTA-copy edits require explicit approval for exact URLs and a proposed diff. After one approved change, SERPsmith measures another 7–14 days before recommending a second optimization to that page. It never uses analytics alone to authorize deletions, redirects, major rewrites, product/template changes, tracking changes, schedule changes, or bulk edits.
+### Website integration
 
-For OpenClaw unattended mode, `plugins/openclaw-serpsmith-guard/` provides guarded shell execution, deliberate exhausted-gate failure, and checkpoint finalization. Production jobs must use a per-job tool allowlist that excludes raw shell/exec/process access. The portable shell wrapper remains a fallback for runtimes without tool restrictions, not equivalent enforcement.
+The two publishers support specific PHP data and Next.js TSX registry layouts, **not arbitrary websites**. Guided onboarding is a starting configuration, not automatic template conversion. Adapt and review the site's registry, article template, asset paths and deployment process before authorizing publication. Publisher configuration can supply `image_directory`, `public_directory`, `articles_directory`, `article_route`, sitemap and discovery-file paths as appropriate to the layout.
 
-## Compatibility
+SERPsmith clones the deployment remote into a job-scoped checkout, commits only the article's declared files and pushes the configured branch. The website's existing deployment process must make that commit publicly available. Configure Git authentication separately, without credentials embedded in remote URLs. Read-only preflight checks the registry and remote branch before research/image spending; it does not prove push permission or successful deployment.
 
-- **OpenClaw:** production-tested reference integration.
-- **Hermes:** designed to work; certification pending.
-- **Grok Build:** designed to work; certification pending. See `references/grok-build-onboarding.md`.
-- **Claude-based agent environments:** designed to work; certification pending.
-- **ChatGPT agent environments:** designed to work; certification pending.
-- **Other AI agent platforms:** designed to work; certification pending.
+New articles include a TL;DR styled from the site's author box and five accessible FAQ accordions styled from its homepage FAQ, with matching FAQPage JSON-LD. Their CSS and progressive FAQ JavaScript are content-addressed, same-origin assets. PHP integration needs the nonce-aware FAQ runtime hook (`SERPSMITH:FAQ-RUNTIME`) in the configured template. Preserve CSP and security headers; do not enable unsafe inline content to bypass an integration failure. Delivered assets and valid schema alone do not prove browser appearance or search rich-result eligibility.
 
-A normal chat without repository and execution tools cannot automate the workflow. See `references/compatibility.md` for the exact test-status meaning.
+### Categories and breadcrumbs
 
-## License
+Opt in with private `publisher.category_navigation`: `categories` maps exactly five stable slugs to five distinct primary labels, and `route` specifies the archive pattern. The current compact breadcrumb verifier expects `/blog/category/<slug>/` archives. Optional `taxonomy_file` and `taxonomy_format` (`php` or `json`) compare a literal site allowlist with this configuration.
 
-SERPsmith is available under AGPL-3.0-only or a separate commercial license.
-See `LICENSE` and `COMMERCIAL-LICENSE.md`.
+Each new article must choose exactly one allowed label. The website must already implement the category archives, visible **Home > Blog > Category** trail above the TL;DR, matching BreadcrumbList and BlogPosting `articleSection`. Enabling the option does not create navigation or convert templates. Keep existing article URLs unchanged; unconfigured blogs are not assigned this taxonomy.
+
+## Private configuration and security
+
+Keep credentials, account/site identities, runtime databases, working material and notification destinations out of source control and public reports. Restrict runtime access to the application user. Configuration written by SERPsmith uses private file permissions; protect manually created files and backups too.
+
+- Dedicated image API authentication currently uses **macOS Keychain**, service `serpsmith-openai-images`, account `serpsmith`. Store the key securely there; there is no portable environment-variable image-key fallback.
+- Google authentication uses `private/google-service-account.json` under the runtime root. Grant that service account the required Search Console/analytics access separately.
+- `private/search-credentials.json` accepts `bing_api_key` and `indexnow_key`, or corresponding `*_keychain` objects with `service` and `account`. Per-site IndexNow keys can live under `sites.<blog-id>`. Keychain references require the macOS `security` tool.
+- Blog `search` settings include `search_console_property`, `sitemap_url`, `bing_site_url` and `indexnow_key_location` as needed. The IndexNow key file must be hosted on the configured site; SERPsmith does not provision it.
+
+`doctor` checks local dependencies, configuration, paths and credential/target presence. It does **not** verify live account authorization, provider availability, deployment, search acceptance or message delivery. Do not expose raw configuration or error payloads while diagnosing a failure.
+
+## Manual articles
+
+```sh
+# Queue only: no research, image spending, publication or messages.
+serpsmith run --blog BLOG --topic 'An evidence-led topic' --request-key REQUEST_ID
+
+# Execute the authorized request, including external effects.
+serpsmith run --blog BLOG --topic 'An evidence-led topic' --request-key REQUEST_ID --publish
+
+# Resume the same job.
+serpsmith retry JOB_ID --publish
+```
+
+`--publish` authorizes the full pipeline, including model/provider calls; it is not just a final website-write switch. Without it, `run` creates/reuses a job and `retry` returns the existing job without executing it. This is not a draft-preview mode. Omit `--topic` to let research select a topic from the blog's context.
+
+Reuse a stable `--request-key` for the same request. Without a key, every manual `run` creates a new job. Manual requests work any day/time, even when automatic calendars are paused; they do not consume scheduled slots.
+
+Research uses fetched source passages rather than snippets alone. New drafts use prose and lists instead of Markdown/HTML tables, start with a useful lead, include contextual links to real internal pages and finish substantive prose with a factual, topic-specific product connection. A plain-text TL;DR and exactly five distinct plain-text FAQ pairs accompany the body, with FAQ immediately before Sources. External body and Sources links receive `nofollow noopener noreferrer`. Structural validation and model fact-checking do not guarantee factual accuracy; review the editorial policy and published result.
+
+## Scheduled operation
+
+```sh
+serpsmith schedule resume --blog BLOG
+serpsmith schedule resume
+serpsmith tick --publish
+
+# Foreground loop; register separately with your operating system if wanted.
+serpsmith service --publish --interval 60
+
+serpsmith schedule pause --blog BLOG
+serpsmith schedule pause
+```
+
+New scheduled articles require both global automation and the blog's calendar to be enabled. `schedule` changes those switches only; it does not install a service. Run one scheduler against the shared runtime root, not a second agent-owned publishing loop.
+
+A tick admits today's due local-time slot, not older missed dates. Slot identity deduplicates repeated ticks and daylight-saving repeated clock times. Safe pre-publication failures have bounded delayed retries. `tick` without `--publish` can still create queued scheduled jobs when calendars are enabled; it is not a read-only status check.
+
+With `--publish`, ticks also process safe post-publication follow-ups and due reminders **even when article calendars are paused**. To prevent all further service-driven effects, stop the service; calendar pause alone is insufficient. `settings.json` can disable automatic reminder delivery with `reminders_enabled: false`.
+
+## Artwork and spending
+
+Artwork tries the configured fixed route order: dedicated OpenAI 2.6 API, dedicated OpenAI 2.5 API, then the Hermes-managed Codex subscription image provider. Availability, entitlement and compatible Hermes/plugin contracts are prerequisites, not guarantees. The application does not switch global Hermes providers.
+
+Automatic artwork shares a maximum of four attempts per article across initial and correction work. Defaults are a $2 article admission cap and $50 UTC-month cap, configurable in `settings.json`. Failed, pending and unknown attempts remain charged conservatively. Reservations estimate cost; they are not a provider-enforced billing ceiling. An optional site-default fallback must be explicitly configured with a matching hash; it is not silently substituted for a personally requested new image.
+
+Image-only requests use operator APIs, **not an image CLI command**. A trusted operator records explicit approval with `Store.authorize_manual_image` on the original article job and passes its returned ID as `manual_request_id` to `images.generate`. One authorization permits one successful candidate through at most three distinct routes, with a separate bounded budget and the same monthly accounting. Reuse the authorization on resume; never reset prior charges or create a replacement article to bypass limits. `images.generate` is text-only; reference-image editing is not exposed by this API. Generation does not itself approve or deploy an image-only replacement.
+
+## Recovery, search and retention
+
+The runtime's `data/serpsmith.sqlite` holds jobs, effect identities, locks, image accounting and a compact publication index. Temporary research, articles, artwork and isolated checkouts live in `work/<job-id>/`.
+
+- Publication intent is recorded before dispatch. Retry reconciles saved intent/commit and verifies the public target; unresolved outcomes stop rather than blindly publishing twice. A Git push alone is not verified publication.
+- After a crash, confirm the prior worker has stopped before using `serpsmith recover JOB_ID --confirm-worker-stopped`. This releases the lock only; it preserves effect and spending history. Then resume with `retry`, not a new job.
+- After verified durable publication, full article/research/image state and the job work directory are removed. Compact URL/title/date, identity, accounting and effect metadata remain. Failed/uncertain work is retained for reconciliation. Retrieve accepted content later from the website or its repository. Ordinary filesystem deletion and SQLite updates are not forensic secure erasure; external provider caches and backups are outside this cleanup.
+- Google Search Console receives a sitemap submission, Bing receives the article URL, and IndexNow receives a URL notification. Accepted submissions are **not indexing confirmation**. No Google direct-indexing or ranking guarantee is provided.
+- Failed search services have finite, delayed, selected-service retries. Missing configuration waits for a detectable configuration change. Accepted or unknown submissions are not automatically replayed. Post-publication recovery uses compact URL records, not a regenerated article.
+- Completion messages report title, URL and each search outcome. A Hermes provider acknowledgment is not proof a recipient read the message. Ambiguous delivery or exhausted follow-ups require reconciliation; `followup_required` does not necessarily mean the article is unpublished.
+
+## Review reminders
+
+```sh
+serpsmith reminders
+serpsmith reminders --send --publish
+serpsmith reminders --ack REMINDER_KEY
+```
+
+Default 30/60/90-day check-ins are grouped by blog and deduplicated before delivery. Listing reminders does not send them; acknowledgment records operator handling, not a claimed send. Pending/unknown delivery is not blindly repeated. Publications without a known date have no invented reminder dates. Reminders do not rewrite articles or automatically improve content.
+
+Optional Search Console/GA4 observations can inform topic selection when `search.advisory_enabled` or `analytics.advisory_enabled` is set and access is configured. They remain advisory, not source evidence or a promise of traffic gains. There is no universal website compatibility or unattended-operation certification: qualify your own accounts, integration and deployment before relying on the service.

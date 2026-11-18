@@ -1,98 +1,86 @@
 ---
-name: "serpsmith"
-description: "Publish SEO articles, verify unattended health, and gate source-to-runtime releases."
+name: serpsmith
+description: "Use when publishing researched blog articles with SERPsmith."
 ---
 
-# SERPsmith
+# SERPsmith operating instructions
 
-Publish evidence-led, AI-search-ready articles to one authorized Git-backed site through a certified runtime adapter. OpenClaw is the first production-tested adapter, not the product boundary.
+Use the installed `serpsmith` CLI and the application's shared Store/pipeline for manual and scheduled publishing. See [setup and capabilities](README.md). Resolve the runtime root from `--home` or `SERPSMITH_HOME` (default `~/SERPsmith`); keep all clients on the same root. Do not create a separate agent-owned publisher or spending ledger.
 
-## 1. Load and bind one site
+## Establish scope and readiness
 
-Read `references/core-policy.md` and its task-routed references. Load one external JSON profile and run `node scripts/validate-profile.mjs PROFILE`. Verify repository instructions, site/branch/upstream, clean tree, content/image/discovery paths, deployment, authorization, external state roots, and secret access without printing values. Stop on mismatch, unknown state, dirty/diverged work, missing ownership, or unresolved configuration.
+- Honor the user's named blog, topic and authorized effects. Observation, article execution, image generation and image deployment are different scopes. A status request does not authorize `run`, `retry` or `tick`.
+- Use `serpsmith status` for job/calendar/publication summaries. `serpsmith doctor` checks local setup only, not live provider authorization, deployment, search or messaging. These commands may initialize local storage; do not treat them as filesystem-read-only probes.
+- `serpsmith blogs add` guides terminal setup; `serpsmith blogs add --file FILE` supports noninteractive onboarding. Keep blog configuration, credentials, destinations, databases and working material private. Avoid publishing full blog listings or raw job/configuration payloads.
+- Confirm website compatibility before execution. The PHP and Next.js publishers require their supported registry/template layouts, configured Git target and working external deployment. Setup does not convert arbitrary templates or install category archives. A successful local check is not live qualification.
 
-Completion: one validated profile, one stable site/slot/run key, one external lock, and no unrelated changes.
+## Manual publication
 
-## 2. Admit the runtime
+For an authorized article execution:
 
-Map native tools or wrappers to `references/adapter-contract.md`. Complete an exact runtime certification using `templates/runtime-capability-map.md` and validate it with:
+```sh
+serpsmith run --blog BLOG --topic 'Requested topic' --request-key STABLE_REQUEST_ID --publish
+```
 
-    node scripts/validate-runtime-capabilities.mjs MAP unattended
+Reuse that key when continuing the same request; use a new key for a genuinely new article request. Without a key, another `run` creates another job. Resume an existing job with:
 
-Bind certification to the exact agent, runtime, host, model policy, tools, and permissions. A change to the agent, host, model policy, tools, permissions, plugin, adapter, or installed skill requires full recertification. A runtime-version-only update may extend the existing certification through the post-update compatibility gate in `references/openclaw-adapter.md`: it must prove the unchanged pinned contract, run isolated no-delivery Guard and scheduler canaries, pass the live Doctor, and record immutable version-specific evidence before changing the map's observed runtime version. A failed or incomplete gate leaves the previous certification unchanged and unattended readiness pending. Unattended certification needs effective passing and safe-failure fixtures; stored configuration is not proof. A runtime that cannot restrict unsafe actions remains manual-only.
+```sh
+serpsmith retry JOB_ID --publish
+```
 
-Use the provider-neutral classes in `references/execution-policy.md`. Run reconciliation, analytics collection, image correlation, and retention as deterministic processes. Reserve agent turns for reasoning or bounded routine work, and certify every model/context policy. A runtime with one model maps both agent classes to its certified default.
+Without `--publish`, these commands do not research, spend, publish or send messages; they are not a preview-generation mode. With it, the entire pipeline may perform external effects. Manual jobs are independent of automatic calendar pauses, run any day/time and do not consume scheduled slots.
 
-Completion: every required capability is proven for the exact runtime and mode, and every configured runtime path resolves from the live installation.
+Preserve pending, accepted and unknown effect identities. Never delete effects, reset image charges or create another job to obtain a cleaner outcome. If publication or delivery may already have occurred, reconcile the original target before retrying.
 
-## 3. Create or resume canonical state
+## Editorial contract
 
-Use `scripts/checkpoint-state.mjs`, `scripts/run-controller.mjs`, and `references/reliability-contract.md`. New runs write only `serpsmith.run-checkpoint.v2` under `serpsmith-core-v27`. Let the deterministic controller choose one next stage, queue it with `scripts/durable-work-queue.mjs`, and execute the leased action through `scripts/durable-worker.mjs`; never duplicate an article, image request, commit, notification, or report. Every transition supplies the expected revision and uses the atomic writer.
+- Use fetched source passages, not search snippets or invented citations. Treat analytics as advisory only. Do not fabricate facts to keep an unsupported topic.
+- Require factual private `product` name, description, HTTPS URL and `verified_capabilities`. Use only verified capabilities in product claims; do not add medical or other unsupported promises.
+- New articles use prose, simple bullets or numbered lists, not Markdown/HTML tables. Preserve meaningful comparisons and qualifications. Genuine inline/fenced code is not table prose. Do not rewrite accepted articles to enforce new-draft rules.
+- Start body prose with a useful lead, not a duplicate title. Include contextual internal links to observed real pages and a topic-specific product connection before FAQ and Sources. Render every external body/Sources link with `nofollow noopener noreferrer`.
+- Keep `tldr` and `faq` separate from `body_markdown`: plain-text TL;DR of 1–600 characters and exactly five distinct FAQ pairs, each containing only `question` (1–240 characters) and `answer` (1–1200). No markup, links, blank values or near-duplicate questions. Humanize and fact-check these alongside the body; structural checks do not prove factual accuracy.
+- Use renderer-owned escaped markup. Put the TL;DR below article navigation and before prose, styled from the site's author box. Put the FAQ immediately before Sources, after the product closing, styled from the site's homepage FAQ with a left-aligned article H2. Visible FAQ copy and FAQPage schema must agree.
+- Preserve accessible single-open FAQ behavior and reduced-motion handling. Use content-addressed same-origin CSS/JS and the PHP nonce-aware runtime hook where applicable. Preserve CSP and security headers; never weaken them to pass verification. Delivered markup/assets alone are not visual acceptance or rich-result eligibility.
+- Categories are opt-in through private `publisher.category_navigation`: exactly five allowed slug/label pairs and one allowed primary label per new article. Verify the site's allowlist, real archives, compact Home > Blog > Category breadcrumb and matching BreadcrumbList/BlogPosting schema. Current compact verification expects `/blog/category/<slug>/` archive links. Do not invent fallback labels, transplant another blog's taxonomy or change existing article URLs.
 
-Treat the checkpoint as publication truth. Scheduler results, agent-turn results, provider responses, and process exits are evidence only.
+## Artwork and image-only requests
 
-Completion: the checkpoint validates and identifies the earliest incomplete phase.
+Follow the fixed dedicated OpenAI 2.6 API → dedicated OpenAI 2.5 API → Hermes-managed Codex subscription route order. Dedicated API keys require macOS Keychain; subscription fallback requires a compatible authenticated Hermes image provider. Do not change global provider configuration or use the image key for research.
 
-## 4. Research and prepare the article
+Automatic artwork shares the original job's four-attempt maximum and article/monthly admission budgets. Failed, pending and unknown attempts remain charged. Honor private image dimensions, theme, palette, requirements and feedback; inspect actual pixels when image review is requested. Do not invent repeated paid aesthetic iterations. A configured hash-bound default is an explicit fallback, not a newly generated candidate.
 
-Inventory posts, slugs, links, and the six latest images. Use configured Search Console, aggregate GA4, AI-search readiness, free demand signals, and authoritative sources. Label unmeasured demand as directional. Record intent, fit, cannibalization risk, citations, links, metadata, taxonomy, CTA, image direction, and alt text. Never invent evidence or product behavior.
+An explicitly requested image-only candidate uses the original job and actual user approval through operator APIs, not a nonexistent CLI subcommand:
 
-Draft to the site adapter, then discover and read the installed portable `blader/humanizer` skill. Verify its `metadata.version` is 3.1.0 or newer before the embedded editorial pass; stop and report a missing or older skill instead of claiming the pass. Preserve facts, citations, exact product terms, structured data, and standard English Title Case H2/H3 headings. Rerun factual, citation, link, heading, metadata, and product-claim checks, and report the version actually used.
+```python
+authorization = store.authorize_manual_image(
+    original_job_id, stable_request_key, approval_reference
+)
+receipt = images.generate(
+    blog, article, workdir, store, original_job_id,
+    correction_key=stable_correction_key,
+    manual_request_id=authorization['id'],
+)
+```
 
-Completion: sourced prose and the site package pass validation without unrelated edits.
+Here `store` is the shared application Store and `images` is `serpsmith.images`; resolve blog/article/workdir in the authorized runtime context. One authorization permits one successful candidate through at most three distinct routes. Its budget cannot exceed the configured article cap; shared monthly accounting still includes it. Reuse the same authorization/effect on resume. A genuinely new user request may authorize another candidate; it does not erase earlier charges. Automatic corrections without manual authorization remain in the original automatic bucket.
 
-## 5. Generate and validate images
+`images.generate` accepts text-only generation, not reference-image edits. Do not pass unsupported reference arguments or silently substitute text-only generation for a localized edit. Report this limitation when it blocks the requested work. Generation does not approve or deploy a replacement: obtain the required scope, preserve article prose/URL, verify the exact replacement and do not rerun research or search submissions just to change artwork. After publication cleanup, retrieve accepted content from the site/repository rather than regenerating it.
 
-Follow `references/image-system.md`. Build two meaningfully different concepts from the article and recent-image conflict list. Prefer literal or functional clarity. Request one standalone, full-frame scene per returned file; never ask a provider to compose multiple concepts or candidate views into one image. Inspect originals and every configured desktop hero, mobile hero, card, and social crop. Produce the exact formats/dimensions, strip metadata, never stretch, and keep candidates internal.
+## Scheduling and reminders
 
-Review at most four generated candidates. Treat one provider operation that returns one to four correlated files as a bounded candidate batch, not an ambiguous result; each file must itself be one usable article image. A contact sheet or split-screen collage is a severe defect, not a fallback candidate. If no candidate passes every quality gate after four reviews, select the highest-ranked fallback-eligible image and continue publication. Stop for an image only when every reviewed candidate fails a hard safety, truthfulness, branding/text, severe-defect, or technical asset gate.
+Enable approved calendars with `serpsmith schedule resume --blog BLOG` and `serpsmith schedule resume`. Pause with the corresponding `pause` commands. These only change calendar switches; they do not register a background service. Use one separately supervised `serpsmith service --publish --interval 60`, not a competing agent cron publisher.
 
-Before an asynchronous provider call, record `external_requested` with operation ID, capability, candidate or bounded batch label, bounded filename, request time, and deadline. End the turn in `waiting_external`. Assign exactly one runtime completion owner. After entering `waiting_external`, the original publisher must ignore generic provider-completion callbacks; only the declared completion adapter may correlate the bounded result, record `external_completed` for the selected artifact, and resume the same run. Provider or scheduler success never means publication success. OpenClaw follows `references/openclaw-adapter.md`.
+`tick --publish` admits today's due local-time slot with repeated-slot deduplication, including repeated daylight-saving times; it does not backfill older dates. `tick` without `--publish` can still queue jobs. Use `status`, not `tick`, to inspect without admitting work.
 
-Completion: one selected, responsive, technically valid image pair is recorded.
+Published-job follow-ups and due reminders run with `--publish` independently of article-calendar pauses. Stop the service to halt all service-driven effects. `reminders_enabled: false` disables automatic reminder delivery, not article execution.
 
-## 6. Validate, publish, and verify
+`serpsmith reminders` lists consolidated due metadata. `serpsmith reminders --send --publish` explicitly delivers; `serpsmith reminders --ack KEY` acknowledges operator handling without claiming a send. Default check-ins are at 30/60/90 days, skip unknown publication dates and never rewrite content. Unknown/pending sends require reconciliation rather than replay.
 
-Run site checks, expected-diff validation, secret/privacy scan, image checks, configured build/lint/type checks, and AI-search readiness. Create one focused normal commit and push without force. Verify deployment, article, canonical, metadata, sitemap/discovery files, links, assets, crawlers, and search notifications. For ordinary articles, Google notification means a successful Search Console sitemap submission through the bundled adapter with HTTP 204 evidence; never call Google's JobPosting/livestream Indexing API, and never pass the Google gate from a rejected response. Resume only incomplete post-push gates.
+## Recovery and completion
 
-Use structured retry classes from `references/adapter-contract.md`. Retry only transient or correctable attempts. Preserve state on concurrent upstream work, then fast-forward and revalidate when safe. Never resolve conflicts or absorb unrelated changes without explicit owner direction.
-
-Completion: every canonical publication gate is true.
-
-## 7. Acknowledge reporting and reconcile
-
-Prepare the concise report and record `report_prepared`. Record `report_delivery_started` before the notification adapter call, then record `report_acknowledged` with its non-secret receipt. Never automatically resend a delivery whose started state has no receipt; classify it as ambiguous for bounded receipt reconciliation. Run the completion finalizer only after acknowledgment.
-
-Run `node scripts/checkpoint-state.mjs classify CHECKPOINT` from an independent monitor. Dispatch bounded recovery for `stale_external`, `recovery_required`, and overdue `report_pending` without notifying the user while a matching recovery is available or active. Send one final error only when recovery is unavailable, unsafe, or exhausted. The monitor never mutates repositories. A run is green only when classification is `complete`.
-
-After acknowledged delivery, run retention from `references/retention.md`: keep the latest three completed runs per site and only each selected source image.
-
-Completion: checkpoint is `complete`, delivery is acknowledged exactly once, retention is recorded, and the repository is clean/synchronized.
-
-## 8. Measure milestones and owner feedback
-
-Create immutable aggregate Search Console snapshots with `scripts/google-search-console-snapshot.mjs` and evaluate published URLs at 7, 14, 28, and 90 days with `scripts/content-milestones.mjs`. Combine these observations with GA4 and require the existing Content Intelligence observation and owner-authorization gates before any existing-page change.
-
-Record every explicit owner image rejection immediately in the private site-namespaced ledger through `scripts/image-feedback-ledger.mjs`, including post-publication feedback. Preserve the concrete reason, map it to a stable concept family and reusable constraint, read it back before replacement generation, and apply every relevant constraint to both briefs. Verify the entry before reporting completion. Exclude a concept family after two rejections until the owner clears it. Keep the ledger outside website repositories; memory, chat, and replaced assets are not substitutes.
-
-Completion: milestone evidence and owner feedback are durable, private, site-isolated, read-back verified, and advisory.
-
-For a sitewide SEO/GEO review, use the optional `references/seo-intelligence.md` workflow. Run its evidence gate, crawl, graph, opportunity, and competitor/SERP comparisons for every authorized site without changing the publication workflow or treating a missing data source as a zero-result finding.
-
-## 9. Learn from reliability evidence
-
-Follow `references/reliability-intelligence.md`. Record retry, recovery, and terminal outcomes in one private site ledger. Evaluate recurring signatures after each event, summarize unresolved patterns weekly, and surface only a newly eligible owner recommendation or one exhausted terminal failure.
-
-Reliability intelligence may propose a reviewed change but never modify code, configuration, schedules, runtime, websites, or release state. Record the owner's decision.
-
-Completion: recurring operational failures produce bounded, evidence-backed, approval-only recommendations.
-
-## Runtime status
-
-OpenClaw is the production-tested reference adapter. Every other runtime remains certification-pending until its exact capability map and end-to-end canary pass; documentation is not certification.
-
-## Product release authorization
-
-Treat source, distributable, and installed-runtime releases as separate mutations. Source work authorizes only the source destination unless the same user message explicitly names distribution or runtime activation. Plans, earlier source completion, and "continue" language do not grant promotion authority. After a source release, report and wait for new approval naming the next destination before any mutation; ask when ambiguous.
-
-Completion: the recorded user approval names the exact release destination before the first mutation to that destination.
+- After a crash, confirm the old worker is stopped before `serpsmith recover JOB_ID --confirm-worker-stopped`; it releases the lock without erasing effects. Resume the original job with `retry`.
+- A commit/push is not verified publication. Verify the exact public canonical, article content, assets and required schema/security properties. Keep uncertain publication intent and work available for reconciliation; never blindly push again.
+- After verified durable publication, the pipeline removes full article/research/image state and the job checkout/work directory. Keep compact publication/effect/accounting metadata, not an archive of recent drafts. Ordinary deletion is not forensic secure erasure and does not clean external provider caches/backups.
+- Repair post-publication failures through URL-only follow-ups. Google receives a Search Console sitemap submission, Bing the article URL and IndexNow a URL notification. Finite retries target explicit failures; missing configuration waits for a detectable change. Never replay accepted/unknown submissions or republish to repair reporting.
+- Report the title, one verified live URL, plain-language Google Search Console/Bing/IndexNow outcomes and any actionable exception. Acceptance is not indexing, rankings or traffic proof. Hermes acknowledgment is not recipient readback. If the pipeline already delivered the completion message, do not send a duplicate report.
+- `followup_required` can describe an already-live article with unfinished search/messaging. Distinguish generated, committed, pushed, publicly verified and delivered states. State unresolved beta/integration limits plainly; never claim universal provider or unattended-site support.

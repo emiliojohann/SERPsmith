@@ -14,22 +14,37 @@ credentials*.json
 service-account*.json
 secrets/
 
-# Private site configuration and operational data
-site-profiles/private/
-runtime/
-state/
-drafts/
-history/
-reports/
-generated/
+# Runtime/operator data never belongs in source control
+/private/
+/blogs/
+/settings.json
+/data/
+/work/
+/runtime/
+/state/
+/drafts/
+/history/
+/reports/
+/generated/
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.db
 
-# Local tool state
-.openclaw/
+# Local Python environments and generated build/cache material
+.venv/
+.python/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+*.whl
+
+# Local agent/editor state
 .hermes/
 .idea/
 .vscode/
-
-# OpenClaw guard plugin build state
-plugins/openclaw-serpsmith-guard/node_modules/
-plugins/openclaw-serpsmith-guard/dist/
-plugins/openclaw-serpsmith-guard/*.tgz
